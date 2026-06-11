@@ -1,0 +1,859 @@
+---
+title: "Transcriptomics Practical"
+subtitle: "scRNA Analysis"
+author: "Stevie Pederson"
+institute: "Adelaide University & Black Ochre Data Labs"
+bibliography: 'assets/references.bib'
+format: 
+  html: 
+    toc: true
+    toc-depth: 3
+---
+
+# Introduction
+
+Today we'll look at working with scRNA data, after alignment and assignment of reads to genes.
+The data we'll work with was generated using the 10X Genomics Chromium system (i.e. a droplet-based protocol) followed by the Cell Ranger pipeline, and is available from the 10X Genomics website.
+This pipeline has already aligned reads to the genome using STAR and counted individual UMIs for each gene.
+All reads were obtained from Peripheral Blood Mononuclear Cells (PBMCs) from a single healthy donor.
+A summary of the Cell Ranger output can be found [here](http://cf.10xgenomics.com/samples/cell-exp/3.0.0/pbmc_1k_v3/pbmc_1k_v3_web_summary.html)
+
+In addition to the above all barcodes returning a UMI count of zero have been removed, ensuring the data is a little smaller and more workable than the original (>300,000 barcodes).
+
+
+## Outline
+
+Today we'll go through some QC steps with the aim of defining clusters that represent individual cell types within the original sample.
+Once we've obtained the clusters, we'll try and identify marker genes for each cell-type.
+Along the way we'll also explore multiple approaches for visualising scRNA data.
+
+## Setup
+
+Let's create a new R Project called `scRNA` inside your transcriptomics folder.
+Making sure you are in the correct project folder, create a new directory called `data`
+
+```bash
+mkdir data
+```
+
+<!-- THESE LINKS NEED CHANING ONCE VMs ARE CONFIGURED -->
+Once you've formed this folder and project, head to the `Terminal` and using bash, download today's data from [this link](data/scrna_practical_data.tar.gz) using `wget`.
+
+Once you have obtained this file, please extract it using the following command.
+
+```bash
+cd data
+tar -xzvf scrna_practical_data.tar.gz
+```
+
+This should produce a folder called `raw_feature_bc_matrix` and inside that folder will be three files.
+Please check that you have everything required using the following command **in the bash Terminal** (not the R Console).
+
+```bash
+ls -alh data/raw_feature_bc_matrix
+```
+
+```{bash, echo = FALSE}
+ls -alh data/raw_feature_bc_matrix | sed -r 's/(stevie)(.+)(stevie)/my_userid\2myuser_id/g'
+```
+
+
+After this, please check the `md5sum` for each file to ensure that the data has transferred correctly.
+Your values should match the following output exactly.
+These are checksums (or mds5sums) which will be different to the values shown below if any content within a files has changed.
+
+```{bash}
+md5sum data/raw_feature_bc_matrix/*
+```
+
+## R Markdown
+
+Now that we've made sure we have the correct data for today, and that everything is in the correct place, let's begin our R Markdown document.
+Once you've finished your `YAML` header, here are my `setup` and `loadPackages` chunks.
+
+```{r setup, echo=TRUE}
+knitr::opts_chunk$set(
+    echo = TRUE, 
+    message = FALSE, 
+    warning = FALSE,
+    fig.align = "center"
+)
+```
+
+```{r customSetup, echo=FALSE}
+knitr::opts_chunk$set(
+    results = "hide",
+    fig.show = "hide"
+)
+if (interactive()) setwd(here::here("practicals"))
+```
+
+```{r loadPackages}
+library(tidyverse)
+library(scales)
+library(DropletUtils)
+library(scater)
+library(scran)
+library(scDblFinder)
+library(rtracklayer)
+library(patchwork)
+theme_set(theme_bw())
+```
+
+If any of the above packages are not installed on your VMs, please install using `BiocManager::install("pkgName")`.
+
+## Data Import
+
+The basic R object structure that we work with for scRNA data is known as a `SingleCellExperiment` object.
+Once again, this is an `S4` object so the structure is fairly inflexible, and with good reason.
+Given that the output from the 10X Genomics `CellRanger` pipeline is fairly common, we can import these directly using the function `read10xCounts()`.
+This will take 20-30 seconds to run.
+
+```{r sce, cache=TRUE, results='markup'}
+sce <- read10xCounts("data/raw_feature_bc_matrix")
+sce
+```
+
+Take a moment to look at all the information printed to the screen
+
+::: {.callout-important}
+*In this initial object, how many genes do we have and many cells do we have?*
+:::
+
+<!-- Insert a section here describing rowData & colData as the core concepts in SummarizedExperiment objects -->
+
+Now we have our object imported, we should be setup and ready to start the filtering.
+
+
+# Data Pre-Processing
+
+## Barcode Ranks
+
+The first step in any scRNA analysis is to remove empty droplets which really means remove barcodes for which no cellular information was obtained.
+The GEMs may have not had a cell, may have had free RNA or the library preparation may have just failed for some other reason.
+The most common approach is to rank each cell by the total counts and find where the clear dropoff in counts is that is likely to represent empty cells.
+
+```{r bcRanks, cache=TRUE}
+bcRanks <- sce %>%
+  counts() %>%
+  barcodeRanks()
+bcRanks
+```
+
+This gives a `DataFrame` with each barcode's rank and the total UMI count associated with each barcode.
+Hidden inside this object is a metadata element, which we can access using  `metadata()`.
+The values for `knee` and `inflection` refer to the points 1) where the UMI counts being to drop off, and 2) where the drop begins to flatten out again.
+The most informative of these is the `knee` and gives an initial idea as to how many cells we may retain as informative.
+
+```{r}
+metadata(bcRanks)
+```
+
+```{r}
+bcRanks %>% subset(total > metadata(.)$knee)
+```
+
+We can see this visually, and it seems like we may lose a few informative cells if we use this as out initial filter.
+
+```{r}
+bcRanks %>%
+  subset(total > 1) %>%
+  as.data.frame() %>%
+  ggplot(aes(rank, total)) +
+  geom_point(alpha = 0.5) +
+  geom_hline(
+    yintercept = metadata(bcRanks)$knee,
+    linetype = 2,
+    colour = "green"
+  ) +
+  geom_hline(
+    yintercept = metadata(bcRanks)$inflection,
+    linetype = 2,
+    colour = "red"
+  ) +
+  scale_x_log10(label = comma) +
+  scale_y_log10(label = comma) +
+  labs(x = "Barcode Rank", y = "Total UMI Counts")
+```
+
+## Finding Empty Droplets
+
+The function `emptyDrops()` actually performs a fairly sophisticated analysis.
+By default any cell with counts < 100 (`lower = 100`) is confidently assumed not to contain a cell, and is used to build a profile of the expected ambient RNA.
+A Monte Carlo (i.e. random sampling) approach is then taken to provide a p-value for the probability of a barcode representing an empty droplet.
+
+```{r emptyDrops, cache=TRUE}
+emptyBC <- sce %>%
+  counts() %>%
+  emptyDrops()
+emptyBC
+```
+
+Note that this is specifically designed to be the same size as the the number of barcodes in our `sce` object.
+To really check our results, we can use and FDR filter to provide support for a droplet being considered as containing a cell.
+
+```{r}
+subset(emptyBC, FDR < 0.01)
+```
+
+As you can see, this has identified `r sum(emptyBC$FDR < 0.01, na.rm = TRUE)` droplets as containing a cell.
+Notice that the original (unfiltered) data was `r comma(nrow(emptyBC))` barcodes, so we have a fairly high rate (`r percent(1 - sum(emptyBC$FDR < 0.01, na.rm = TRUE) / nrow(emptyBC), 0.1)`) of empty droplets.
+
+Let's check how this result tracks with UMI counts, and compare it with our naive `knee` and `inflection` values obtained from `barcodeRanks()`
+
+```{r}
+emptyBC %>%
+  subset(!is.na(LogProb)) %>%
+  as.data.frame() %>%
+  mutate(isCell = FDR < 0.01) %>%
+  ggplot(aes(Total, -LogProb, colour = isCell)) +
+  geom_point() +
+  geom_vline(
+    xintercept = unlist(metadata(bcRanks)),
+    linetype = 2,
+    colour = "blue"
+  ) +
+  scale_colour_manual(values = c("black", "red")) +
+  labs(x = "Total UMI Count", y = "-logProb")
+```
+
+As you can see, there may be a few outliers at the top with very large UMI counts too.
+Let's save this as a new `SingleCellExperiment` object, only retaining the droplets which contain a cell.
+
+```{r}
+sceWC <- sce[,which(emptyBC$FDR < 0.01)]
+```
+
+## Removing Other Low Quality Cells
+
+### Adding Gene Annotations
+
+Now we have the identified the droplets which contain a cell, we still have no idea about the quality of the cells within each droplet.
+Some may be doublets, whilst others may be low quality (i.e. broken prior to incorporation in the droplet).
+As we'll use mitochondrial reads for part of this process, we'll need to map our gene IDs to where they actually lie on the genome.
+For this step, and for downstream analysis, we'll need to know which gene is which.
+
+Given that the data was made public in Nov 2018, it's likely that Ensembl Release 93 will be close to the gene annotations used for obtaining the UMI counts.
+Unfortunately, 10X genomics have not made this information public so we can't be sure, but testing seemed to check this guess out.
+
+Head to https://ftp.ensembl.org/pub/release-93/gtf/homo_sapiens/ and download the file `r list.files("data", pattern = "gtf.gz")` into the directory 'data'.
+(Use `wget` once you have the correct download path)
+
+Once this has downloaded, load the gene-level information.
+
+```{r}
+genesGR <- import.gff("data/Homo_sapiens.GRCh38.93.gtf.gz", feature.type = "gene")
+names(genesGR) <- genesGR$gene_id
+genesGR
+```
+
+
+We can place the `GRanges` object associated with each gene in the `rowRanges` slot within the `SingleCellExperiment` object.
+
+```{r}
+rowRanges(sceWC) <- genesGR[rownames(sceWC)]
+rowRanges(sceWC)
+```
+
+### Adding QC Statistics
+
+We can now use the mitochondrial genes to perform QC.
+
+```{r}
+mito <- sceWC %>%
+  seqnames() %>%
+  as.character() %>% 
+  str_detect("MT")
+table(mito)
+```
+
+We can see that we have UMI counts for 13 mitochondrial genes and we can use these to assess whether a cell contains an excessive amount of mitochondrial RNA, as an indicator of a cell which has ruptured.
+The function `addPerCellQC()` will modify the `colData` of the object, so we have all of our QC stats included in the object, as opposed to having multiple objects with different sources and getting ourselves confused.
+
+Let's check the `colData(sceWC)` first, and notice that we only have two columns, with the primary column being the Barcode.
+
+```{r}
+colData(sceWC)
+```
+
+
+Once you've checked that, run `addPerCellQC()` and check the `colData()` once again.
+
+```{r}
+sceWC <- addPerCellQC(sceWC, subsets = list(mito = mito))
+colData(sceWC)
+```
+
+Now we have:
+
+- the UMI library sizes (sum/total)
+- the number of detected genes (i.e. with at least one read)
+- the details about the mitochondrial content of each droplet
+
+We can manually use these for QC, so let's check the library sizes against the number of detected genes first.
+
+### Using Gene Information
+
+```{r}
+colData(sceWC) %>%
+  as.data.frame() %>%
+  ggplot(aes(detected, sum)) +
+  geom_point() +
+  geom_smooth(se = FALSE) +
+  scale_x_log10(label = comma) + 
+  scale_y_log10(label = comma) +
+  labs(x = "Detected Genes", y = "Total UMI Count")
+```
+
+This seems pretty consistent using visual inspection.
+In particular, we are looking for cells which:
+
+- have unusually high counts as that may indicate a doublet
+- contain low numbers of reads/detected genes as these are likely to poorly sampled transcriptomes
+
+There do appear to be some cells at the low end which are poorly sampled cells.
+We can add this directly to the colData in our `SingleCellExperiment` object, using the arbitrarily chosen value of 200.
+
+```{r}
+sceWC$lowCounts <- colData(sceWC)$detected < 200
+table(sceWC$lowCounts)
+```
+
+### Using Mitochondrial Information
+
+Next we'll check the mitochondrial content by plotting the number of mitochondrial genes detected against the proportion of the library which is mitochondrial.
+
+```{r}
+colData(sceWC) %>%
+  as.data.frame() %>%
+  mutate(subsets_mito_detected = as.factor(subsets_mito_detected)) %>%
+  ggplot(aes(subsets_mito_detected, subsets_mito_percent)) +
+  geom_boxplot() +
+  geom_hline(yintercept = 20, linetype = 2)  +
+  labs(x = "Number of Mitochondrial Genes Detected", y = "Mitochondrial %")
+```
+
+Now we have some cells which appear to be outliers, with some being nearly 100% mitochondrial.
+These are likely to be damaged cells, and as such, will be not a good sample of the true transcriptional state of the cell.
+We could manually set a threshold anywhere we choose, and I'd be tempted by 20% given this plot.
+
+```{r}
+sceWC$hiMito <- colData(sceWC)$subsets_mito_percent > 20
+table(sceWC$hiMito)
+```
+
+By this strategy, we would lose `r sum(sceWC$hiMito)` cells.
+Let's see how this relates to the small library sizes
+
+```{r}
+colData(sceWC) %>%
+  as.data.frame() %>%
+  dplyr::count(lowCounts, hiMito)
+```
+
+Combining these two filtering approaches, we would now retain `r sum(!sceWC$lowCounts & !sceWC$hiMito)` cells for downstream analysis.
+
+### Detection of Doublets
+
+An automated approach to doublet detection is also available.
+This simulates doublets by adding sets of two randomly selected cells and uses this set of information to provide a score for whether a cell is likely to be a doublet.
+
+
+```{r doublets, cache=TRUE}
+sceWC <- scDblFinder(sceWC) 
+```
+
+
+```{r}
+colData(sceWC) %>%
+  as.data.frame() %>%
+  ggplot(aes(detected, sum)) +
+  geom_point(aes(colour = scDblFinder.class)) +
+  geom_smooth(se = FALSE) +
+  scale_x_log10(label = comma) + 
+  scale_y_log10(label = comma) +
+  scale_colour_brewer(palette = "Set1") +
+  labs(x = "Detected Genes", y = "Total UMI Count")
+```
+
+
+
+```{r}
+sceWC$discard <- colData(sceWC) %>%
+  with(
+    lowCounts | hiMito | scDblFinder.class == "coublet"
+  )
+colData(sceWC) %>%
+  as.data.frame() %>%
+  dplyr::count(
+    lowCounts, hiMito, scDblFinder.class, discard
+  )
+```
+
+Checking all of our QC criteria we would now have `r sum(!sceWC$discard)` cells to keep for clustering.
+
+Let's proceed with a filtered version of the above dataset using our manual filtering approach to remove low quality cells.
+However, we'll also **remove any genes with zero counts** at this point too.
+We can add this largest observed count to the `rowData()` as this time we're working with *gene-level* information.
+
+```{r}
+rowData(sceWC)$maxCount <- sceWC %>%
+  counts() %>%
+  as.matrix() %>%
+  rowMaxs() 
+```
+
+The `subset()` function for `SingleCellExperiment` objects is a little different.
+For this the argument `subset` refers to the `rowData()` element, whilst the `select` argument refers to the `colData()` element.
+
+```{r}
+sceFilt <- subset(sceWC, subset = maxCount > 0, select = !discard)
+sceFilt
+```
+
+
+## Normalisation
+
+We can take a couple of different approaches to normalisation, and today we'll use the deconvolution approach.
+Under this approach we'll perform some quick and unsophisticated clustering and calculate normalisation factors for each cluster, in a similar manner to bulk-RNA.
+The clusters are then deconvoluted back to the individual cells for cell-specific normalisation factors.
+There is only a slight difference in the final values obtained under this method and normalisation by library size, so both are generally appropriate.
+
+```{r}
+sceFilt$quickClust <- quickCluster(sceFilt)
+table(sceFilt$quickClust)
+```
+
+```{r}
+sizeFactors(sceFilt) <- calculateSumFactors(sceFilt, cluster = colData(sceFilt)$quickClust)
+summary(sizeFactors(sceFilt))
+colData(sceFilt) %>%
+  as.data.frame() %>%
+  mutate(size_factors = sizeFactors(sceFilt)) %>%
+  ggplot(aes(sum, size_factors)) +
+  geom_point() 
+```
+
+Now that we have found our factors for normalisaton, we can add our normalised counts to the `SingleCellExperiment` object.
+We do this simply by calling the function `logNormCounts()` which adds this as a new `assay` to the original object.
+
+```{r}
+sceFilt <- logNormCounts(sceFilt)
+```
+
+# Dimensional Reduction
+
+## Variable genes
+
+Now we have all that we need to start the fun part of the analysis, which is clustering the cells and identifying cell types and marker genes.
+The first step towards this is to select the most variable genes as that is where the bulk of our biological signal should come from.
+First we need to model our gene-level means and variances
+
+```{r}
+geneVars <- modelGeneVar(sceFilt)
+```
+
+We can inspect the relationship between these using the `metadata()` element of this object.
+It's a bit messy though.
+
+```{r}
+geneVars %>%
+  metadata() %>%
+  with(
+    tibble(mean, var, trend = trend(mean))
+  ) %>%
+  arrange(desc(var)) %>%
+  mutate(hvg = seq_len(nrow(.)) <= 1000) %>%
+  ggplot(aes(mean, var, colour = hvg)) +
+  geom_point() +
+  geom_line(aes(y = trend), colour = "blue") +
+  scale_colour_manual(values = c("black", "red"))
+```
+
+Now we have the gene-level variance modelled, we can select our most variable genes.
+There are multiple approaches we can choose, but here, we'll just choose the 1000 most variable.
+Note that this may exclude genes at the low end of expression.
+
+```{r}
+hvg <- getTopHVGs(geneVars, n = 1000)
+```
+
+## PCA
+
+You might notice that the `SingleCellExperiment` object we're working with has a (blank) element called `reducedDimNames`.
+This is ready to store any output from dimensional reduction, such as PCA, tSNE or UMAP.
+As we're now becoming used to, we just add this by calling the function `runPCA()` and overwriting the original object.
+The genes identified as `hvg` are added as `subset_row`.
+
+```{r}
+sceFilt <- runPCA(sceFilt, subset_row = hvg)
+sceFilt
+```
+
+By default, the first 50 PCs are saved.
+
+```{r}
+reducedDim(sceFilt, "PCA") %>% dim()
+```
+
+At some point, each principal component just captures technical noise, so we should find how many are informative.
+
+```{r}
+sceFilt %>%
+  reducedDim("PCA") %>%
+  attr("percentVar") %>%
+  enframe(value = "Var (%)", name = c()) %>%
+  mutate(PC = seq_along(`Var (%)`)) %>%
+  ggplot(aes(PC, `Var (%)`)) +
+  geom_point()
+```
+
+As we can see, the variance captured by each PC drops off rapidly, and beyond PC5, there is minimal contribution to the overall variance.
+We should choose the elbow point on this plot and although there are automated approaches, I'd be comfortable choosing 5 by looking at that plot.
+Let's remove the un-informative PCs.
+
+```{r}
+reducedDim(sceFilt, "PCA") <- reducedDim(sceFilt, "PCA")[,1:5]
+```
+
+Now let's look at our data, just using the first two PCs.
+
+```{r}
+plotReducedDim(sceFilt, dimred = "PCA")
+```
+
+Let's overlay the number of detected to see if the clusters are correlating with this simple value.
+Let's also extend out to PC3.
+
+```{r}
+plotReducedDim(sceFilt, dimred = "PCA", colour_by = "detected", ncomponents = 3) 
+```
+
+Clearly much of the separation between cells is captured by PC1 and PC2.
+PC3 adds minimal information.
+Our next step would be to apply clustering techniques and try alternate visualisations such as tSNE and UMAP.
+
+## tSNE
+
+The $t$-stochastic neighbour embedding approach is commonly used for visualisation of scRNA data.
+As this is non-linear and is bound by preserving distances between points, it can tease apart clusters more easily.
+Let's first check our results from the `quickCluster()` output that we used for Normalisation.
+
+```{r}
+plotReducedDim(sceFilt, dimred = "PCA", colour_by = "quickClust")
+```
+
+There are a few cells that seem to group nicely, but other clusters are less compelling.
+Let's now add the tSNE output to our `reducedDims` element.
+Note that it relies on a PCA already being performed *a priori*, so we can just use our existing PCA element
+As there is a step involving randomising the data, I've set the random seed here so we should all see similar plots.
+
+```{r}
+set.seed(100)
+sceFilt <- runTSNE(sceFilt, dimred = "PCA")
+sceFilt
+```
+
+Our `reducedDims` element now has a `TNSE` component and we can plot this using very similar code to above.
+Instead of plotting PCA, we just change the `dimred` argument to be `"TSNE"`.
+
+```{r}
+plotReducedDim(sceFilt, dimred = "TSNE", colour_by = "quickClust")
+```
+
+## UMAP
+
+An alternative to tSNE which is gaining popularity is Uniform manifold approximation and projection (UMAP).
+The underlying mathematics is quite different, however, like the tSNE, the motivation is produce a reduced dimensional visualisation which demonstrates the relationships between cells.
+
+```{r}
+set.seed(101)
+sceFilt <- runUMAP(sceFilt, dimred = "PCA")
+sceFilt
+```
+
+```{r}
+plotReducedDim(sceFilt, dimred = "UMAP", colour_by = "quickClust")
+```
+
+There is no correct visualisation, and how we present our results is always a matter of judgement.
+Here we'll compare the three approaches, and will overlay the number of detected genes to see if this is influencing our layouts at all.
+
+```{r}
+list(
+  plotReducedDim(sceFilt, dimred = "PCA", colour_by = "detected") + 
+    theme(legend.position = "none") +
+    ggtitle("PCA"),
+  plotReducedDim(sceFilt, dimred = "TSNE", colour_by = "detected") + 
+    theme(legend.position = "none") +
+    ggtitle("tSNE"),
+  plotReducedDim(sceFilt, dimred = "UMAP", colour_by = "detected") + 
+    ggtitle("UMAP")
+) %>% 
+  wrap_plots()
+```
+
+# Clustering
+
+As we can see above, there is no perfect layout, just our personal choice.
+Identifying clusters can play a key role in selecting our preferred visualisation so let's be a bit more rigorous than our previous method.
+However, as with visualisations, there is no correct solution, rather there are just different perspectives, some of which may be more informative than others.
+Whilst there do appear to be some distinct cell types in this dataset, there are clearly a few cells which are less definitive.
+
+## Shared Neighbour Graphs
+
+One of the most common clustering approaches is to first determine how similar each cell is to each other using our retained Principal Components.
+Once we've determined those distances, clusters are formed from cells which appear to be similar to each other.
+
+```{r}
+g <- buildSNNGraph(sceFilt, k = 10, use.dimred = "PCA")
+sceFilt$snnCluster <- igraph::cluster_walktrap(g)$membership %>%
+  as.factor()
+table(sceFilt$snnCluster)
+plotReducedDim(sceFilt, dimred = "PCA", colour_by = "snnCluster", text_by = "snnCluster") 
+```
+
+After you've had a good look at these clusters, try alternate visualisations using tSNE or UMAP as the dimensional reduction.
+
+::: {.callout-important}
+Do you think our clusters are a good representation of the cell types?
+:::
+
+### Checking for artefacts
+
+Sometimes clusters can be formed from cells showing similar expression patterns, but where these patterns are driven by other artefacts.
+A possible checking step is to inspect the data we have and how it is distributed amongst existing clusters.
+Let's see if the number of detected genes has had any impact on cluster formation.
+
+```{r}
+plotColData(sceFilt, y = "detected", x = "snnCluster", colour_by = "snnCluster") +
+  labs(x = "Cluster", y = "# Detected Genes")
+```
+
+It is entirely possible that any discrepancies between the number of features is true biology, however it is also possible that is a technical artefact.
+At this point, it is very difficult to make any clear judgement about the source of any variation.
+
+We can also check the library sizes in much the same way.
+
+```{r}
+plotColData(sceFilt, y = "total", x = "snnCluster", colour_by = "snnCluster") +
+  labs(x = "Cluster", y = "Total Reads")
+```
+
+
+
+## k-Means Clustering
+
+An alternative approach to clustering is to use $k$-means, in which we define (up to) $k$ clusters beforehand.
+This algorithm then finds the optimal means for each cluster and allocates each cell to the cluster with the nearest mean.
+Unfortunately there is a bias towards clusters of the same spherical radius.
+The `kmeans()` function required to perform the clustering here is actually a `base` function too.
+
+```{r}
+set.seed(100)
+km <- reducedDim(sceFilt, type = "PCA") %>%
+  kmeans(centers = 10)
+table(km$cluster)
+sceFilt$kMeans <- as.factor(km$cluster)
+plotReducedDim(sceFilt, dimred = "PCA", colour_by = "kMeans", text_by = "kMeans") 
+```
+
+Here we can simply explore the relationship between clusters using dendrogram
+
+```{r}
+dist(km$centers) %>%
+  hclust("ward.D2") %>%
+  plot()
+```
+
+### Additional notes regarding k-means
+
+As it is not build from any edges or graph-based approaches, it is very easy to *over-cluster* using $k$-means.
+This can actually be useful for separating extremes of a relatively continuous cluster and enables detection of marker genes which may denote the gradient of a cluster.
+
+Unfortunately our version of R is too out of date for this, but in the newer versions of `scran`, there is a new function where we can use $k$-means as initial clustering before generating the shared neighbour graph.
+It is expected this may become a common approach in the next few years, particularly with large datasets.
+
+# Marker Gene Detection
+
+## Genes which are DE somewhere
+
+One of the key motivations behind any scRNA analysis is to identify cell types within one or more samples, and determine what genes are defining the differences between cell types or cell states.
+This is performed relatively simply using the function `findMarkers()`, which performs a simple $t$-test when left with default settings.
+
+```{r}
+markersAny <- findMarkers(sceFilt, groups = sceFilt$snnCluster)
+subset(markersAny[[1]], FDR < 0.01)
+```
+
+Looking at the most significant marker genes from cluster 1 immediately highlights some of the challenges.
+
+- How was the p-value obtained. From just one comparison, from all comparisons or another method?
+- Looking across the the logFC for each comparison, how do we consider a gene to be a marker for each cell type?
+
+The default setting for the p-value is not made clear in the manual, however this is set to `pval.type = "any"`.
+This uses a method for combining p-values (Simes' method) testing the null hypothesis that the gene is DE nowhere with the alternative the gene is DE somewhere.
+The `Top` column shows the minimum rank across all comparisons for that gene, such that all genes with `Top = 1` were the most highly ranked in at least one comparison.
+This column only appears when using the default setting of `pval.type = "any"` and you'll notice that it disappears as we look at different options.
+
+As you can also see, no directionality has been applied to the test, but we can rerun this setting `direction="up"` which will now return results for genes that are up-regulated somewhere.
+
+```{r}
+markersAny <- findMarkers(sceFilt, groups = sceFilt$snnCluster, direction = "up")
+subset(markersAny[[1]], FDR < 0.01)
+```
+
+Notice that we can still see genes that are highly-ranked for being up in one comparison, but are still down in other comparisons.
+
+We can quickly summarise the results for all clusters using some `lapply()` magic.
+
+```{r}
+markersAny %>%
+  lapply(subset, FDR < 0.01) %>% 
+  sapply(nrow)
+```
+
+The last command (`sapply()`) is like `lapply()` but it attempts to simplify the output.
+Here it's done well and has returned a vector instead of a list.
+
+## Genes which are DE in many comparisons
+
+As an alternative, we can change the value for `pval.type = "some"`, which will now test the Null Hypothesis that each gene is not DE in more than half the comparisons, with the alternative that the gene is DE in more than half of the comparisons.
+This involves a different strategy for combining the p-values
+
+```{r}
+markersSome <- findMarkers(sceFilt, groups = sceFilt$snnCluster, direction = "up", pval.type = "some")
+markersSome %>%
+  lapply(subset, FDR < 0.01) %>% 
+  sapply(nrow)
+```
+
+As this is a more stringent test, we clearly have fewer results
+
+```{r}
+subset(markersSome[[1]], FDR < 0.01)
+```
+
+Now our genes appear to be more consistently up-regulated in cluster 1 compared to other clusters.
+When checking this, it's always good to be aware of which clusters were the most related to each other too.
+
+## Genes which are DE in all comparisons
+
+Clearly the next approach would be to look for marker genes which are up-regulated in each cluster compared to all other clusters, and we do this by setting `pval.type = "all"`.
+This uses a different method again for combining p-values and as this is the most difficult hurdle to overcome, we'd expect to see far fewer genes.
+
+```{r}
+markersAll <- findMarkers(sceFilt, groups = sceFilt$snnCluster, direction = "up", pval.type = "all")
+markersAll %>%
+  lapply(subset, FDR < 0.01) %>% 
+  sapply(nrow)
+```
+
+We may see that some clusters have no unique markers under this strategy.
+
+Let's check our first cluster again
+
+```{r}
+subset(markersAll[[1]], FDR < 0.01)
+```
+
+Looking at the logFC values when comparing against all other clusters, this looks like a promising set of candidate genes.
+From here, we should inspect the expression patterns.
+Before we move on though, it might be worth discussing a couple of other alternatives to the testing strategy.
+
+## Alternative Tests
+
+In the above sections, we used a $t$ test to find our markers, but `findMarkers()` offer two more alternatives.
+The argument `test.type` can take one of three options: 1) `"t"`; 2) `"wilcox"` or 3) `"binom"`.
+The Wilcoxon Rank-Sum test is what's known as a non-parametric test, in that it doesn't rely on the assumption of normality.
+The ranks of the logcounts are instead compared across clusters, however it is known that non-parametric tests are less powerful than parametric tests if the conditions of normality are approximately satisfied.
+
+The third option `test.type = "binom"` models the probability of a cell within a cluster expressing the gene and this can lend an alternative viewpoint on the data.
+
+```{r}
+markersBinom <- findMarkers(sceFilt, groups = sceFilt$snnCluster, test.type = "binom", direction = "up", pval.type = "all")
+markersBinom %>%
+  lapply(subset, FDR < 0.01) %>% 
+  sapply(nrow)
+```
+
+This is clearly less powerful than the t-test but as you may realise, may by highly appropriate in some circumstances
+
+# Visualisation
+
+## Using PCA/TSNE
+
+Now that we've identified a few genes which appear unique to a given cluster, we can visualise the expression of these genes within each cluster.
+Two common approaches are to overlay the logcounts over our clusters, or to produce violin plots for each cluster.
+Let's start by overlaying the expression values over the clusters.
+
+```{r}
+gn <- rownames(markersAll[[1]])[1]
+plotReducedDim(sceFilt, dimred = "PCA", colour_by = gn)
+```
+
+Unfortunately, if we'd like to add the gene name instead of the Ensembl ID, we have to regenerate the fill colours.
+However this is a `ggplot` object so if we know the fill is just the default `scale_fill_viridis_c()` this is easy enough.
+The alternative would be to set the rownames as the gene name/symbol at the beginning of our analysis.
+Some people do prefer this.
+
+```{r}
+plotReducedDim(sceFilt, dimred = "PCA", colour_by = gn) +
+  scale_fill_viridis_c(name = rowData(sceFilt)[gn, "gene_name"])
+```
+
+This approach is great for overlaying a single gene (or other confounders such as doubletScore or `total`)
+
+## Violin Plots
+
+If we wish to check out more than one marker gene, we can produce violin plots.
+
+```{r}
+plotExpression(sceFilt, features = gn, x = "snnCluster", colour_by = "snnCluster")
+```
+
+```{r}
+gn <- markersAll[[1]] %>%
+  subset(FDR < 0.01) %>%
+  rownames() %>%
+  .[seq(1, min(10, length(.)))]
+plotExpression(sceFilt, features = gn, x = "snnCluster", colour_by = "snnCluster")
+```
+
+Once again we can take advantage of our `ggplot` skills and remake the facets, including a labeller function.
+This is a common trick used to change the labels for facets without changing your data.
+
+```{r}
+gnLabeller <- as_labeller(
+  rowData(sceFilt)$gene_name %>% setNames(rownames(sceFilt))
+  )
+plotExpression(sceFilt, features = gn, x = "snnCluster", colour_by = "snnCluster") +
+  facet_wrap(~Feature, labeller = gnLabeller, ncol = 2)
+```
+
+Let's get the top ranked gene from each cluster and run a quick check across all of our data.
+
+```{r}
+topRank <- markersAll %>%
+  lapply(subset, FDR < 0.01) %>%
+  lapply(rownames) %>%
+  sapply(magrittr::extract, 1) %>%
+  .[!is.na(.)]
+gnLabeller(topRank) %>% unlist()
+```
+
+```{r}
+plotExpression(sceFilt, features = topRank, x = "snnCluster", colour_by = "snnCluster") +
+  facet_wrap(~Feature, labeller = gnLabeller, ncol = 2)
+```
+
+
+
+# Conclusion
+
+Now you've thoroughly inspected your clusters, do you believe them?
+Have we found markers that we have faith in?
+How could we pick up more complex patterns?
+
+Please change your clustering approach and see if you are able to improve your results.
+

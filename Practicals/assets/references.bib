@@ -1,0 +1,368 @@
+
+@article{Herbst2023-pj,
+  author = {Herbst, Josephine and Nagy, Solveig Henriette and Vercauteren, Ilse and De Veylder, Lieven and Kunze, Reinhard},
+  title = {The long non-coding RNA LINDA restrains cellular collapse following DNA damage in Arabidopsis thaliana},
+  journal = {The Plant Journal},
+  volume = {116},
+  number = {5},
+  pages = {1370-1384},
+  keywords = {long non-coding RNAs, DNA damage response pathway, gene regulation network, cell death, transcriptome analysis, CRISPR/Cas12, Arabidopsis thaliana},
+  doi = {https://doi.org/10.1111/tpj.16431},
+  url = {https://onlinelibrary.wiley.com/doi/abs/10.1111/tpj.16431},
+  eprint = {https://onlinelibrary.wiley.com/doi/pdf/10.1111/tpj.16431},
+  abstract = {SUMMARY The genomic integrity of every organism is endangered by various intrinsic and extrinsic stresses. To maintain genomic integrity, a sophisticated DNA damage response (DDR) network is activated rapidly after DNA damage. Notably, the fundamental DDR mechanisms are conserved in eukaryotes. However, knowledge about many regulatory aspects of the plant DDR is still limited. Important, yet little understood, regulatory factors of the DDR are the long non-coding RNAs (lncRNAs). In humans, 13 lncRNAs functioning in DDR have been characterized to date, whereas no such lncRNAs have been characterized in plants yet. By meta-analysis, we identified the putative long intergenic non-coding RNA induced by DNA damage (LINDA) that responds strongly to various DNA double-strand break-inducing treatments, but not to replication stress induced by mitomycin C. After DNA damage, LINDA is rapidly induced in an ATM- and SOG1-dependent manner. Intriguingly, the transcriptional response of LINDA to DNA damage is similar to that of its flanking hypothetical protein-encoding gene. Phylogenetic analysis of putative Brassicales and Malvales LINDA homologs indicates that LINDA lncRNAs originate from duplication of a flanking small protein-encoding gene followed by pseudogenization. We demonstrate that LINDA is not only needed for the regulation of this flanking gene but also fine-tuning of the DDR after the occurrence of DNA double-strand breaks. Moreover, Δlinda mutant root stem cells are unable to recover from DNA damage, most likely due to hyper-induced cell death.},
+  year = {2023}
+}
+
+
+@ARTICLE{Dobin2013-us,
+  title    = "{STAR}: ultrafast universal {RNA}-seq aligner",
+  author   = "Dobin, Alexander and Davis, Carrie A and Schlesinger, Felix and
+              Drenkow, Jorg and Zaleski, Chris and Jha, Sonali and Batut,
+              Philippe and Chaisson, Mark and Gingeras, Thomas R",
+  journal  = "Bioinformatics",
+  volume   =  29,
+  number   =  1,
+  pages    = "15--21",
+  abstract = "MOTIVATION: Accurate alignment of high-throughput RNA-seq data is
+              a challenging and yet unsolved problem because of the
+              non-contiguous transcript structure, relatively short read lengths
+              and constantly increasing throughput of the sequencing
+              technologies. Currently available RNA-seq aligners suffer from
+              high mapping error rates, low mapping speed, read length
+              limitation and mapping biases. RESULTS: To align our large (>80
+              billon reads) ENCODE Transcriptome RNA-seq dataset, we developed
+              the Spliced Transcripts Alignment to a Reference (STAR) software
+              based on a previously undescribed RNA-seq alignment algorithm that
+              uses sequential maximum mappable seed search in uncompressed
+              suffix arrays followed by seed clustering and stitching procedure.
+              STAR outperforms other aligners by a factor of >50 in mapping
+              speed, aligning to the human genome 550 million 2 × 76 bp
+              paired-end reads per hour on a modest 12-core server, while at the
+              same time improving alignment sensitivity and precision. In
+              addition to unbiased de novo detection of canonical junctions,
+              STAR can discover non-canonical splices and chimeric (fusion)
+              transcripts, and is also capable of mapping full-length RNA
+              sequences. Using Roche 454 sequencing of reverse transcription
+              polymerase chain reaction amplicons, we experimentally validated
+              1960 novel intergenic splice junctions with an 80-90\% success
+              rate, corroborating the high precision of the STAR mapping
+              strategy. AVAILABILITY AND IMPLEMENTATION: STAR is implemented as
+              a standalone C++ code. STAR is free open source software
+              distributed under GPLv3 license and can be downloaded from
+              http://code.google.com/p/rna-star/.",
+  month    =  jan,
+  year     =  2013,
+  language = "en"
+}
+
+
+@ARTICLE{Lun2016-vb,
+  title     = "It's {DE}-licious: A recipe for differential expression analyses
+               of {RNA}-seq experiments using quasi-likelihood methods in
+               {edgeR}",
+  author    = "Lun, Aaron T L and Chen, Yunshun and Smyth, Gordon K",
+  journal   = "Methods Mol. Biol.",
+  publisher = "Springer New York",
+  volume    =  1418,
+  pages     = "391--416",
+  abstract  = "RNA sequencing (RNA-seq) is widely used to profile
+               transcriptional activity in biological systems. Here we present
+               an analysis pipeline for differential expression analysis of
+               RNA-seq experiments using the Rsubread and edgeR software
+               packages. The basic pipeline includes read alignment and
+               counting, filtering and normalization, modelling of biological
+               variability and hypothesis testing. For hypothesis testing, we
+               describe particularly the quasi-likelihood features of edgeR.
+               Some more advanced downstream analysis steps are also covered,
+               including complex comparisons, gene ontology enrichment analyses
+               and gene set testing. The code required to run each step is
+               described, along with an outline of the underlying theory. The
+               chapter includes a case study in which the pipeline is used to
+               study the expression profiles of mammary gland cells in virgin,
+               pregnant and lactating mice.",
+  year      =  2016,
+  keywords  = "Differential expression; Generalized linear models;
+               Quasi-likelihood; RNA-seq; Read alignment; Read counts;
+               Variability",
+  language  = "en"
+}
+
+@ARTICLE{Law2018-mk,
+  title     = "{RNA}-seq analysis is easy as 1-2-3 with limma, Glimma and
+               {edgeR}",
+  author    = "Law, Charity W and Alhamdoosh, Monther and Su, Shian and Dong,
+               Xueyi and Tian, Luyi and Smyth, Gordon K and Ritchie, Matthew E",
+  journal   = "F1000Res.",
+  publisher = "F1000 Research, Ltd.",
+  volume    =  5,
+  number    =  1408,
+  pages     =  1408,
+  abstract  = "The ability to easily and efficiently analyse RNA-sequencing data
+               is a key strength of the Bioconductor project. Starting with
+               counts summarised at the gene-level, a typical analysis involves
+               pre-processing, exploratory data analysis, differential
+               expression testing and pathway analysis with the results obtained
+               informing future experiments and validation studies. In this
+               workflow article, we analyse RNA-sequencing data from the mouse
+               mammary gland, demonstrating use of the popular edgeR package to
+               import, organise, filter and normalise the data, followed by the
+               limma package with its voom method, linear modelling and
+               empirical Bayes moderation to assess differential expression and
+               perform gene set testing. This pipeline is further enhanced by
+               the Glimma package which enables interactive exploration of the
+               results so that individual samples and genes can be examined by
+               the user. The complete analysis offered by these three packages
+               highlights the ease with which researchers can turn the raw
+               counts from an RNA-sequencing experiment into biological insights
+               using Bioconductor.",
+  month     =  dec,
+  year      =  2018,
+  keywords  = "RNA sequencing, data analysis, gene expression",
+  language  = "en"
+}
+
+@Article{Ritchie2015-lm,
+    author = {Matthew E Ritchie and Belinda Phipson and Di Wu and Yifang Hu and Charity W Law and Wei Shi and Gordon K Smyth},
+    title = {{limma} powers differential expression analyses for {RNA}-sequencing and microarray studies},
+    journal = {Nucleic Acids Research},
+    year = {2015},
+    volume = {43},
+    number = {7},
+    pages = {e47},
+    doi = {10.1093/nar/gkv007},
+  }
+
+@ARTICLE{Liao2014-gy,
+  title    = "{featureCounts}: an efficient general purpose program for
+              assigning sequence reads to genomic features",
+  author   = "Liao, Yang and Smyth, Gordon K and Shi, Wei",
+  journal  = "Bioinformatics",
+  volume   =  30,
+  number   =  7,
+  pages    = "923--930",
+  abstract = "MOTIVATION: Next-generation sequencing technologies generate
+              millions of short sequence reads, which are usually aligned to a
+              reference genome. In many applications, the key information
+              required for downstream analysis is the number of reads mapping to
+              each genomic feature, for example to each exon or each gene. The
+              process of counting reads is called read summarization. Read
+              summarization is required for a great variety of genomic analyses
+              but has so far received relatively little attention in the
+              literature. RESULTS: We present featureCounts, a read
+              summarization program suitable for counting reads generated from
+              either RNA or genomic DNA sequencing experiments. featureCounts
+              implements highly efficient chromosome hashing and feature
+              blocking techniques. It is considerably faster than existing
+              methods (by an order of magnitude for gene-level summarization)
+              and requires far less computer memory. It works with either single
+              or paired-end reads and provides a wide range of options
+              appropriate for different sequencing applications. AVAILABILITY
+              AND IMPLEMENTATION: featureCounts is available under GNU General
+              Public License as part of the Subread
+              (http://subread.sourceforge.net) or Rsubread
+              (http://www.bioconductor.org) software packages.",
+  month    =  apr,
+  year     =  2014,
+  language = "en"
+}
+
+@ARTICLE{Ward2020-qf,
+  title     = "{ngsReports}: a Bioconductor package for managing {FastQC}
+               reports and other {NGS} related log files",
+  author    = "Ward, C M and To, T H and Pederson, S M",
+  journal   = "Bioinformatics",
+  publisher = "academic.oup.com",
+  abstract  = "Motivation High throughput next generation sequencing (NGS) has
+               become exceedingly cheap, facilitating studies to be undertaken
+               containing large sample numbers. Quality …",
+  year      =  2020
+}
+
+@ARTICLE{Robinson2010-qp,
+  title    = "A scaling normalization method for differential expression
+              analysis of {RNA}-seq data",
+  author   = "Robinson, Mark D and Oshlack, Alicia",
+  journal  = "Genome Biol.",
+  volume   =  11,
+  number   =  3,
+  pages    = "R25",
+  abstract = "The fine detail provided by sequencing-based transcriptome surveys
+              suggests that RNA-seq is likely to become the platform of choice
+              for interrogating steady state RNA. In order to discover
+              biologically important changes in expression, we show that
+              normalization continues to be an essential step in the analysis.
+              We outline a simple and effective method for performing
+              normalization and show dramatically improved results for inferring
+              differential expression in simulated and publicly available data
+              sets.",
+  month    =  mar,
+  year     =  2010,
+  language = "en"
+}
+
+@Article{Young2010-gs,
+    title = {Gene ontology analysis for RNA-seq: accounting for selection bias},
+    author = {Matthew D Young and Matthew J Wakefield and Gordon K Smyth and Alicia Oshlack},
+    journal = {Genome Biology},
+    volume = {11},
+    pages = {R14},
+    year = {2010},
+  }
+
+@ARTICLE{Pertea2015-zd,
+  title     = "{StringTie} enables improved reconstruction of a transcriptome
+               from {RNA}-seq reads",
+  author    = "Pertea, Mihaela and Pertea, Geo M and Antonescu, Corina M and
+               Chang, Tsung-Cheng and Mendell, Joshua T and Salzberg, Steven L",
+  journal   = "Nat. Biotechnol.",
+  publisher = "Springer Science and Business Media LLC",
+  volume    =  33,
+  number    =  3,
+  pages     = "290--295",
+  abstract  = "Methods used to sequence the transcriptome often produce more
+               than 200 million short sequences. We introduce StringTie, a
+               computational method that applies a network flow algorithm
+               originally developed in optimization theory, together with
+               optional de novo assembly, to assemble these complex data sets
+               into transcripts. When used to analyze both simulated and real
+               data sets, StringTie produces more complete and accurate
+               reconstructions of genes and better estimates of expression
+               levels, compared with other leading transcript assembly programs
+               including Cufflinks, IsoLasso, Scripture and Traph. For example,
+               on 90 million reads from human blood, StringTie correctly
+               assembled 10,990 transcripts, whereas the next best assembly was
+               of 7,187 transcripts by Cufflinks, which is a 53\% increase in
+               transcripts assembled. On a simulated data set, StringTie
+               correctly assembled 7,559 transcripts, which is 20\% more than
+               the 6,310 assembled by Cufflinks. As well as producing a more
+               complete transcriptome assembly, StringTie runs faster on all
+               data sets tested to date compared with other assembly software,
+               including Cufflinks.",
+  month     =  mar,
+  year      =  2015,
+  language  = "en"
+}
+
+@ARTICLE{Haas2013-ma,
+  title     = "De novo transcript sequence reconstruction from {RNA}-seq using
+               the Trinity platform for reference generation and analysis",
+  author    = "Haas, Brian J and Papanicolaou, Alexie and Yassour, Moran and
+               Grabherr, Manfred and Blood, Philip D and Bowden, Joshua and
+               Couger, Matthew Brian and Eccles, David and Li, Bo and Lieber,
+               Matthias and MacManes, Matthew D and Ott, Michael and Orvis,
+               Joshua and Pochet, Nathalie and Strozzi, Francesco and Weeks,
+               Nathan and Westerman, Rick and William, Thomas and Dewey, Colin N
+               and Henschel, Robert and LeDuc, Richard D and Friedman, Nir and
+               Regev, Aviv",
+  journal   = "Nat. Protoc.",
+  publisher = "Springer Science and Business Media LLC",
+  volume    =  8,
+  number    =  8,
+  pages     = "1494--1512",
+  abstract  = "De novo assembly of RNA-seq data enables researchers to study
+               transcriptomes without the need for a genome sequence; this
+               approach can be usefully applied, for instance, in research on
+               'non-model organisms' of ecological and evolutionary importance,
+               cancer samples or the microbiome. In this protocol we describe
+               the use of the Trinity platform for de novo transcriptome
+               assembly from RNA-seq data in non-model organisms. We also
+               present Trinity-supported companion utilities for downstream
+               applications, including RSEM for transcript abundance estimation,
+               R/Bioconductor packages for identifying differentially expressed
+               transcripts across samples and approaches to identify
+               protein-coding genes. In the procedure, we provide a workflow for
+               genome-independent transcriptome analysis leveraging the Trinity
+               platform. The software, documentation and demonstrations are
+               freely available from http://trinityrnaseq.sourceforge.net. The
+               run time of this protocol is highly dependent on the size and
+               complexity of data to be analyzed. The example data set analyzed
+               in the procedure detailed herein can be processed in less than 5
+               h.",
+  month     =  aug,
+  year      =  2013,
+  language  = "en"
+}
+
+@article{Wang2017-te,
+  author = {Wang, Dong and Qu, Zhipeng and Yang, Lan and Zhang, Qingzhu and Liu, Zhi-Hong and Do, Trung and Adelson, David L. and Wang, Zhen-Yu and Searle, Iain and Zhu, Jian-Kang},
+  title = {Transposable elements (TEs) contribute to stress-related long intergenic noncoding RNAs in plants},
+  journal = {The Plant Journal},
+  volume = {90},
+  number = {1},
+  pages = {133-146},
+  keywords = {transposable element, long intergenic noncoding RNAs, transposable elements-associated lincRNAs, abiotic stress, noncoding RNAs},
+  doi = {10.1111/tpj.13481},
+  url = {https://onlinelibrary.wiley.com/doi/abs/10.1111/tpj.13481},
+  eprint = {https://onlinelibrary.wiley.com/doi/pdf/10.1111/tpj.13481},
+  abstract = {Summary Noncoding RNAs have been extensively described in plant and animal transcriptomes by using high-throughput sequencing technology. Of these noncoding RNAs, a growing number of long intergenic noncoding RNAs (lincRNAs) have been described in multicellular organisms, however the origins and functions of many lincRNAs remain to be explored. In many eukaryotic genomes, transposable elements (TEs) are widely distributed and often account for large fractions of plant and animal genomes yet the contribution of TEs to lincRNAs is largely unknown. By using strand-specific RNA-sequencing, we profiled the expression patterns of lincRNAs in Arabidopsis, rice and maize, and identified 47 611 and 398 TE-associated lincRNAs (TE-lincRNAs), respectively. TE-lincRNAs were more often derived from retrotransposons than DNA transposons and as retrotransposon copy number in both rice and maize genomes so did TE-lincRNAs. We validated the expression of these TE-lincRNAs by strand-specific RT-PCR and also demonstrated tissue-specific transcription and stress-induced TE-lincRNAs either after salt, abscisic acid (ABA) or cold treatments. For Arabidopsis TE-lincRNA11195, mutants had reduced sensitivity to ABA as demonstrated by longer roots and higher shoot biomass when compared to wild-type. Finally, by altering the chromatin state in the Arabidopsis chromatin remodelling mutant ddm1, unique lincRNAs including TE-lincRNAs were generated from the preceding untranscribed regions and interestingly inherited in a wild-type background in subsequent generations. Our findings not only demonstrate that TE-associated lincRNAs play important roles in plant abiotic stress responses but lincRNAs and TE-lincRNAs might act as an adaptive reservoir in eukaryotes.},
+  year = {2017}
+}
+
+@ARTICLE{Tegenfeldt2025-lt,
+  title     = "{OrthoDB} and {BUSCO} update: annotation of orthologs with wider
+               sampling of genomes",
+  author    = "Tegenfeldt, Fredrik and Kuznetsov, Dmitry and Manni, Mosè and
+               Berkeley, Matthew and Zdobnov, Evgeny M and Kriventseva, Evgenia
+               V",
+  journal   = "Nucleic Acids Res.",
+  publisher = "Oxford Academic",
+  volume    =  53,
+  number    = "D1",
+  pages     = "D516--D522",
+  abstract  = "OrthoDB (https://www.orthodb.org) offers evolutionary and
+               functional annotations of orthologous genes in the widest
+               sampling of eukaryotes, prokaryotes, and viruses, extending
+               experimental gene function knowledge to newly sequenced genomes.
+               We collect gene annotations, delineate hierarchical gene
+               orthology and annotate the orthologous groups (OGs) with
+               functional and evolutionary traits. OrthoDB is the leading
+               resource for species diversity, striving to sample the most
+               diverse and well-researched organisms with the highest quality
+               genomic data. This update expands to include 5827 eukaryotic
+               genomes. We have also added coding DNA sequences (CDSs) and gene
+               loci coordinates. OrthoDB can be browsed, downloaded, or accessed
+               using REST API, SPARQL/RDF and now also via API packages for
+               Python and R Bioconductor. OrthoLoger
+               (https://orthologer.ezlab.org), the tool used for inferring
+               orthologs in OrthoDB, is now available as a Conda package and
+               through BioContainers. ODB-mapper, a component of OrthoLoger,
+               streamlines annotation of genes from newly sequenced genomes with
+               OrthoDB evolutionary and functional descriptors. The benchmarking
+               sets of universal single-copy orthologs (BUSCO), derived from
+               OrthoDB, had correspondingly a major update. The BUSCO tool
+               (https://busco.ezlab.org) has become a standard in genomics,
+               uniquely capable of assessing both eukaryotic and prokaryotic
+               species. It is applicable to gene sets, transcriptomes, genome
+               assemblies and metagenomic bins.",
+  month     =  jan,
+  year      =  2025,
+  keywords  = "genes; genome; genomics; dna; gene annotation; benchmarking",
+  language  = "en"
+}
+
+@article{Jiang202-ps,
+    doi = {10.1371/journal.pone.0232559},
+    author = {Jiang, Haowei and Pederson, Stevie and Newman, Morgan and Dong, Yang and Barthelson, Karissa and Lardelli, Michael},
+    journal = {PLOS ONE},
+    publisher = {Public Library of Science},
+    title = {Transcriptome analysis indicates dominant effects on ribosome and mitochondrial function of a premature termination codon mutation in the zebrafish gene psen2},
+    year = {2020},
+    month = {07},
+    volume = {15},
+    url = {https://doi.org/10.1371/journal.pone.0232559},
+    pages = {1-25},
+    abstract = {PRESENILIN 2 (PSEN2) is one of the genes mutated in early onset familial Alzheimer’s disease (EOfAD). PSEN2 shares significant amino acid sequence identity with another EOfAD-related gene PRESENILIN 1 (PSEN1), and partial functional redundancy is seen between these two genes. However, the complete range of functions of PSEN1 and PSEN2 is not yet understood. In this study, we performed targeted mutagenesis of the zebrafish psen2 gene to generate a premature termination codon close downstream of the translation start with the intention of creating a null mutation. Homozygotes for this mutation, psen2S4Ter, are viable and fertile, and adults do not show any gross psen2-dependent pigmentation defects, arguing against significant loss of γ-secretase activity. Also, assessment of the numbers of Dorsal Longitudinal Ascending (DoLA) interneurons that are responsive to psen2 but not psen1 activity during embryogenesis did not reveal decreased psen2 function. Transcripts containing the S4Ter mutation show no evidence of destabilization by nonsense-mediated decay. Forced expression in zebrafish embryos of fusions of psen2S4Ter 5’ mRNA sequences with sequence encoding enhanced green fluorescent protein (EGFP) indicated that the psen2S4Ter mutation permits utilization of cryptic, novel downstream translation start codons. These likely initiate translation of N-terminally truncated Psen2 proteins lacking late endosomal/lysosomal localization sequences and that obey the “reading frame preservation rule” of PRESENILIN EOfAD mutations. Transcriptome analysis of entire brains from a 6-month-old family of wild type, heterozygous and homozygous psen2S4Ter female siblings revealed profoundly dominant effects on gene expression likely indicating changes in ribosomal, mitochondrial, and anion transport functions.},
+    number = {7},
+
+}
+
+
+@Book{Wickham2016-gg,
+    author = {Hadley Wickham},
+    title = {ggplot2: Elegant Graphics for Data Analysis},
+    publisher = {Springer-Verlag New York},
+    year = {2016},
+    isbn = {978-3-319-24277-4},
+    url = {https://ggplot2.tidyverse.org},
+  }

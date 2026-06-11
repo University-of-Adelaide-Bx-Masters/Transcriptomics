@@ -1,0 +1,1250 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.7.32">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+<meta name="author" content="Stevie Pederson">
+
+<title>Transcriptomics Practical</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+html { -webkit-text-size-adjust: 100%; }
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+</style>
+
+
+<script src="scRNA_files/libs/clipboard/clipboard.min.js"></script>
+<script src="scRNA_files/libs/quarto-html/quarto.js" type="module"></script>
+<script src="scRNA_files/libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="scRNA_files/libs/quarto-html/popper.min.js"></script>
+<script src="scRNA_files/libs/quarto-html/tippy.umd.min.js"></script>
+<script src="scRNA_files/libs/quarto-html/anchor.min.js"></script>
+<link href="scRNA_files/libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="scRNA_files/libs/quarto-html/quarto-syntax-highlighting-37eea08aefeeee20ff55810ff984fec1.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="scRNA_files/libs/bootstrap/bootstrap.min.js"></script>
+<link href="scRNA_files/libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="scRNA_files/libs/bootstrap/bootstrap-1e1b6d7d3018d0281420745e134191b0.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+
+  <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
+
+<script type="text/javascript">
+const typesetMath = (el) => {
+  if (window.MathJax) {
+    // MathJax Typeset
+    window.MathJax.typeset([el]);
+  } else if (window.katex) {
+    // KaTeX Render
+    var mathElements = el.getElementsByClassName("math");
+    var macros = [];
+    for (var i = 0; i < mathElements.length; i++) {
+      var texText = mathElements[i].firstChild;
+      if (mathElements[i].tagName == "SPAN") {
+        window.katex.render(texText.data, mathElements[i], {
+          displayMode: mathElements[i].classList.contains('display'),
+          throwOnError: false,
+          macros: macros,
+          fleqn: false
+        });
+      }
+    }
+  }
+}
+window.Quarto = {
+  typesetMath
+};
+</script>
+
+</head>
+
+<body class="quarto-light">
+
+<div id="quarto-content" class="page-columns page-rows-contents page-layout-article">
+<div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+  <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">Table of contents</h2>
+   
+  <ul>
+  <li><a href="#introduction" id="toc-introduction" class="nav-link active" data-scroll-target="#introduction">Introduction</a>
+  <ul class="collapse">
+  <li><a href="#outline" id="toc-outline" class="nav-link" data-scroll-target="#outline">Outline</a></li>
+  <li><a href="#setup" id="toc-setup" class="nav-link" data-scroll-target="#setup">Setup</a></li>
+  <li><a href="#r-markdown" id="toc-r-markdown" class="nav-link" data-scroll-target="#r-markdown">R Markdown</a></li>
+  <li><a href="#data-import" id="toc-data-import" class="nav-link" data-scroll-target="#data-import">Data Import</a></li>
+  </ul></li>
+  <li><a href="#data-pre-processing" id="toc-data-pre-processing" class="nav-link" data-scroll-target="#data-pre-processing">Data Pre-Processing</a>
+  <ul class="collapse">
+  <li><a href="#barcode-ranks" id="toc-barcode-ranks" class="nav-link" data-scroll-target="#barcode-ranks">Barcode Ranks</a></li>
+  <li><a href="#finding-empty-droplets" id="toc-finding-empty-droplets" class="nav-link" data-scroll-target="#finding-empty-droplets">Finding Empty Droplets</a></li>
+  <li><a href="#removing-other-low-quality-cells" id="toc-removing-other-low-quality-cells" class="nav-link" data-scroll-target="#removing-other-low-quality-cells">Removing Other Low Quality Cells</a>
+  <ul class="collapse">
+  <li><a href="#adding-gene-annotations" id="toc-adding-gene-annotations" class="nav-link" data-scroll-target="#adding-gene-annotations">Adding Gene Annotations</a></li>
+  <li><a href="#adding-qc-statistics" id="toc-adding-qc-statistics" class="nav-link" data-scroll-target="#adding-qc-statistics">Adding QC Statistics</a></li>
+  <li><a href="#using-gene-information" id="toc-using-gene-information" class="nav-link" data-scroll-target="#using-gene-information">Using Gene Information</a></li>
+  <li><a href="#using-mitochondrial-information" id="toc-using-mitochondrial-information" class="nav-link" data-scroll-target="#using-mitochondrial-information">Using Mitochondrial Information</a></li>
+  <li><a href="#detection-of-doublets" id="toc-detection-of-doublets" class="nav-link" data-scroll-target="#detection-of-doublets">Detection of Doublets</a></li>
+  </ul></li>
+  <li><a href="#normalisation" id="toc-normalisation" class="nav-link" data-scroll-target="#normalisation">Normalisation</a></li>
+  </ul></li>
+  <li><a href="#dimensional-reduction" id="toc-dimensional-reduction" class="nav-link" data-scroll-target="#dimensional-reduction">Dimensional Reduction</a>
+  <ul class="collapse">
+  <li><a href="#variable-genes" id="toc-variable-genes" class="nav-link" data-scroll-target="#variable-genes">Variable genes</a></li>
+  <li><a href="#pca" id="toc-pca" class="nav-link" data-scroll-target="#pca">PCA</a></li>
+  <li><a href="#tsne" id="toc-tsne" class="nav-link" data-scroll-target="#tsne">tSNE</a></li>
+  <li><a href="#umap" id="toc-umap" class="nav-link" data-scroll-target="#umap">UMAP</a></li>
+  </ul></li>
+  <li><a href="#clustering" id="toc-clustering" class="nav-link" data-scroll-target="#clustering">Clustering</a>
+  <ul class="collapse">
+  <li><a href="#shared-neighbour-graphs" id="toc-shared-neighbour-graphs" class="nav-link" data-scroll-target="#shared-neighbour-graphs">Shared Neighbour Graphs</a>
+  <ul class="collapse">
+  <li><a href="#checking-for-artefacts" id="toc-checking-for-artefacts" class="nav-link" data-scroll-target="#checking-for-artefacts">Checking for artefacts</a></li>
+  </ul></li>
+  <li><a href="#k-means-clustering" id="toc-k-means-clustering" class="nav-link" data-scroll-target="#k-means-clustering">k-Means Clustering</a>
+  <ul class="collapse">
+  <li><a href="#additional-notes-regarding-k-means" id="toc-additional-notes-regarding-k-means" class="nav-link" data-scroll-target="#additional-notes-regarding-k-means">Additional notes regarding k-means</a></li>
+  </ul></li>
+  </ul></li>
+  <li><a href="#marker-gene-detection" id="toc-marker-gene-detection" class="nav-link" data-scroll-target="#marker-gene-detection">Marker Gene Detection</a>
+  <ul class="collapse">
+  <li><a href="#genes-which-are-de-somewhere" id="toc-genes-which-are-de-somewhere" class="nav-link" data-scroll-target="#genes-which-are-de-somewhere">Genes which are DE somewhere</a></li>
+  <li><a href="#genes-which-are-de-in-many-comparisons" id="toc-genes-which-are-de-in-many-comparisons" class="nav-link" data-scroll-target="#genes-which-are-de-in-many-comparisons">Genes which are DE in many comparisons</a></li>
+  <li><a href="#genes-which-are-de-in-all-comparisons" id="toc-genes-which-are-de-in-all-comparisons" class="nav-link" data-scroll-target="#genes-which-are-de-in-all-comparisons">Genes which are DE in all comparisons</a></li>
+  <li><a href="#alternative-tests" id="toc-alternative-tests" class="nav-link" data-scroll-target="#alternative-tests">Alternative Tests</a></li>
+  </ul></li>
+  <li><a href="#visualisation" id="toc-visualisation" class="nav-link" data-scroll-target="#visualisation">Visualisation</a>
+  <ul class="collapse">
+  <li><a href="#using-pcatsne" id="toc-using-pcatsne" class="nav-link" data-scroll-target="#using-pcatsne">Using PCA/TSNE</a></li>
+  <li><a href="#violin-plots" id="toc-violin-plots" class="nav-link" data-scroll-target="#violin-plots">Violin Plots</a></li>
+  </ul></li>
+  <li><a href="#conclusion" id="toc-conclusion" class="nav-link" data-scroll-target="#conclusion">Conclusion</a></li>
+  </ul>
+</nav>
+</div>
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<h1 class="title">Transcriptomics Practical</h1>
+<p class="subtitle lead">scRNA Analysis</p>
+</div>
+
+
+<div class="quarto-title-meta-author">
+  <div class="quarto-title-meta-heading">Author</div>
+  <div class="quarto-title-meta-heading">Affiliation</div>
+  
+    <div class="quarto-title-meta-contents">
+    <p class="author">Stevie Pederson </p>
+  </div>
+  <div class="quarto-title-meta-contents">
+        <p class="affiliation">
+            Adelaide University &amp; Black Ochre Data Labs
+          </p>
+      </div>
+  </div>
+
+<div class="quarto-title-meta">
+
+      
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<section id="introduction" class="level1">
+<h1>Introduction</h1>
+<p>Today we’ll look at working with scRNA data, after alignment and assignment of reads to genes. The data we’ll work with was generated using the 10X Genomics Chromium system (i.e.&nbsp;a droplet-based protocol) followed by the Cell Ranger pipeline, and is available from the 10X Genomics website. This pipeline has already aligned reads to the genome using STAR and counted individual UMIs for each gene. All reads were obtained from Peripheral Blood Mononuclear Cells (PBMCs) from a single healthy donor. A summary of the Cell Ranger output can be found <a href="http://cf.10xgenomics.com/samples/cell-exp/3.0.0/pbmc_1k_v3/pbmc_1k_v3_web_summary.html">here</a></p>
+<p>In addition to the above all barcodes returning a UMI count of zero have been removed, ensuring the data is a little smaller and more workable than the original (&gt;300,000 barcodes).</p>
+<section id="outline" class="level2">
+<h2 class="anchored" data-anchor-id="outline">Outline</h2>
+<p>Today we’ll go through some QC steps with the aim of defining clusters that represent individual cell types within the original sample. Once we’ve obtained the clusters, we’ll try and identify marker genes for each cell-type. Along the way we’ll also explore multiple approaches for visualising scRNA data.</p>
+</section>
+<section id="setup" class="level2">
+<h2 class="anchored" data-anchor-id="setup">Setup</h2>
+<p>Let’s create a new R Project called <code>scRNA</code> inside your transcriptomics folder. Making sure you are in the correct project folder, create a new directory called <code>data</code></p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">mkdir</span> data</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<!-- THESE LINKS NEED CHANING ONCE VMs ARE CONFIGURED -->
+<p>Once you’ve formed this folder and project, head to the <code>Terminal</code> and using bash, download today’s data from <a href="data/scrna_practical_data.tar.gz">this link</a> using <code>wget</code>.</p>
+<p>Once you have obtained this file, please extract it using the following command.</p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="bu">cd</span> data</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="fu">tar</span> <span class="at">-xzvf</span> scrna_practical_data.tar.gz</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>This should produce a folder called <code>raw_feature_bc_matrix</code> and inside that folder will be three files. Please check that you have everything required using the following command <strong>in the bash Terminal</strong> (not the R Console).</p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="fu">ls</span> <span class="at">-alh</span> data/raw_feature_bc_matrix</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell">
+<div class="cell-output cell-output-stdout">
+<pre><code>total 52M
+drwxrwxr-x 2 my_userid myuser_id 4.0K May 26  2020 .
+drwxrwxr-x 3 my_userid myuser_id 4.0K Nov  9 23:55 ..
+-rw-rw-r-- 1 my_userid myuser_id 4.3M May 26  2020 barcodes.tsv
+-rw-rw-r-- 1 my_userid myuser_id 794K May 26  2020 genes.tsv
+-rw-rw-r-- 1 my_userid myuser_id  47M May 26  2020 matrix.mtx</code></pre>
+</div>
+</div>
+<p>After this, please check the <code>md5sum</code> for each file to ensure that the data has transferred correctly. Your values should match the following output exactly. These are checksums (or mds5sums) which will be different to the values shown below if any content within a files has changed.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="fu">md5sum</span> data/raw_feature_bc_matrix/<span class="pp">*</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>6ab3b16bc6c70ad66e9940ca7a8b8b86  data/raw_feature_bc_matrix/barcodes.tsv
+b9995e9e7ba8a6d010dbb753e61b808a  data/raw_feature_bc_matrix/genes.tsv
+a9af001ff63a23377fd73a87aebf2952  data/raw_feature_bc_matrix/matrix.mtx</code></pre>
+</div>
+</div>
+</section>
+<section id="r-markdown" class="level2">
+<h2 class="anchored" data-anchor-id="r-markdown">R Markdown</h2>
+<p>Now that we’ve made sure we have the correct data for today, and that everything is in the correct place, let’s begin our R Markdown document. Once you’ve finished your <code>YAML</code> header, here are my <code>setup</code> and <code>loadPackages</code> chunks.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>knitr<span class="sc">::</span>opts_chunk<span class="sc">$</span><span class="fu">set</span>(</span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>    <span class="at">echo =</span> <span class="cn">TRUE</span>, </span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>    <span class="at">message =</span> <span class="cn">FALSE</span>, </span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a>    <span class="at">warning =</span> <span class="cn">FALSE</span>,</span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a>    <span class="at">fig.align =</span> <span class="st">"center"</span></span>
+<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell" data-layout-align="center">
+<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tidyverse)</span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(scales)</span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(DropletUtils)</span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(scater)</span>
+<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(scran)</span>
+<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(scDblFinder)</span>
+<span id="cb8-7"><a href="#cb8-7" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(rtracklayer)</span>
+<span id="cb8-8"><a href="#cb8-8" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(patchwork)</span>
+<span id="cb8-9"><a href="#cb8-9" aria-hidden="true" tabindex="-1"></a><span class="fu">theme_set</span>(<span class="fu">theme_bw</span>())</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>If any of the above packages are not installed on your VMs, please install using <code>BiocManager::install("pkgName")</code>.</p>
+</section>
+<section id="data-import" class="level2">
+<h2 class="anchored" data-anchor-id="data-import">Data Import</h2>
+<p>The basic R object structure that we work with for scRNA data is known as a <code>SingleCellExperiment</code> object. Once again, this is an <code>S4</code> object so the structure is fairly inflexible, and with good reason. Given that the output from the 10X Genomics <code>CellRanger</code> pipeline is fairly common, we can import these directly using the function <code>read10xCounts()</code>. This will take 20-30 seconds to run.</p>
+<div class="cell" data-layout-align="center">
+<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>sce <span class="ot">&lt;-</span> <span class="fu">read10xCounts</span>(<span class="st">"data/raw_feature_bc_matrix"</span>)</span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>sce</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>class: SingleCellExperiment 
+dim: 33538 234600 
+metadata(1): Samples
+assays(1): counts
+rownames(33538): ENSG00000243485 ENSG00000237613 ... ENSG00000277475
+  ENSG00000268674
+rowData names(2): ID Symbol
+colnames: NULL
+colData names(2): Sample Barcode
+reducedDimNames(0):
+mainExpName: NULL
+altExpNames(0):</code></pre>
+</div>
+</div>
+<p>Take a moment to look at all the information printed to the screen</p>
+<div class="callout callout-style-default callout-important callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Important
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p><em>In this initial object, how many genes do we have and many cells do we have?</em></p>
+</div>
+</div>
+<!-- Insert a section here describing rowData & colData as the core concepts in SummarizedExperiment objects -->
+<p>Now we have our object imported, we should be setup and ready to start the filtering.</p>
+</section>
+</section>
+<section id="data-pre-processing" class="level1">
+<h1>Data Pre-Processing</h1>
+<section id="barcode-ranks" class="level2">
+<h2 class="anchored" data-anchor-id="barcode-ranks">Barcode Ranks</h2>
+<p>The first step in any scRNA analysis is to remove empty droplets which really means remove barcodes for which no cellular information was obtained. The GEMs may have not had a cell, may have had free RNA or the library preparation may have just failed for some other reason. The most common approach is to rank each cell by the total counts and find where the clear dropoff in counts is that is likely to represent empty cells.</p>
+<div class="cell" data-layout-align="center">
+<div class="sourceCode cell-code" id="cb11"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a>bcRanks <span class="ot">&lt;-</span> sce <span class="sc">%&gt;%</span></span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">counts</span>() <span class="sc">%&gt;%</span></span>
+<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">barcodeRanks</span>()</span>
+<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a>bcRanks</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>This gives a <code>DataFrame</code> with each barcode’s rank and the total UMI count associated with each barcode. Hidden inside this object is a metadata element, which we can access using <code>metadata()</code>. The values for <code>knee</code> and <code>inflection</code> refer to the points 1) where the UMI counts being to drop off, and 2) where the drop begins to flatten out again. The most informative of these is the <code>knee</code> and gives an initial idea as to how many cells we may retain as informative.</p>
+<div class="cell" data-layout-align="center">
+<div class="sourceCode cell-code" id="cb12"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="fu">metadata</span>(bcRanks)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell" data-layout-align="center">
+<div class="sourceCode cell-code" id="cb13"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a>bcRanks <span class="sc">%&gt;%</span> <span class="fu">subset</span>(total <span class="sc">&gt;</span> <span class="fu">metadata</span>(.)<span class="sc">$</span>knee)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>We can see this visually, and it seems like we may lose a few informative cells if we use this as out initial filter.</p>
+<div class="cell" data-layout-align="center">
+<div class="sourceCode cell-code" id="cb14"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a>bcRanks <span class="sc">%&gt;%</span></span>
+<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">subset</span>(total <span class="sc">&gt;</span> <span class="dv">1</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">as.data.frame</span>() <span class="sc">%&gt;%</span></span>
+<span id="cb14-4"><a href="#cb14-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(rank, total)) <span class="sc">+</span></span>
+<span id="cb14-5"><a href="#cb14-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>(<span class="at">alpha =</span> <span class="fl">0.5</span>) <span class="sc">+</span></span>
+<span id="cb14-6"><a href="#cb14-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_hline</span>(</span>
+<span id="cb14-7"><a href="#cb14-7" aria-hidden="true" tabindex="-1"></a>    <span class="at">yintercept =</span> <span class="fu">metadata</span>(bcRanks)<span class="sc">$</span>knee,</span>
+<span id="cb14-8"><a href="#cb14-8" aria-hidden="true" tabindex="-1"></a>    <span class="at">linetype =</span> <span class="dv">2</span>,</span>
+<span id="cb14-9"><a href="#cb14-9" aria-hidden="true" tabindex="-1"></a>    <span class="at">colour =</span> <span class="st">"green"</span></span>
+<span id="cb14-10"><a href="#cb14-10" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">+</span></span>
+<span id="cb14-11"><a href="#cb14-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_hline</span>(</span>
+<span id="cb14-12"><a href="#cb14-12" aria-hidden="true" tabindex="-1"></a>    <span class="at">yintercept =</span> <span class="fu">metadata</span>(bcRanks)<span class="sc">$</span>inflection,</span>
+<span id="cb14-13"><a href="#cb14-13" aria-hidden="true" tabindex="-1"></a>    <span class="at">linetype =</span> <span class="dv">2</span>,</span>
+<span id="cb14-14"><a href="#cb14-14" aria-hidden="true" tabindex="-1"></a>    <span class="at">colour =</span> <span class="st">"red"</span></span>
+<span id="cb14-15"><a href="#cb14-15" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">+</span></span>
+<span id="cb14-16"><a href="#cb14-16" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_x_log10</span>(<span class="at">label =</span> comma) <span class="sc">+</span></span>
+<span id="cb14-17"><a href="#cb14-17" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_y_log10</span>(<span class="at">label =</span> comma) <span class="sc">+</span></span>
+<span id="cb14-18"><a href="#cb14-18" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">x =</span> <span class="st">"Barcode Rank"</span>, <span class="at">y =</span> <span class="st">"Total UMI Counts"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+<section id="finding-empty-droplets" class="level2">
+<h2 class="anchored" data-anchor-id="finding-empty-droplets">Finding Empty Droplets</h2>
+<p>The function <code>emptyDrops()</code> actually performs a fairly sophisticated analysis. By default any cell with counts &lt; 100 (<code>lower = 100</code>) is confidently assumed not to contain a cell, and is used to build a profile of the expected ambient RNA. A Monte Carlo (i.e.&nbsp;random sampling) approach is then taken to provide a p-value for the probability of a barcode representing an empty droplet.</p>
+<div class="cell" data-layout-align="center">
+<div class="sourceCode cell-code" id="cb15"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a>emptyBC <span class="ot">&lt;-</span> sce <span class="sc">%&gt;%</span></span>
+<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">counts</span>() <span class="sc">%&gt;%</span></span>
+<span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">emptyDrops</span>()</span>
+<span id="cb15-4"><a href="#cb15-4" aria-hidden="true" tabindex="-1"></a>emptyBC</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>Note that this is specifically designed to be the same size as the the number of barcodes in our <code>sce</code> object. To really check our results, we can use and FDR filter to provide support for a droplet being considered as containing a cell.</p>
+<div class="cell" data-layout-align="center">
+<div class="sourceCode cell-code" id="cb16"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a><span class="fu">subset</span>(emptyBC, FDR <span class="sc">&lt;</span> <span class="fl">0.01</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>As you can see, this has identified 1185 droplets as containing a cell. Notice that the original (unfiltered) data was 234,600 barcodes, so we have a fairly high rate (99.5%) of empty droplets.</p>
+<p>Let’s check how this result tracks with UMI counts, and compare it with our naive <code>knee</code> and <code>inflection</code> values obtained from <code>barcodeRanks()</code></p>
+<div class="cell" data-layout-align="center">
+<div class="sourceCode cell-code" id="cb17"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a>emptyBC <span class="sc">%&gt;%</span></span>
+<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">subset</span>(<span class="sc">!</span><span class="fu">is.na</span>(LogProb)) <span class="sc">%&gt;%</span></span>
+<span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">as.data.frame</span>() <span class="sc">%&gt;%</span></span>
+<span id="cb17-4"><a href="#cb17-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">isCell =</span> FDR <span class="sc">&lt;</span> <span class="fl">0.01</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb17-5"><a href="#cb17-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(Total, <span class="sc">-</span>LogProb, <span class="at">colour =</span> isCell)) <span class="sc">+</span></span>
+<span id="cb17-6"><a href="#cb17-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>() <span class="sc">+</span></span>
+<span id="cb17-7"><a href="#cb17-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_vline</span>(</span>
+<span id="cb17-8"><a href="#cb17-8" aria-hidden="true" tabindex="-1"></a>    <span class="at">xintercept =</span> <span class="fu">unlist</span>(<span class="fu">metadata</span>(bcRanks)),</span>
+<span id="cb17-9"><a href="#cb17-9" aria-hidden="true" tabindex="-1"></a>    <span class="at">linetype =</span> <span class="dv">2</span>,</span>
+<span id="cb17-10"><a href="#cb17-10" aria-hidden="true" tabindex="-1"></a>    <span class="at">colour =</span> <span class="st">"blue"</span></span>
+<span id="cb17-11"><a href="#cb17-11" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">+</span></span>
+<span id="cb17-12"><a href="#cb17-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_colour_manual</span>(<span class="at">values =</span> <span class="fu">c</span>(<span class="st">"black"</span>, <span class="st">"red"</span>)) <span class="sc">+</span></span>
+<span id="cb17-13"><a href="#cb17-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">x =</span> <span class="st">"Total UMI Count"</span>, <span class="at">y =</span> <span class="st">"-logProb"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>As you can see, there may be a few outliers at the top with very large UMI counts too. Let’s save this as a new <code>SingleCellExperiment</code> object, only retaining the droplets which contain a cell.</p>
+<div class="cell" data-layout-align="center">
+<div class="sourceCode cell-code" id="cb18"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a>sceWC <span class="ot">&lt;-</span> sce[,<span class="fu">which</span>(emptyBC<span class="sc">$</span>FDR <span class="sc">&lt;</span> <span class="fl">0.01</span>)]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+<section id="removing-other-low-quality-cells" class="level2">
+<h2 class="anchored" data-anchor-id="removing-other-low-quality-cells">Removing Other Low Quality Cells</h2>
+<section id="adding-gene-annotations" class="level3">
+<h3 class="anchored" data-anchor-id="adding-gene-annotations">Adding Gene Annotations</h3>
+<p>Now we have the identified the droplets which contain a cell, we still have no idea about the quality of the cells within each droplet. Some may be doublets, whilst others may be low quality (i.e.&nbsp;broken prior to incorporation in the droplet). As we’ll use mitochondrial reads for part of this process, we’ll need to map our gene IDs to where they actually lie on the genome. For this step, and for downstream analysis, we’ll need to know which gene is which.</p>
+<p>Given that the data was made public in Nov 2018, it’s likely that Ensembl Release 93 will be close to the gene annotations used for obtaining the UMI counts. Unfortunately, 10X genomics have not made this information public so we can’t be sure, but testing seemed to check this guess out.</p>
+<p>Head to https://ftp.ensembl.org/pub/release-93/gtf/homo_sapiens/ and download the file Homo_sapiens.GRCh38.93.gtf.gz into the directory ‘data’. (Use <code>wget</code> once you have the correct download path)</p>
+<p>Once this has downloaded, load the gene-level information.</p>
+<div class="cell" data-layout-align="center">
+<div class="sourceCode cell-code" id="cb19"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a>genesGR <span class="ot">&lt;-</span> <span class="fu">import.gff</span>(<span class="st">"data/Homo_sapiens.GRCh38.93.gtf.gz"</span>, <span class="at">feature.type =</span> <span class="st">"gene"</span>)</span>
+<span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a><span class="fu">names</span>(genesGR) <span class="ot">&lt;-</span> genesGR<span class="sc">$</span>gene_id</span>
+<span id="cb19-3"><a href="#cb19-3" aria-hidden="true" tabindex="-1"></a>genesGR</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>We can place the <code>GRanges</code> object associated with each gene in the <code>rowRanges</code> slot within the <code>SingleCellExperiment</code> object.</p>
+<div class="cell" data-layout-align="center">
+<div class="sourceCode cell-code" id="cb20"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a><span class="fu">rowRanges</span>(sceWC) <span class="ot">&lt;-</span> genesGR[<span class="fu">rownames</span>(sceWC)]</span>
+<span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a><span class="fu">rowRanges</span>(sceWC)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+<section id="adding-qc-statistics" class="level3">
+<h3 class="anchored" data-anchor-id="adding-qc-statistics">Adding QC Statistics</h3>
+<p>We can now use the mitochondrial genes to perform QC.</p>
+<div class="cell" data-layout-align="center">
+<div class="sourceCode cell-code" id="cb21"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a>mito <span class="ot">&lt;-</span> sceWC <span class="sc">%&gt;%</span></span>
+<span id="cb21-2"><a href="#cb21-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">seqnames</span>() <span class="sc">%&gt;%</span></span>
+<span id="cb21-3"><a href="#cb21-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">as.character</span>() <span class="sc">%&gt;%</span> </span>
+<span id="cb21-4"><a href="#cb21-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">str_detect</span>(<span class="st">"MT"</span>)</span>
+<span id="cb21-5"><a href="#cb21-5" aria-hidden="true" tabindex="-1"></a><span class="fu">table</span>(mito)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>We can see that we have UMI counts for 13 mitochondrial genes and we can use these to assess whether a cell contains an excessive amount of mitochondrial RNA, as an indicator of a cell which has ruptured. The function <code>addPerCellQC()</code> will modify the <code>colData</code> of the object, so we have all of our QC stats included in the object, as opposed to having multiple objects with different sources and getting ourselves confused.</p>
+<p>Let’s check the <code>colData(sceWC)</code> first, and notice that we only have two columns, with the primary column being the Barcode.</p>
+<div class="cell" data-layout-align="center">
+<div class="sourceCode cell-code" id="cb22"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a><span class="fu">colData</span>(sceWC)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>Once you’ve checked that, run <code>addPerCellQC()</code> and check the <code>colData()</code> once again.</p>
+<div class="cell" data-layout-align="center">
+<div class="sourceCode cell-code" id="cb23"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a>sceWC <span class="ot">&lt;-</span> <span class="fu">addPerCellQC</span>(sceWC, <span class="at">subsets =</span> <span class="fu">list</span>(<span class="at">mito =</span> mito))</span>
+<span id="cb23-2"><a href="#cb23-2" aria-hidden="true" tabindex="-1"></a><span class="fu">colData</span>(sceWC)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>Now we have:</p>
+<ul>
+<li>the UMI library sizes (sum/total)</li>
+<li>the number of detected genes (i.e.&nbsp;with at least one read)</li>
+<li>the details about the mitochondrial content of each droplet</li>
+</ul>
+<p>We can manually use these for QC, so let’s check the library sizes against the number of detected genes first.</p>
+</section>
+<section id="using-gene-information" class="level3">
+<h3 class="anchored" data-anchor-id="using-gene-information">Using Gene Information</h3>
+<div class="cell" data-layout-align="center">
+<div class="sourceCode cell-code" id="cb24"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a><span class="fu">colData</span>(sceWC) <span class="sc">%&gt;%</span></span>
+<span id="cb24-2"><a href="#cb24-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">as.data.frame</span>() <span class="sc">%&gt;%</span></span>
+<span id="cb24-3"><a href="#cb24-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(detected, sum)) <span class="sc">+</span></span>
+<span id="cb24-4"><a href="#cb24-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>() <span class="sc">+</span></span>
+<span id="cb24-5"><a href="#cb24-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_smooth</span>(<span class="at">se =</span> <span class="cn">FALSE</span>) <span class="sc">+</span></span>
+<span id="cb24-6"><a href="#cb24-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_x_log10</span>(<span class="at">label =</span> comma) <span class="sc">+</span> </span>
+<span id="cb24-7"><a href="#cb24-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_y_log10</span>(<span class="at">label =</span> comma) <span class="sc">+</span></span>
+<span id="cb24-8"><a href="#cb24-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">x =</span> <span class="st">"Detected Genes"</span>, <span class="at">y =</span> <span class="st">"Total UMI Count"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>This seems pretty consistent using visual inspection. In particular, we are looking for cells which:</p>
+<ul>
+<li>have unusually high counts as that may indicate a doublet</li>
+<li>contain low numbers of reads/detected genes as these are likely to poorly sampled transcriptomes</li>
+</ul>
+<p>There do appear to be some cells at the low end which are poorly sampled cells. We can add this directly to the colData in our <code>SingleCellExperiment</code> object, using the arbitrarily chosen value of 200.</p>
+<div class="cell" data-layout-align="center">
+<div class="sourceCode cell-code" id="cb25"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a>sceWC<span class="sc">$</span>lowCounts <span class="ot">&lt;-</span> <span class="fu">colData</span>(sceWC)<span class="sc">$</span>detected <span class="sc">&lt;</span> <span class="dv">200</span></span>
+<span id="cb25-2"><a href="#cb25-2" aria-hidden="true" tabindex="-1"></a><span class="fu">table</span>(sceWC<span class="sc">$</span>lowCounts)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+<section id="using-mitochondrial-information" class="level3">
+<h3 class="anchored" data-anchor-id="using-mitochondrial-information">Using Mitochondrial Information</h3>
+<p>Next we’ll check the mitochondrial content by plotting the number of mitochondrial genes detected against the proportion of the library which is mitochondrial.</p>
+<div class="cell" data-layout-align="center">
+<div class="sourceCode cell-code" id="cb26"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a><span class="fu">colData</span>(sceWC) <span class="sc">%&gt;%</span></span>
+<span id="cb26-2"><a href="#cb26-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">as.data.frame</span>() <span class="sc">%&gt;%</span></span>
+<span id="cb26-3"><a href="#cb26-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">subsets_mito_detected =</span> <span class="fu">as.factor</span>(subsets_mito_detected)) <span class="sc">%&gt;%</span></span>
+<span id="cb26-4"><a href="#cb26-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(subsets_mito_detected, subsets_mito_percent)) <span class="sc">+</span></span>
+<span id="cb26-5"><a href="#cb26-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_boxplot</span>() <span class="sc">+</span></span>
+<span id="cb26-6"><a href="#cb26-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_hline</span>(<span class="at">yintercept =</span> <span class="dv">20</span>, <span class="at">linetype =</span> <span class="dv">2</span>)  <span class="sc">+</span></span>
+<span id="cb26-7"><a href="#cb26-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">x =</span> <span class="st">"Number of Mitochondrial Genes Detected"</span>, <span class="at">y =</span> <span class="st">"Mitochondrial %"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>Now we have some cells which appear to be outliers, with some being nearly 100% mitochondrial. These are likely to be damaged cells, and as such, will be not a good sample of the true transcriptional state of the cell. We could manually set a threshold anywhere we choose, and I’d be tempted by 20% given this plot.</p>
+<div class="cell" data-layout-align="center">
+<div class="sourceCode cell-code" id="cb27"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true" tabindex="-1"></a>sceWC<span class="sc">$</span>hiMito <span class="ot">&lt;-</span> <span class="fu">colData</span>(sceWC)<span class="sc">$</span>subsets_mito_percent <span class="sc">&gt;</span> <span class="dv">20</span></span>
+<span id="cb27-2"><a href="#cb27-2" aria-hidden="true" tabindex="-1"></a><span class="fu">table</span>(sceWC<span class="sc">$</span>hiMito)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>By this strategy, we would lose 82 cells. Let’s see how this relates to the small library sizes</p>
+<div class="cell" data-layout-align="center">
+<div class="sourceCode cell-code" id="cb28"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb28-1"><a href="#cb28-1" aria-hidden="true" tabindex="-1"></a><span class="fu">colData</span>(sceWC) <span class="sc">%&gt;%</span></span>
+<span id="cb28-2"><a href="#cb28-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">as.data.frame</span>() <span class="sc">%&gt;%</span></span>
+<span id="cb28-3"><a href="#cb28-3" aria-hidden="true" tabindex="-1"></a>  dplyr<span class="sc">::</span><span class="fu">count</span>(lowCounts, hiMito)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>Combining these two filtering approaches, we would now retain 1089 cells for downstream analysis.</p>
+</section>
+<section id="detection-of-doublets" class="level3">
+<h3 class="anchored" data-anchor-id="detection-of-doublets">Detection of Doublets</h3>
+<p>An automated approach to doublet detection is also available. This simulates doublets by adding sets of two randomly selected cells and uses this set of information to provide a score for whether a cell is likely to be a doublet.</p>
+<div class="cell" data-layout-align="center">
+<div class="sourceCode cell-code" id="cb29"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb29-1"><a href="#cb29-1" aria-hidden="true" tabindex="-1"></a>sceWC <span class="ot">&lt;-</span> <span class="fu">scDblFinder</span>(sceWC) </span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell" data-layout-align="center">
+<div class="sourceCode cell-code" id="cb30"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb30-1"><a href="#cb30-1" aria-hidden="true" tabindex="-1"></a><span class="fu">colData</span>(sceWC) <span class="sc">%&gt;%</span></span>
+<span id="cb30-2"><a href="#cb30-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">as.data.frame</span>() <span class="sc">%&gt;%</span></span>
+<span id="cb30-3"><a href="#cb30-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(detected, sum)) <span class="sc">+</span></span>
+<span id="cb30-4"><a href="#cb30-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>(<span class="fu">aes</span>(<span class="at">colour =</span> scDblFinder.class)) <span class="sc">+</span></span>
+<span id="cb30-5"><a href="#cb30-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_smooth</span>(<span class="at">se =</span> <span class="cn">FALSE</span>) <span class="sc">+</span></span>
+<span id="cb30-6"><a href="#cb30-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_x_log10</span>(<span class="at">label =</span> comma) <span class="sc">+</span> </span>
+<span id="cb30-7"><a href="#cb30-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_y_log10</span>(<span class="at">label =</span> comma) <span class="sc">+</span></span>
+<span id="cb30-8"><a href="#cb30-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_colour_brewer</span>(<span class="at">palette =</span> <span class="st">"Set1"</span>) <span class="sc">+</span></span>
+<span id="cb30-9"><a href="#cb30-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">x =</span> <span class="st">"Detected Genes"</span>, <span class="at">y =</span> <span class="st">"Total UMI Count"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell" data-layout-align="center">
+<div class="sourceCode cell-code" id="cb31"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb31-1"><a href="#cb31-1" aria-hidden="true" tabindex="-1"></a>sceWC<span class="sc">$</span>discard <span class="ot">&lt;-</span> <span class="fu">colData</span>(sceWC) <span class="sc">%&gt;%</span></span>
+<span id="cb31-2"><a href="#cb31-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">with</span>(</span>
+<span id="cb31-3"><a href="#cb31-3" aria-hidden="true" tabindex="-1"></a>    lowCounts <span class="sc">|</span> hiMito <span class="sc">|</span> scDblFinder.class <span class="sc">==</span> <span class="st">"coublet"</span></span>
+<span id="cb31-4"><a href="#cb31-4" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb31-5"><a href="#cb31-5" aria-hidden="true" tabindex="-1"></a><span class="fu">colData</span>(sceWC) <span class="sc">%&gt;%</span></span>
+<span id="cb31-6"><a href="#cb31-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">as.data.frame</span>() <span class="sc">%&gt;%</span></span>
+<span id="cb31-7"><a href="#cb31-7" aria-hidden="true" tabindex="-1"></a>  dplyr<span class="sc">::</span><span class="fu">count</span>(</span>
+<span id="cb31-8"><a href="#cb31-8" aria-hidden="true" tabindex="-1"></a>    lowCounts, hiMito, scDblFinder.class, discard</span>
+<span id="cb31-9"><a href="#cb31-9" aria-hidden="true" tabindex="-1"></a>  )</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>Checking all of our QC criteria we would now have 1089 cells to keep for clustering.</p>
+<p>Let’s proceed with a filtered version of the above dataset using our manual filtering approach to remove low quality cells. However, we’ll also <strong>remove any genes with zero counts</strong> at this point too. We can add this largest observed count to the <code>rowData()</code> as this time we’re working with <em>gene-level</em> information.</p>
+<div class="cell" data-layout-align="center">
+<div class="sourceCode cell-code" id="cb32"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb32-1"><a href="#cb32-1" aria-hidden="true" tabindex="-1"></a><span class="fu">rowData</span>(sceWC)<span class="sc">$</span>maxCount <span class="ot">&lt;-</span> sceWC <span class="sc">%&gt;%</span></span>
+<span id="cb32-2"><a href="#cb32-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">counts</span>() <span class="sc">%&gt;%</span></span>
+<span id="cb32-3"><a href="#cb32-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">as.matrix</span>() <span class="sc">%&gt;%</span></span>
+<span id="cb32-4"><a href="#cb32-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">rowMaxs</span>() </span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>The <code>subset()</code> function for <code>SingleCellExperiment</code> objects is a little different. For this the argument <code>subset</code> refers to the <code>rowData()</code> element, whilst the <code>select</code> argument refers to the <code>colData()</code> element.</p>
+<div class="cell" data-layout-align="center">
+<div class="sourceCode cell-code" id="cb33"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb33-1"><a href="#cb33-1" aria-hidden="true" tabindex="-1"></a>sceFilt <span class="ot">&lt;-</span> <span class="fu">subset</span>(sceWC, <span class="at">subset =</span> maxCount <span class="sc">&gt;</span> <span class="dv">0</span>, <span class="at">select =</span> <span class="sc">!</span>discard)</span>
+<span id="cb33-2"><a href="#cb33-2" aria-hidden="true" tabindex="-1"></a>sceFilt</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+</section>
+<section id="normalisation" class="level2">
+<h2 class="anchored" data-anchor-id="normalisation">Normalisation</h2>
+<p>We can take a couple of different approaches to normalisation, and today we’ll use the deconvolution approach. Under this approach we’ll perform some quick and unsophisticated clustering and calculate normalisation factors for each cluster, in a similar manner to bulk-RNA. The clusters are then deconvoluted back to the individual cells for cell-specific normalisation factors. There is only a slight difference in the final values obtained under this method and normalisation by library size, so both are generally appropriate.</p>
+<div class="cell" data-layout-align="center">
+<div class="sourceCode cell-code" id="cb34"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb34-1"><a href="#cb34-1" aria-hidden="true" tabindex="-1"></a>sceFilt<span class="sc">$</span>quickClust <span class="ot">&lt;-</span> <span class="fu">quickCluster</span>(sceFilt)</span>
+<span id="cb34-2"><a href="#cb34-2" aria-hidden="true" tabindex="-1"></a><span class="fu">table</span>(sceFilt<span class="sc">$</span>quickClust)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell" data-layout-align="center">
+<div class="sourceCode cell-code" id="cb35"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb35-1"><a href="#cb35-1" aria-hidden="true" tabindex="-1"></a><span class="fu">sizeFactors</span>(sceFilt) <span class="ot">&lt;-</span> <span class="fu">calculateSumFactors</span>(sceFilt, <span class="at">cluster =</span> <span class="fu">colData</span>(sceFilt)<span class="sc">$</span>quickClust)</span>
+<span id="cb35-2"><a href="#cb35-2" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(<span class="fu">sizeFactors</span>(sceFilt))</span>
+<span id="cb35-3"><a href="#cb35-3" aria-hidden="true" tabindex="-1"></a><span class="fu">colData</span>(sceFilt) <span class="sc">%&gt;%</span></span>
+<span id="cb35-4"><a href="#cb35-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">as.data.frame</span>() <span class="sc">%&gt;%</span></span>
+<span id="cb35-5"><a href="#cb35-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">size_factors =</span> <span class="fu">sizeFactors</span>(sceFilt)) <span class="sc">%&gt;%</span></span>
+<span id="cb35-6"><a href="#cb35-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(sum, size_factors)) <span class="sc">+</span></span>
+<span id="cb35-7"><a href="#cb35-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>() </span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>Now that we have found our factors for normalisaton, we can add our normalised counts to the <code>SingleCellExperiment</code> object. We do this simply by calling the function <code>logNormCounts()</code> which adds this as a new <code>assay</code> to the original object.</p>
+<div class="cell" data-layout-align="center">
+<div class="sourceCode cell-code" id="cb36"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb36-1"><a href="#cb36-1" aria-hidden="true" tabindex="-1"></a>sceFilt <span class="ot">&lt;-</span> <span class="fu">logNormCounts</span>(sceFilt)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+</section>
+<section id="dimensional-reduction" class="level1">
+<h1>Dimensional Reduction</h1>
+<section id="variable-genes" class="level2">
+<h2 class="anchored" data-anchor-id="variable-genes">Variable genes</h2>
+<p>Now we have all that we need to start the fun part of the analysis, which is clustering the cells and identifying cell types and marker genes. The first step towards this is to select the most variable genes as that is where the bulk of our biological signal should come from. First we need to model our gene-level means and variances</p>
+<div class="cell" data-layout-align="center">
+<div class="sourceCode cell-code" id="cb37"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb37-1"><a href="#cb37-1" aria-hidden="true" tabindex="-1"></a>geneVars <span class="ot">&lt;-</span> <span class="fu">modelGeneVar</span>(sceFilt)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>We can inspect the relationship between these using the <code>metadata()</code> element of this object. It’s a bit messy though.</p>
+<div class="cell" data-layout-align="center">
+<div class="sourceCode cell-code" id="cb38"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb38-1"><a href="#cb38-1" aria-hidden="true" tabindex="-1"></a>geneVars <span class="sc">%&gt;%</span></span>
+<span id="cb38-2"><a href="#cb38-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">metadata</span>() <span class="sc">%&gt;%</span></span>
+<span id="cb38-3"><a href="#cb38-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">with</span>(</span>
+<span id="cb38-4"><a href="#cb38-4" aria-hidden="true" tabindex="-1"></a>    <span class="fu">tibble</span>(mean, var, <span class="at">trend =</span> <span class="fu">trend</span>(mean))</span>
+<span id="cb38-5"><a href="#cb38-5" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">%&gt;%</span></span>
+<span id="cb38-6"><a href="#cb38-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">arrange</span>(<span class="fu">desc</span>(var)) <span class="sc">%&gt;%</span></span>
+<span id="cb38-7"><a href="#cb38-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">hvg =</span> <span class="fu">seq_len</span>(<span class="fu">nrow</span>(.)) <span class="sc">&lt;=</span> <span class="dv">1000</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb38-8"><a href="#cb38-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(mean, var, <span class="at">colour =</span> hvg)) <span class="sc">+</span></span>
+<span id="cb38-9"><a href="#cb38-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>() <span class="sc">+</span></span>
+<span id="cb38-10"><a href="#cb38-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_line</span>(<span class="fu">aes</span>(<span class="at">y =</span> trend), <span class="at">colour =</span> <span class="st">"blue"</span>) <span class="sc">+</span></span>
+<span id="cb38-11"><a href="#cb38-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_colour_manual</span>(<span class="at">values =</span> <span class="fu">c</span>(<span class="st">"black"</span>, <span class="st">"red"</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>Now we have the gene-level variance modelled, we can select our most variable genes. There are multiple approaches we can choose, but here, we’ll just choose the 1000 most variable. Note that this may exclude genes at the low end of expression.</p>
+<div class="cell" data-layout-align="center">
+<div class="sourceCode cell-code" id="cb39"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb39-1"><a href="#cb39-1" aria-hidden="true" tabindex="-1"></a>hvg <span class="ot">&lt;-</span> <span class="fu">getTopHVGs</span>(geneVars, <span class="at">n =</span> <span class="dv">1000</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+<section id="pca" class="level2">
+<h2 class="anchored" data-anchor-id="pca">PCA</h2>
+<p>You might notice that the <code>SingleCellExperiment</code> object we’re working with has a (blank) element called <code>reducedDimNames</code>. This is ready to store any output from dimensional reduction, such as PCA, tSNE or UMAP. As we’re now becoming used to, we just add this by calling the function <code>runPCA()</code> and overwriting the original object. The genes identified as <code>hvg</code> are added as <code>subset_row</code>.</p>
+<div class="cell" data-layout-align="center">
+<div class="sourceCode cell-code" id="cb40"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb40-1"><a href="#cb40-1" aria-hidden="true" tabindex="-1"></a>sceFilt <span class="ot">&lt;-</span> <span class="fu">runPCA</span>(sceFilt, <span class="at">subset_row =</span> hvg)</span>
+<span id="cb40-2"><a href="#cb40-2" aria-hidden="true" tabindex="-1"></a>sceFilt</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>By default, the first 50 PCs are saved.</p>
+<div class="cell" data-layout-align="center">
+<div class="sourceCode cell-code" id="cb41"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb41-1"><a href="#cb41-1" aria-hidden="true" tabindex="-1"></a><span class="fu">reducedDim</span>(sceFilt, <span class="st">"PCA"</span>) <span class="sc">%&gt;%</span> <span class="fu">dim</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>At some point, each principal component just captures technical noise, so we should find how many are informative.</p>
+<div class="cell" data-layout-align="center">
+<div class="sourceCode cell-code" id="cb42"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb42-1"><a href="#cb42-1" aria-hidden="true" tabindex="-1"></a>sceFilt <span class="sc">%&gt;%</span></span>
+<span id="cb42-2"><a href="#cb42-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">reducedDim</span>(<span class="st">"PCA"</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb42-3"><a href="#cb42-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">attr</span>(<span class="st">"percentVar"</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb42-4"><a href="#cb42-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">enframe</span>(<span class="at">value =</span> <span class="st">"Var (%)"</span>, <span class="at">name =</span> <span class="fu">c</span>()) <span class="sc">%&gt;%</span></span>
+<span id="cb42-5"><a href="#cb42-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">PC =</span> <span class="fu">seq_along</span>(<span class="st">`</span><span class="at">Var (%)</span><span class="st">`</span>)) <span class="sc">%&gt;%</span></span>
+<span id="cb42-6"><a href="#cb42-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(PC, <span class="st">`</span><span class="at">Var (%)</span><span class="st">`</span>)) <span class="sc">+</span></span>
+<span id="cb42-7"><a href="#cb42-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>As we can see, the variance captured by each PC drops off rapidly, and beyond PC5, there is minimal contribution to the overall variance. We should choose the elbow point on this plot and although there are automated approaches, I’d be comfortable choosing 5 by looking at that plot. Let’s remove the un-informative PCs.</p>
+<div class="cell" data-layout-align="center">
+<div class="sourceCode cell-code" id="cb43"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb43-1"><a href="#cb43-1" aria-hidden="true" tabindex="-1"></a><span class="fu">reducedDim</span>(sceFilt, <span class="st">"PCA"</span>) <span class="ot">&lt;-</span> <span class="fu">reducedDim</span>(sceFilt, <span class="st">"PCA"</span>)[,<span class="dv">1</span><span class="sc">:</span><span class="dv">5</span>]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>Now let’s look at our data, just using the first two PCs.</p>
+<div class="cell" data-layout-align="center">
+<div class="sourceCode cell-code" id="cb44"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb44-1"><a href="#cb44-1" aria-hidden="true" tabindex="-1"></a><span class="fu">plotReducedDim</span>(sceFilt, <span class="at">dimred =</span> <span class="st">"PCA"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>Let’s overlay the number of detected to see if the clusters are correlating with this simple value. Let’s also extend out to PC3.</p>
+<div class="cell" data-layout-align="center">
+<div class="sourceCode cell-code" id="cb45"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb45-1"><a href="#cb45-1" aria-hidden="true" tabindex="-1"></a><span class="fu">plotReducedDim</span>(sceFilt, <span class="at">dimred =</span> <span class="st">"PCA"</span>, <span class="at">colour_by =</span> <span class="st">"detected"</span>, <span class="at">ncomponents =</span> <span class="dv">3</span>) </span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>Clearly much of the separation between cells is captured by PC1 and PC2. PC3 adds minimal information. Our next step would be to apply clustering techniques and try alternate visualisations such as tSNE and UMAP.</p>
+</section>
+<section id="tsne" class="level2">
+<h2 class="anchored" data-anchor-id="tsne">tSNE</h2>
+<p>The <span class="math inline">\(t\)</span>-stochastic neighbour embedding approach is commonly used for visualisation of scRNA data. As this is non-linear and is bound by preserving distances between points, it can tease apart clusters more easily. Let’s first check our results from the <code>quickCluster()</code> output that we used for Normalisation.</p>
+<div class="cell" data-layout-align="center">
+<div class="sourceCode cell-code" id="cb46"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb46-1"><a href="#cb46-1" aria-hidden="true" tabindex="-1"></a><span class="fu">plotReducedDim</span>(sceFilt, <span class="at">dimred =</span> <span class="st">"PCA"</span>, <span class="at">colour_by =</span> <span class="st">"quickClust"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>There are a few cells that seem to group nicely, but other clusters are less compelling. Let’s now add the tSNE output to our <code>reducedDims</code> element. Note that it relies on a PCA already being performed <em>a priori</em>, so we can just use our existing PCA element As there is a step involving randomising the data, I’ve set the random seed here so we should all see similar plots.</p>
+<div class="cell" data-layout-align="center">
+<div class="sourceCode cell-code" id="cb47"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb47-1"><a href="#cb47-1" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">100</span>)</span>
+<span id="cb47-2"><a href="#cb47-2" aria-hidden="true" tabindex="-1"></a>sceFilt <span class="ot">&lt;-</span> <span class="fu">runTSNE</span>(sceFilt, <span class="at">dimred =</span> <span class="st">"PCA"</span>)</span>
+<span id="cb47-3"><a href="#cb47-3" aria-hidden="true" tabindex="-1"></a>sceFilt</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>Our <code>reducedDims</code> element now has a <code>TNSE</code> component and we can plot this using very similar code to above. Instead of plotting PCA, we just change the <code>dimred</code> argument to be <code>"TSNE"</code>.</p>
+<div class="cell" data-layout-align="center">
+<div class="sourceCode cell-code" id="cb48"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb48-1"><a href="#cb48-1" aria-hidden="true" tabindex="-1"></a><span class="fu">plotReducedDim</span>(sceFilt, <span class="at">dimred =</span> <span class="st">"TSNE"</span>, <span class="at">colour_by =</span> <span class="st">"quickClust"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+<section id="umap" class="level2">
+<h2 class="anchored" data-anchor-id="umap">UMAP</h2>
+<p>An alternative to tSNE which is gaining popularity is Uniform manifold approximation and projection (UMAP). The underlying mathematics is quite different, however, like the tSNE, the motivation is produce a reduced dimensional visualisation which demonstrates the relationships between cells.</p>
+<div class="cell" data-layout-align="center">
+<div class="sourceCode cell-code" id="cb49"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb49-1"><a href="#cb49-1" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">101</span>)</span>
+<span id="cb49-2"><a href="#cb49-2" aria-hidden="true" tabindex="-1"></a>sceFilt <span class="ot">&lt;-</span> <span class="fu">runUMAP</span>(sceFilt, <span class="at">dimred =</span> <span class="st">"PCA"</span>)</span>
+<span id="cb49-3"><a href="#cb49-3" aria-hidden="true" tabindex="-1"></a>sceFilt</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell" data-layout-align="center">
+<div class="sourceCode cell-code" id="cb50"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb50-1"><a href="#cb50-1" aria-hidden="true" tabindex="-1"></a><span class="fu">plotReducedDim</span>(sceFilt, <span class="at">dimred =</span> <span class="st">"UMAP"</span>, <span class="at">colour_by =</span> <span class="st">"quickClust"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>There is no correct visualisation, and how we present our results is always a matter of judgement. Here we’ll compare the three approaches, and will overlay the number of detected genes to see if this is influencing our layouts at all.</p>
+<div class="cell" data-layout-align="center">
+<div class="sourceCode cell-code" id="cb51"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb51-1"><a href="#cb51-1" aria-hidden="true" tabindex="-1"></a><span class="fu">list</span>(</span>
+<span id="cb51-2"><a href="#cb51-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">plotReducedDim</span>(sceFilt, <span class="at">dimred =</span> <span class="st">"PCA"</span>, <span class="at">colour_by =</span> <span class="st">"detected"</span>) <span class="sc">+</span> </span>
+<span id="cb51-3"><a href="#cb51-3" aria-hidden="true" tabindex="-1"></a>    <span class="fu">theme</span>(<span class="at">legend.position =</span> <span class="st">"none"</span>) <span class="sc">+</span></span>
+<span id="cb51-4"><a href="#cb51-4" aria-hidden="true" tabindex="-1"></a>    <span class="fu">ggtitle</span>(<span class="st">"PCA"</span>),</span>
+<span id="cb51-5"><a href="#cb51-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">plotReducedDim</span>(sceFilt, <span class="at">dimred =</span> <span class="st">"TSNE"</span>, <span class="at">colour_by =</span> <span class="st">"detected"</span>) <span class="sc">+</span> </span>
+<span id="cb51-6"><a href="#cb51-6" aria-hidden="true" tabindex="-1"></a>    <span class="fu">theme</span>(<span class="at">legend.position =</span> <span class="st">"none"</span>) <span class="sc">+</span></span>
+<span id="cb51-7"><a href="#cb51-7" aria-hidden="true" tabindex="-1"></a>    <span class="fu">ggtitle</span>(<span class="st">"tSNE"</span>),</span>
+<span id="cb51-8"><a href="#cb51-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">plotReducedDim</span>(sceFilt, <span class="at">dimred =</span> <span class="st">"UMAP"</span>, <span class="at">colour_by =</span> <span class="st">"detected"</span>) <span class="sc">+</span> </span>
+<span id="cb51-9"><a href="#cb51-9" aria-hidden="true" tabindex="-1"></a>    <span class="fu">ggtitle</span>(<span class="st">"UMAP"</span>)</span>
+<span id="cb51-10"><a href="#cb51-10" aria-hidden="true" tabindex="-1"></a>) <span class="sc">%&gt;%</span> </span>
+<span id="cb51-11"><a href="#cb51-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">wrap_plots</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+</section>
+<section id="clustering" class="level1">
+<h1>Clustering</h1>
+<p>As we can see above, there is no perfect layout, just our personal choice. Identifying clusters can play a key role in selecting our preferred visualisation so let’s be a bit more rigorous than our previous method. However, as with visualisations, there is no correct solution, rather there are just different perspectives, some of which may be more informative than others. Whilst there do appear to be some distinct cell types in this dataset, there are clearly a few cells which are less definitive.</p>
+<section id="shared-neighbour-graphs" class="level2">
+<h2 class="anchored" data-anchor-id="shared-neighbour-graphs">Shared Neighbour Graphs</h2>
+<p>One of the most common clustering approaches is to first determine how similar each cell is to each other using our retained Principal Components. Once we’ve determined those distances, clusters are formed from cells which appear to be similar to each other.</p>
+<div class="cell" data-layout-align="center">
+<div class="sourceCode cell-code" id="cb52"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb52-1"><a href="#cb52-1" aria-hidden="true" tabindex="-1"></a>g <span class="ot">&lt;-</span> <span class="fu">buildSNNGraph</span>(sceFilt, <span class="at">k =</span> <span class="dv">10</span>, <span class="at">use.dimred =</span> <span class="st">"PCA"</span>)</span>
+<span id="cb52-2"><a href="#cb52-2" aria-hidden="true" tabindex="-1"></a>sceFilt<span class="sc">$</span>snnCluster <span class="ot">&lt;-</span> igraph<span class="sc">::</span><span class="fu">cluster_walktrap</span>(g)<span class="sc">$</span>membership <span class="sc">%&gt;%</span></span>
+<span id="cb52-3"><a href="#cb52-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">as.factor</span>()</span>
+<span id="cb52-4"><a href="#cb52-4" aria-hidden="true" tabindex="-1"></a><span class="fu">table</span>(sceFilt<span class="sc">$</span>snnCluster)</span>
+<span id="cb52-5"><a href="#cb52-5" aria-hidden="true" tabindex="-1"></a><span class="fu">plotReducedDim</span>(sceFilt, <span class="at">dimred =</span> <span class="st">"PCA"</span>, <span class="at">colour_by =</span> <span class="st">"snnCluster"</span>, <span class="at">text_by =</span> <span class="st">"snnCluster"</span>) </span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>After you’ve had a good look at these clusters, try alternate visualisations using tSNE or UMAP as the dimensional reduction.</p>
+<div class="callout callout-style-default callout-important callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Important
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Do you think our clusters are a good representation of the cell types?</p>
+</div>
+</div>
+<section id="checking-for-artefacts" class="level3">
+<h3 class="anchored" data-anchor-id="checking-for-artefacts">Checking for artefacts</h3>
+<p>Sometimes clusters can be formed from cells showing similar expression patterns, but where these patterns are driven by other artefacts. A possible checking step is to inspect the data we have and how it is distributed amongst existing clusters. Let’s see if the number of detected genes has had any impact on cluster formation.</p>
+<div class="cell" data-layout-align="center">
+<div class="sourceCode cell-code" id="cb53"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb53-1"><a href="#cb53-1" aria-hidden="true" tabindex="-1"></a><span class="fu">plotColData</span>(sceFilt, <span class="at">y =</span> <span class="st">"detected"</span>, <span class="at">x =</span> <span class="st">"snnCluster"</span>, <span class="at">colour_by =</span> <span class="st">"snnCluster"</span>) <span class="sc">+</span></span>
+<span id="cb53-2"><a href="#cb53-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">x =</span> <span class="st">"Cluster"</span>, <span class="at">y =</span> <span class="st">"# Detected Genes"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>It is entirely possible that any discrepancies between the number of features is true biology, however it is also possible that is a technical artefact. At this point, it is very difficult to make any clear judgement about the source of any variation.</p>
+<p>We can also check the library sizes in much the same way.</p>
+<div class="cell" data-layout-align="center">
+<div class="sourceCode cell-code" id="cb54"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb54-1"><a href="#cb54-1" aria-hidden="true" tabindex="-1"></a><span class="fu">plotColData</span>(sceFilt, <span class="at">y =</span> <span class="st">"total"</span>, <span class="at">x =</span> <span class="st">"snnCluster"</span>, <span class="at">colour_by =</span> <span class="st">"snnCluster"</span>) <span class="sc">+</span></span>
+<span id="cb54-2"><a href="#cb54-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">x =</span> <span class="st">"Cluster"</span>, <span class="at">y =</span> <span class="st">"Total Reads"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+</section>
+<section id="k-means-clustering" class="level2">
+<h2 class="anchored" data-anchor-id="k-means-clustering">k-Means Clustering</h2>
+<p>An alternative approach to clustering is to use <span class="math inline">\(k\)</span>-means, in which we define (up to) <span class="math inline">\(k\)</span> clusters beforehand. This algorithm then finds the optimal means for each cluster and allocates each cell to the cluster with the nearest mean. Unfortunately there is a bias towards clusters of the same spherical radius. The <code>kmeans()</code> function required to perform the clustering here is actually a <code>base</code> function too.</p>
+<div class="cell" data-layout-align="center">
+<div class="sourceCode cell-code" id="cb55"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb55-1"><a href="#cb55-1" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">100</span>)</span>
+<span id="cb55-2"><a href="#cb55-2" aria-hidden="true" tabindex="-1"></a>km <span class="ot">&lt;-</span> <span class="fu">reducedDim</span>(sceFilt, <span class="at">type =</span> <span class="st">"PCA"</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb55-3"><a href="#cb55-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">kmeans</span>(<span class="at">centers =</span> <span class="dv">10</span>)</span>
+<span id="cb55-4"><a href="#cb55-4" aria-hidden="true" tabindex="-1"></a><span class="fu">table</span>(km<span class="sc">$</span>cluster)</span>
+<span id="cb55-5"><a href="#cb55-5" aria-hidden="true" tabindex="-1"></a>sceFilt<span class="sc">$</span>kMeans <span class="ot">&lt;-</span> <span class="fu">as.factor</span>(km<span class="sc">$</span>cluster)</span>
+<span id="cb55-6"><a href="#cb55-6" aria-hidden="true" tabindex="-1"></a><span class="fu">plotReducedDim</span>(sceFilt, <span class="at">dimred =</span> <span class="st">"PCA"</span>, <span class="at">colour_by =</span> <span class="st">"kMeans"</span>, <span class="at">text_by =</span> <span class="st">"kMeans"</span>) </span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>Here we can simply explore the relationship between clusters using dendrogram</p>
+<div class="cell" data-layout-align="center">
+<div class="sourceCode cell-code" id="cb56"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb56-1"><a href="#cb56-1" aria-hidden="true" tabindex="-1"></a><span class="fu">dist</span>(km<span class="sc">$</span>centers) <span class="sc">%&gt;%</span></span>
+<span id="cb56-2"><a href="#cb56-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">hclust</span>(<span class="st">"ward.D2"</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb56-3"><a href="#cb56-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">plot</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<section id="additional-notes-regarding-k-means" class="level3">
+<h3 class="anchored" data-anchor-id="additional-notes-regarding-k-means">Additional notes regarding k-means</h3>
+<p>As it is not build from any edges or graph-based approaches, it is very easy to <em>over-cluster</em> using <span class="math inline">\(k\)</span>-means. This can actually be useful for separating extremes of a relatively continuous cluster and enables detection of marker genes which may denote the gradient of a cluster.</p>
+<p>Unfortunately our version of R is too out of date for this, but in the newer versions of <code>scran</code>, there is a new function where we can use <span class="math inline">\(k\)</span>-means as initial clustering before generating the shared neighbour graph. It is expected this may become a common approach in the next few years, particularly with large datasets.</p>
+</section>
+</section>
+</section>
+<section id="marker-gene-detection" class="level1">
+<h1>Marker Gene Detection</h1>
+<section id="genes-which-are-de-somewhere" class="level2">
+<h2 class="anchored" data-anchor-id="genes-which-are-de-somewhere">Genes which are DE somewhere</h2>
+<p>One of the key motivations behind any scRNA analysis is to identify cell types within one or more samples, and determine what genes are defining the differences between cell types or cell states. This is performed relatively simply using the function <code>findMarkers()</code>, which performs a simple <span class="math inline">\(t\)</span>-test when left with default settings.</p>
+<div class="cell" data-layout-align="center">
+<div class="sourceCode cell-code" id="cb57"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb57-1"><a href="#cb57-1" aria-hidden="true" tabindex="-1"></a>markersAny <span class="ot">&lt;-</span> <span class="fu">findMarkers</span>(sceFilt, <span class="at">groups =</span> sceFilt<span class="sc">$</span>snnCluster)</span>
+<span id="cb57-2"><a href="#cb57-2" aria-hidden="true" tabindex="-1"></a><span class="fu">subset</span>(markersAny[[<span class="dv">1</span>]], FDR <span class="sc">&lt;</span> <span class="fl">0.01</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>Looking at the most significant marker genes from cluster 1 immediately highlights some of the challenges.</p>
+<ul>
+<li>How was the p-value obtained. From just one comparison, from all comparisons or another method?</li>
+<li>Looking across the the logFC for each comparison, how do we consider a gene to be a marker for each cell type?</li>
+</ul>
+<p>The default setting for the p-value is not made clear in the manual, however this is set to <code>pval.type = "any"</code>. This uses a method for combining p-values (Simes’ method) testing the null hypothesis that the gene is DE nowhere with the alternative the gene is DE somewhere. The <code>Top</code> column shows the minimum rank across all comparisons for that gene, such that all genes with <code>Top = 1</code> were the most highly ranked in at least one comparison. This column only appears when using the default setting of <code>pval.type = "any"</code> and you’ll notice that it disappears as we look at different options.</p>
+<p>As you can also see, no directionality has been applied to the test, but we can rerun this setting <code>direction="up"</code> which will now return results for genes that are up-regulated somewhere.</p>
+<div class="cell" data-layout-align="center">
+<div class="sourceCode cell-code" id="cb58"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb58-1"><a href="#cb58-1" aria-hidden="true" tabindex="-1"></a>markersAny <span class="ot">&lt;-</span> <span class="fu">findMarkers</span>(sceFilt, <span class="at">groups =</span> sceFilt<span class="sc">$</span>snnCluster, <span class="at">direction =</span> <span class="st">"up"</span>)</span>
+<span id="cb58-2"><a href="#cb58-2" aria-hidden="true" tabindex="-1"></a><span class="fu">subset</span>(markersAny[[<span class="dv">1</span>]], FDR <span class="sc">&lt;</span> <span class="fl">0.01</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>Notice that we can still see genes that are highly-ranked for being up in one comparison, but are still down in other comparisons.</p>
+<p>We can quickly summarise the results for all clusters using some <code>lapply()</code> magic.</p>
+<div class="cell" data-layout-align="center">
+<div class="sourceCode cell-code" id="cb59"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb59-1"><a href="#cb59-1" aria-hidden="true" tabindex="-1"></a>markersAny <span class="sc">%&gt;%</span></span>
+<span id="cb59-2"><a href="#cb59-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">lapply</span>(subset, FDR <span class="sc">&lt;</span> <span class="fl">0.01</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb59-3"><a href="#cb59-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">sapply</span>(nrow)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>The last command (<code>sapply()</code>) is like <code>lapply()</code> but it attempts to simplify the output. Here it’s done well and has returned a vector instead of a list.</p>
+</section>
+<section id="genes-which-are-de-in-many-comparisons" class="level2">
+<h2 class="anchored" data-anchor-id="genes-which-are-de-in-many-comparisons">Genes which are DE in many comparisons</h2>
+<p>As an alternative, we can change the value for <code>pval.type = "some"</code>, which will now test the Null Hypothesis that each gene is not DE in more than half the comparisons, with the alternative that the gene is DE in more than half of the comparisons. This involves a different strategy for combining the p-values</p>
+<div class="cell" data-layout-align="center">
+<div class="sourceCode cell-code" id="cb60"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb60-1"><a href="#cb60-1" aria-hidden="true" tabindex="-1"></a>markersSome <span class="ot">&lt;-</span> <span class="fu">findMarkers</span>(sceFilt, <span class="at">groups =</span> sceFilt<span class="sc">$</span>snnCluster, <span class="at">direction =</span> <span class="st">"up"</span>, <span class="at">pval.type =</span> <span class="st">"some"</span>)</span>
+<span id="cb60-2"><a href="#cb60-2" aria-hidden="true" tabindex="-1"></a>markersSome <span class="sc">%&gt;%</span></span>
+<span id="cb60-3"><a href="#cb60-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">lapply</span>(subset, FDR <span class="sc">&lt;</span> <span class="fl">0.01</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb60-4"><a href="#cb60-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">sapply</span>(nrow)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>As this is a more stringent test, we clearly have fewer results</p>
+<div class="cell" data-layout-align="center">
+<div class="sourceCode cell-code" id="cb61"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb61-1"><a href="#cb61-1" aria-hidden="true" tabindex="-1"></a><span class="fu">subset</span>(markersSome[[<span class="dv">1</span>]], FDR <span class="sc">&lt;</span> <span class="fl">0.01</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>Now our genes appear to be more consistently up-regulated in cluster 1 compared to other clusters. When checking this, it’s always good to be aware of which clusters were the most related to each other too.</p>
+</section>
+<section id="genes-which-are-de-in-all-comparisons" class="level2">
+<h2 class="anchored" data-anchor-id="genes-which-are-de-in-all-comparisons">Genes which are DE in all comparisons</h2>
+<p>Clearly the next approach would be to look for marker genes which are up-regulated in each cluster compared to all other clusters, and we do this by setting <code>pval.type = "all"</code>. This uses a different method again for combining p-values and as this is the most difficult hurdle to overcome, we’d expect to see far fewer genes.</p>
+<div class="cell" data-layout-align="center">
+<div class="sourceCode cell-code" id="cb62"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb62-1"><a href="#cb62-1" aria-hidden="true" tabindex="-1"></a>markersAll <span class="ot">&lt;-</span> <span class="fu">findMarkers</span>(sceFilt, <span class="at">groups =</span> sceFilt<span class="sc">$</span>snnCluster, <span class="at">direction =</span> <span class="st">"up"</span>, <span class="at">pval.type =</span> <span class="st">"all"</span>)</span>
+<span id="cb62-2"><a href="#cb62-2" aria-hidden="true" tabindex="-1"></a>markersAll <span class="sc">%&gt;%</span></span>
+<span id="cb62-3"><a href="#cb62-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">lapply</span>(subset, FDR <span class="sc">&lt;</span> <span class="fl">0.01</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb62-4"><a href="#cb62-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">sapply</span>(nrow)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>We may see that some clusters have no unique markers under this strategy.</p>
+<p>Let’s check our first cluster again</p>
+<div class="cell" data-layout-align="center">
+<div class="sourceCode cell-code" id="cb63"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb63-1"><a href="#cb63-1" aria-hidden="true" tabindex="-1"></a><span class="fu">subset</span>(markersAll[[<span class="dv">1</span>]], FDR <span class="sc">&lt;</span> <span class="fl">0.01</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>Looking at the logFC values when comparing against all other clusters, this looks like a promising set of candidate genes. From here, we should inspect the expression patterns. Before we move on though, it might be worth discussing a couple of other alternatives to the testing strategy.</p>
+</section>
+<section id="alternative-tests" class="level2">
+<h2 class="anchored" data-anchor-id="alternative-tests">Alternative Tests</h2>
+<p>In the above sections, we used a <span class="math inline">\(t\)</span> test to find our markers, but <code>findMarkers()</code> offer two more alternatives. The argument <code>test.type</code> can take one of three options: 1) <code>"t"</code>; 2) <code>"wilcox"</code> or 3) <code>"binom"</code>. The Wilcoxon Rank-Sum test is what’s known as a non-parametric test, in that it doesn’t rely on the assumption of normality. The ranks of the logcounts are instead compared across clusters, however it is known that non-parametric tests are less powerful than parametric tests if the conditions of normality are approximately satisfied.</p>
+<p>The third option <code>test.type = "binom"</code> models the probability of a cell within a cluster expressing the gene and this can lend an alternative viewpoint on the data.</p>
+<div class="cell" data-layout-align="center">
+<div class="sourceCode cell-code" id="cb64"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb64-1"><a href="#cb64-1" aria-hidden="true" tabindex="-1"></a>markersBinom <span class="ot">&lt;-</span> <span class="fu">findMarkers</span>(sceFilt, <span class="at">groups =</span> sceFilt<span class="sc">$</span>snnCluster, <span class="at">test.type =</span> <span class="st">"binom"</span>, <span class="at">direction =</span> <span class="st">"up"</span>, <span class="at">pval.type =</span> <span class="st">"all"</span>)</span>
+<span id="cb64-2"><a href="#cb64-2" aria-hidden="true" tabindex="-1"></a>markersBinom <span class="sc">%&gt;%</span></span>
+<span id="cb64-3"><a href="#cb64-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">lapply</span>(subset, FDR <span class="sc">&lt;</span> <span class="fl">0.01</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb64-4"><a href="#cb64-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">sapply</span>(nrow)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>This is clearly less powerful than the t-test but as you may realise, may by highly appropriate in some circumstances</p>
+</section>
+</section>
+<section id="visualisation" class="level1">
+<h1>Visualisation</h1>
+<section id="using-pcatsne" class="level2">
+<h2 class="anchored" data-anchor-id="using-pcatsne">Using PCA/TSNE</h2>
+<p>Now that we’ve identified a few genes which appear unique to a given cluster, we can visualise the expression of these genes within each cluster. Two common approaches are to overlay the logcounts over our clusters, or to produce violin plots for each cluster. Let’s start by overlaying the expression values over the clusters.</p>
+<div class="cell" data-layout-align="center">
+<div class="sourceCode cell-code" id="cb65"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb65-1"><a href="#cb65-1" aria-hidden="true" tabindex="-1"></a>gn <span class="ot">&lt;-</span> <span class="fu">rownames</span>(markersAll[[<span class="dv">1</span>]])[<span class="dv">1</span>]</span>
+<span id="cb65-2"><a href="#cb65-2" aria-hidden="true" tabindex="-1"></a><span class="fu">plotReducedDim</span>(sceFilt, <span class="at">dimred =</span> <span class="st">"PCA"</span>, <span class="at">colour_by =</span> gn)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>Unfortunately, if we’d like to add the gene name instead of the Ensembl ID, we have to regenerate the fill colours. However this is a <code>ggplot</code> object so if we know the fill is just the default <code>scale_fill_viridis_c()</code> this is easy enough. The alternative would be to set the rownames as the gene name/symbol at the beginning of our analysis. Some people do prefer this.</p>
+<div class="cell" data-layout-align="center">
+<div class="sourceCode cell-code" id="cb66"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb66-1"><a href="#cb66-1" aria-hidden="true" tabindex="-1"></a><span class="fu">plotReducedDim</span>(sceFilt, <span class="at">dimred =</span> <span class="st">"PCA"</span>, <span class="at">colour_by =</span> gn) <span class="sc">+</span></span>
+<span id="cb66-2"><a href="#cb66-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_fill_viridis_c</span>(<span class="at">name =</span> <span class="fu">rowData</span>(sceFilt)[gn, <span class="st">"gene_name"</span>])</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>This approach is great for overlaying a single gene (or other confounders such as doubletScore or <code>total</code>)</p>
+</section>
+<section id="violin-plots" class="level2">
+<h2 class="anchored" data-anchor-id="violin-plots">Violin Plots</h2>
+<p>If we wish to check out more than one marker gene, we can produce violin plots.</p>
+<div class="cell" data-layout-align="center">
+<div class="sourceCode cell-code" id="cb67"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb67-1"><a href="#cb67-1" aria-hidden="true" tabindex="-1"></a><span class="fu">plotExpression</span>(sceFilt, <span class="at">features =</span> gn, <span class="at">x =</span> <span class="st">"snnCluster"</span>, <span class="at">colour_by =</span> <span class="st">"snnCluster"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell" data-layout-align="center">
+<div class="sourceCode cell-code" id="cb68"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb68-1"><a href="#cb68-1" aria-hidden="true" tabindex="-1"></a>gn <span class="ot">&lt;-</span> markersAll[[<span class="dv">1</span>]] <span class="sc">%&gt;%</span></span>
+<span id="cb68-2"><a href="#cb68-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">subset</span>(FDR <span class="sc">&lt;</span> <span class="fl">0.01</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb68-3"><a href="#cb68-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">rownames</span>() <span class="sc">%&gt;%</span></span>
+<span id="cb68-4"><a href="#cb68-4" aria-hidden="true" tabindex="-1"></a>  .[<span class="fu">seq</span>(<span class="dv">1</span>, <span class="fu">min</span>(<span class="dv">10</span>, <span class="fu">length</span>(.)))]</span>
+<span id="cb68-5"><a href="#cb68-5" aria-hidden="true" tabindex="-1"></a><span class="fu">plotExpression</span>(sceFilt, <span class="at">features =</span> gn, <span class="at">x =</span> <span class="st">"snnCluster"</span>, <span class="at">colour_by =</span> <span class="st">"snnCluster"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>Once again we can take advantage of our <code>ggplot</code> skills and remake the facets, including a labeller function. This is a common trick used to change the labels for facets without changing your data.</p>
+<div class="cell" data-layout-align="center">
+<div class="sourceCode cell-code" id="cb69"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb69-1"><a href="#cb69-1" aria-hidden="true" tabindex="-1"></a>gnLabeller <span class="ot">&lt;-</span> <span class="fu">as_labeller</span>(</span>
+<span id="cb69-2"><a href="#cb69-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">rowData</span>(sceFilt)<span class="sc">$</span>gene_name <span class="sc">%&gt;%</span> <span class="fu">setNames</span>(<span class="fu">rownames</span>(sceFilt))</span>
+<span id="cb69-3"><a href="#cb69-3" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb69-4"><a href="#cb69-4" aria-hidden="true" tabindex="-1"></a><span class="fu">plotExpression</span>(sceFilt, <span class="at">features =</span> gn, <span class="at">x =</span> <span class="st">"snnCluster"</span>, <span class="at">colour_by =</span> <span class="st">"snnCluster"</span>) <span class="sc">+</span></span>
+<span id="cb69-5"><a href="#cb69-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">facet_wrap</span>(<span class="sc">~</span>Feature, <span class="at">labeller =</span> gnLabeller, <span class="at">ncol =</span> <span class="dv">2</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>Let’s get the top ranked gene from each cluster and run a quick check across all of our data.</p>
+<div class="cell" data-layout-align="center">
+<div class="sourceCode cell-code" id="cb70"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb70-1"><a href="#cb70-1" aria-hidden="true" tabindex="-1"></a>topRank <span class="ot">&lt;-</span> markersAll <span class="sc">%&gt;%</span></span>
+<span id="cb70-2"><a href="#cb70-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">lapply</span>(subset, FDR <span class="sc">&lt;</span> <span class="fl">0.01</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb70-3"><a href="#cb70-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">lapply</span>(rownames) <span class="sc">%&gt;%</span></span>
+<span id="cb70-4"><a href="#cb70-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">sapply</span>(magrittr<span class="sc">::</span>extract, <span class="dv">1</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb70-5"><a href="#cb70-5" aria-hidden="true" tabindex="-1"></a>  .[<span class="sc">!</span><span class="fu">is.na</span>(.)]</span>
+<span id="cb70-6"><a href="#cb70-6" aria-hidden="true" tabindex="-1"></a><span class="fu">gnLabeller</span>(topRank) <span class="sc">%&gt;%</span> <span class="fu">unlist</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell" data-layout-align="center">
+<div class="sourceCode cell-code" id="cb71"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb71-1"><a href="#cb71-1" aria-hidden="true" tabindex="-1"></a><span class="fu">plotExpression</span>(sceFilt, <span class="at">features =</span> topRank, <span class="at">x =</span> <span class="st">"snnCluster"</span>, <span class="at">colour_by =</span> <span class="st">"snnCluster"</span>) <span class="sc">+</span></span>
+<span id="cb71-2"><a href="#cb71-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">facet_wrap</span>(<span class="sc">~</span>Feature, <span class="at">labeller =</span> gnLabeller, <span class="at">ncol =</span> <span class="dv">2</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+</section>
+<section id="conclusion" class="level1">
+<h1>Conclusion</h1>
+<p>Now you’ve thoroughly inspected your clusters, do you believe them? Have we found markers that we have faith in? How could we pick up more complex patterns?</p>
+<p>Please change your clustering approach and see if you are able to improve your results.</p>
+</section>
+
+</main>
+<!-- /main column -->
+<script id="quarto-html-after-body" type="application/javascript">
+  window.document.addEventListener("DOMContentLoaded", function (event) {
+    const icon = "";
+    const anchorJS = new window.AnchorJS();
+    anchorJS.options = {
+      placement: 'right',
+      icon: icon
+    };
+    anchorJS.add('.anchored');
+    const isCodeAnnotation = (el) => {
+      for (const clz of el.classList) {
+        if (clz.startsWith('code-annotation-')) {                     
+          return true;
+        }
+      }
+      return false;
+    }
+    const onCopySuccess = function(e) {
+      // button target
+      const button = e.trigger;
+      // don't keep focus
+      button.blur();
+      // flash "checked"
+      button.classList.add('code-copy-button-checked');
+      var currentTitle = button.getAttribute("title");
+      button.setAttribute("title", "Copied!");
+      let tooltip;
+      if (window.bootstrap) {
+        button.setAttribute("data-bs-toggle", "tooltip");
+        button.setAttribute("data-bs-placement", "left");
+        button.setAttribute("data-bs-title", "Copied!");
+        tooltip = new bootstrap.Tooltip(button, 
+          { trigger: "manual", 
+            customClass: "code-copy-button-tooltip",
+            offset: [0, -8]});
+        tooltip.show();    
+      }
+      setTimeout(function() {
+        if (tooltip) {
+          tooltip.hide();
+          button.removeAttribute("data-bs-title");
+          button.removeAttribute("data-bs-toggle");
+          button.removeAttribute("data-bs-placement");
+        }
+        button.setAttribute("title", currentTitle);
+        button.classList.remove('code-copy-button-checked');
+      }, 1000);
+      // clear code selection
+      e.clearSelection();
+    }
+    const getTextToCopy = function(trigger) {
+        const codeEl = trigger.previousElementSibling.cloneNode(true);
+        for (const childEl of codeEl.children) {
+          if (isCodeAnnotation(childEl)) {
+            childEl.remove();
+          }
+        }
+        return codeEl.innerText;
+    }
+    const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+      text: getTextToCopy
+    });
+    clipboard.on('success', onCopySuccess);
+    if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+      const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+        text: getTextToCopy,
+        container: window.document.getElementById('quarto-embedded-source-code-modal')
+      });
+      clipboardModal.on('success', onCopySuccess);
+    }
+      var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var mailtoRegex = new RegExp(/^mailto:/);
+        var filterRegex = new RegExp('/' + window.location.host + '/');
+      var isInternal = (href) => {
+          return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+      }
+      // Inspect non-navigation links and adorn them if external
+     var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+      for (var i=0; i<links.length; i++) {
+        const link = links[i];
+        if (!isInternal(link.href)) {
+          // undo the damage that might have been done by quarto-nav.js in the case of
+          // links that we want to consider external
+          if (link.dataset.originalHref !== undefined) {
+            link.href = link.dataset.originalHref;
+          }
+        }
+      }
+    function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+      const config = {
+        allowHTML: true,
+        maxWidth: 500,
+        delay: 100,
+        arrow: false,
+        appendTo: function(el) {
+            return el.parentElement;
+        },
+        interactive: true,
+        interactiveBorder: 10,
+        theme: 'quarto',
+        placement: 'bottom-start',
+      };
+      if (contentFn) {
+        config.content = contentFn;
+      }
+      if (onTriggerFn) {
+        config.onTrigger = onTriggerFn;
+      }
+      if (onUntriggerFn) {
+        config.onUntrigger = onUntriggerFn;
+      }
+      window.tippy(el, config); 
+    }
+    const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+    for (var i=0; i<noterefs.length; i++) {
+      const ref = noterefs[i];
+      tippyHover(ref, function() {
+        // use id or data attribute instead here
+        let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+        try { href = new URL(href).hash; } catch {}
+        const id = href.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note) {
+          return note.innerHTML;
+        } else {
+          return "";
+        }
+      });
+    }
+    const xrefs = window.document.querySelectorAll('a.quarto-xref');
+    const processXRef = (id, note) => {
+      // Strip column container classes
+      const stripColumnClz = (el) => {
+        el.classList.remove("page-full", "page-columns");
+        if (el.children) {
+          for (const child of el.children) {
+            stripColumnClz(child);
+          }
+        }
+      }
+      stripColumnClz(note)
+      if (id === null || id.startsWith('sec-')) {
+        // Special case sections, only their first couple elements
+        const container = document.createElement("div");
+        if (note.children && note.children.length > 2) {
+          container.appendChild(note.children[0].cloneNode(true));
+          for (let i = 1; i < note.children.length; i++) {
+            const child = note.children[i];
+            if (child.tagName === "P" && child.innerText === "") {
+              continue;
+            } else {
+              container.appendChild(child.cloneNode(true));
+              break;
+            }
+          }
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(container);
+          }
+          return container.innerHTML
+        } else {
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(note);
+          }
+          return note.innerHTML;
+        }
+      } else {
+        // Remove any anchor links if they are present
+        const anchorLink = note.querySelector('a.anchorjs-link');
+        if (anchorLink) {
+          anchorLink.remove();
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        if (note.classList.contains("callout")) {
+          return note.outerHTML;
+        } else {
+          return note.innerHTML;
+        }
+      }
+    }
+    for (var i=0; i<xrefs.length; i++) {
+      const xref = xrefs[i];
+      tippyHover(xref, undefined, function(instance) {
+        instance.disable();
+        let url = xref.getAttribute('href');
+        let hash = undefined; 
+        if (url.startsWith('#')) {
+          hash = url;
+        } else {
+          try { hash = new URL(url).hash; } catch {}
+        }
+        if (hash) {
+          const id = hash.replace(/^#\/?/, "");
+          const note = window.document.getElementById(id);
+          if (note !== null) {
+            try {
+              const html = processXRef(id, note.cloneNode(true));
+              instance.setContent(html);
+            } finally {
+              instance.enable();
+              instance.show();
+            }
+          } else {
+            // See if we can fetch this
+            fetch(url.split('#')[0])
+            .then(res => res.text())
+            .then(html => {
+              const parser = new DOMParser();
+              const htmlDoc = parser.parseFromString(html, "text/html");
+              const note = htmlDoc.getElementById(id);
+              if (note !== null) {
+                const html = processXRef(id, note);
+                instance.setContent(html);
+              } 
+            }).finally(() => {
+              instance.enable();
+              instance.show();
+            });
+          }
+        } else {
+          // See if we can fetch a full url (with no hash to target)
+          // This is a special case and we should probably do some content thinning / targeting
+          fetch(url)
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.querySelector('main.content');
+            if (note !== null) {
+              // This should only happen for chapter cross references
+              // (since there is no id in the URL)
+              // remove the first header
+              if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+                note.children[0].remove();
+              }
+              const html = processXRef(null, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      }, function(instance) {
+      });
+    }
+        let selectedAnnoteEl;
+        const selectorForAnnotation = ( cell, annotation) => {
+          let cellAttr = 'data-code-cell="' + cell + '"';
+          let lineAttr = 'data-code-annotation="' +  annotation + '"';
+          const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+          return selector;
+        }
+        const selectCodeLines = (annoteEl) => {
+          const doc = window.document;
+          const targetCell = annoteEl.getAttribute("data-target-cell");
+          const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+          const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+          const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+          const lineIds = lines.map((line) => {
+            return targetCell + "-" + line;
+          })
+          let top = null;
+          let height = null;
+          let parent = null;
+          if (lineIds.length > 0) {
+              //compute the position of the single el (top and bottom and make a div)
+              const el = window.document.getElementById(lineIds[0]);
+              top = el.offsetTop;
+              height = el.offsetHeight;
+              parent = el.parentElement.parentElement;
+            if (lineIds.length > 1) {
+              const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+              const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+              height = bottom - top;
+            }
+            if (top !== null && height !== null && parent !== null) {
+              // cook up a div (if necessary) and position it 
+              let div = window.document.getElementById("code-annotation-line-highlight");
+              if (div === null) {
+                div = window.document.createElement("div");
+                div.setAttribute("id", "code-annotation-line-highlight");
+                div.style.position = 'absolute';
+                parent.appendChild(div);
+              }
+              div.style.top = top - 2 + "px";
+              div.style.height = height + 4 + "px";
+              div.style.left = 0;
+              let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+              if (gutterDiv === null) {
+                gutterDiv = window.document.createElement("div");
+                gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+                gutterDiv.style.position = 'absolute';
+                const codeCell = window.document.getElementById(targetCell);
+                const gutter = codeCell.querySelector('.code-annotation-gutter');
+                gutter.appendChild(gutterDiv);
+              }
+              gutterDiv.style.top = top - 2 + "px";
+              gutterDiv.style.height = height + 4 + "px";
+            }
+            selectedAnnoteEl = annoteEl;
+          }
+        };
+        const unselectCodeLines = () => {
+          const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+          elementsIds.forEach((elId) => {
+            const div = window.document.getElementById(elId);
+            if (div) {
+              div.remove();
+            }
+          });
+          selectedAnnoteEl = undefined;
+        };
+          // Handle positioning of the toggle
+      window.addEventListener(
+        "resize",
+        throttle(() => {
+          elRect = undefined;
+          if (selectedAnnoteEl) {
+            selectCodeLines(selectedAnnoteEl);
+          }
+        }, 10)
+      );
+      function throttle(fn, ms) {
+      let throttle = false;
+      let timer;
+        return (...args) => {
+          if(!throttle) { // first call gets through
+              fn.apply(this, args);
+              throttle = true;
+          } else { // all the others get throttled
+              if(timer) clearTimeout(timer); // cancel #2
+              timer = setTimeout(() => {
+                fn.apply(this, args);
+                timer = throttle = false;
+              }, ms);
+          }
+        };
+      }
+        // Attach click handler to the DT
+        const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+        for (const annoteDlNode of annoteDls) {
+          annoteDlNode.addEventListener('click', (event) => {
+            const clickedEl = event.target;
+            if (clickedEl !== selectedAnnoteEl) {
+              unselectCodeLines();
+              const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+              if (activeEl) {
+                activeEl.classList.remove('code-annotation-active');
+              }
+              selectCodeLines(clickedEl);
+              clickedEl.classList.add('code-annotation-active');
+            } else {
+              // Unselect the line
+              unselectCodeLines();
+              clickedEl.classList.remove('code-annotation-active');
+            }
+          });
+        }
+    const findCites = (el) => {
+      const parentEl = el.parentElement;
+      if (parentEl) {
+        const cites = parentEl.dataset.cites;
+        if (cites) {
+          return {
+            el,
+            cites: cites.split(' ')
+          };
+        } else {
+          return findCites(el.parentElement)
+        }
+      } else {
+        return undefined;
+      }
+    };
+    var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+    for (var i=0; i<bibliorefs.length; i++) {
+      const ref = bibliorefs[i];
+      const citeInfo = findCites(ref);
+      if (citeInfo) {
+        tippyHover(citeInfo.el, function() {
+          var popup = window.document.createElement('div');
+          citeInfo.cites.forEach(function(cite) {
+            var citeDiv = window.document.createElement('div');
+            citeDiv.classList.add('hanging-indent');
+            citeDiv.classList.add('csl-entry');
+            var biblioDiv = window.document.getElementById('ref-' + cite);
+            if (biblioDiv) {
+              citeDiv.innerHTML = biblioDiv.innerHTML;
+            }
+            popup.appendChild(citeDiv);
+          });
+          return popup.innerHTML;
+        });
+      }
+    }
+  });
+  </script>
+</div> <!-- /content -->
+
+
+
+
+</body></html>

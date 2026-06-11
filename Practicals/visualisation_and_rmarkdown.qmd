@@ -1,0 +1,900 @@
+---
+title: "Transcriptomics Practical"
+subtitle: 'Practical 3: Data Visualisation'
+author: "Steven Delean & Stevie Pederson"
+institute: "Adelaide University & Black Ochre Data Labs"
+bibliography: 'assets/references.bib'
+format: 
+  html: 
+    toc: true
+    toc-depth: 3
+---
+
+```{r, echo = FALSE}
+knitr::opts_chunk$set(
+  echo = TRUE, eval = TRUE, results = "hide",
+  fig.show = "hide", message = FALSE, warnings=  FALSE
+)
+```
+
+# Introduction
+
+## Last Session
+
+In the previous practical we introduced several key packages from the `tidyverse` which are fundamental data science packages, heavily used in bioinformatics.
+These included:
+
+1. Using the `magrittr` to chain together multiple functions
+2. How to perform Excel-like operations on a data frame
+    + Including sorting and filtering
+    + Subsetting rows and columns
+    + Modifying existing columns and adding new columns
+    + Pivoting data into longer or wider format
+
+## Today's Content
+
+Now that we know the basics of data exploration, we can start visualising transcriptomics data using `ggplot2`.
+Just like the previous packages, `ggplot2` is actually a core package from an ecosystem known as the `tidyverse`.
+
+![](assets/tidy_workflow.png)
+
+
+During the course of the practical we'll also briefly encounter both `stringr` for working with character vectors (or columns) and `forcats` for working with categorical variables, known as `factors` in R.
+
+Once we've walked through the fundamentals of data visualisation, we'll move to a way of managing your code alongside formatted notes, beautifully presented tables and high-quality figures, using `rmarkdown`.
+
+# Data Visualisation
+
+## Data Import
+
+Before starting any visualisation, let's start a new R script called `data_visualisation.R` and begin our script with the following
+
+```{r}
+#| echo: true
+#| eval: false
+library(tidyverse)
+psen2VsWT <- read_csv("data/psen2VsWT.csv")
+```
+
+```{r}
+#| echo: false
+#| eval: true
+#| message: true
+library(tidyverse)
+psen2VsWT <- read_csv(here::here("practicals", "data", "psen2VsWT.csv"))
+```
+
+As we now know, calling `library(tidyverse)` will load several packages, including `ggplot2`, along with those from the last session.
+
+## Base Graphics in R
+
+As might be expected, R comes with quite powerful graphics capability built in, via the package `graphics`, installed with every R installation.
+These methods were the workhorse for the first 10-15 years of R usage and still have their place, however `ggplot2` has become the industry standard across most of science.
+Let's take a minute to explore the basics before moving on the `ggplot2`.
+The main plotting functions we'll look at are:
+
+1. Points, usually in x vs y format
+2. Boxplots, looking at the ranges of data within categories
+3. Histograms, looking at the distribution of a large number of data points
+
+### Simple x vs y plots
+
+Comparing to values (x & y) from a dataset is one of the most common figure types.
+Now we understand that columns are just vectors, we could show two columns from `psen2VsWT` against each other very easily.
+If we compare logFC against logCPM, we'll be plotting the change after treatment against the average expression, known colloquially in transcriptomics as an MA plots (despite neither value being M or A).
+
+```{r}
+#| eval: false
+plot(psen2VsWT$logCPM, psen2VsWT$logFC)
+```
+
+The default points look a bit rubbish, so we can change them to a solid circle by adding `pch = 19`
+
+```{r}
+#| eval: false
+plot(psen2VsWT$logCPM, psen2VsWT$logFC, pch = 19)
+```
+
+This may not be intuitive at all, but jump to the help page for points using `?pch`.
+A few lines below the **Details** header you'll see that `pch` is short for "plotting character', and further down the page is a figure that shows what character gets shown for each value.
+
+- 0-14 are empty shapes, with some being an overlay of two different ones (e.g. 13)
+- 15-20 are filled shapes
+- 21-25 are shapes with an outline colour and a filled colour
+
+In addition to changing the points, we can add lines to the plot after it's been created.
+The following adds a horizontal (`h`) line at $y=0$, choosing the line-type (`lty`) to be `"dashed"`
+
+```{r}
+#| eval: false
+abline(h = 0, lty = "dashed")
+```
+
+We can also add titles using the function `title()`
+
+```{r}
+#| eval: false
+title("A Simple MA Plot")
+```
+
+
+### Boxplots
+
+Sometimes we wish to look at the distribution of values within categories.
+We haven't formally looked at categorical data yet, but as you can see there are some columns in `psen2VsWT` which are clearly categories, such as `chromosome` and `gene_biotype`
+When using boxplots the value we wish to view will be on the y-axis, with the categories on the x-axis, and we can specify this using R's formula syntax: `y ~ x`.
+We read this as `y` *depends on* `x`, or `y` *is a function of* `x`.
+
+We'll look at `gc_content` by `gene_biotype`, so will use the formula `gc_content ~ gene_biotype`.
+Notice that because we're using a formula, we need to tell R which data object the two columns are in, and we pass this to the function as `data = psen2V2WT`.
+
+```{r}
+boxplot(gc_content ~ gene_biotype, data = psen2VsWT)
+```
+
+There are a lot of categories here and some might not display well on the x-axis, but we'll learn how to work around that a bit later.
+In general, this is a nice, quick & easy way to have first look at values we're interested in.
+
+### Histograms
+
+Sometimes, we wish to inspect histograms, and this is a very common visualisation for $p$-values.
+We know from our basic statistics lectures that for every data point where $H_0$ is true, these values will be drawn from an Uniform distribution between 0 & 1, i.e. $\mathcal{U}(0, 1)$.
+This means they should be randomly distributed between the limits of the distribution, i.e 0 & 1.
+
+Under $H_A$ however, the p-values will be very small.
+In transcriptomics, we commonly see the majority of genes being unaffected by the treatment, but a small number being impacted, so we should see a cluster of small p-values in amongst a random distribution between 0 & 1.
+
+
+```{r}
+hist(psen2VsWT$PValue)
+```
+
+Just as we expected!
+
+## Using `ggplot2`
+
+:::: {.columns}
+::: {.column width = "75%"}
+
+Now we've seen the key basic graphics capability, let's move straight to `ggplot2`, which makes the creation of complex and highly-detailed figures comparatively simple.
+
+:::
+
+::: {.column width = "25%"}
+
+![](https://ggplot2.tidyverse.org/logo.png)
+:::
+::::
+
+### Layers
+
+`ggplot2` is an R implementation of [The Grammar of Graphics](https://link.springer.com/book/10.1007/0-387-28695-0) (hence the `gg`), by Hadley Wickham @Wickham2016-gg.
+The foundational principles are that we build a plot in layers, similar to how we added lines and a title above, but in a clearly structured way.
+The basic types of layers are:
+
+![](assets/gglayers.png)
+
+In more clear language, this means we:
+
+1. Organise our data
+2. Defining key variables (i.e. columns) my mapping them to "aesthetics", where aesthetics are colour, shape, linetype, transparency etc
+3. Decide which type of geometry we'll use, e.g. lines, points, boxplots etc
+
+From there we have optional layers:
+
+4. Facets represent sub-panels within each plot
+5. Statistics are the summary type values to add, such as regression lines, ellipses etc
+6. Co-ordinates represent the scales, such as the x & y axes and whether we log transform, the different colour palettes etc
+7. The `theme` is the overall style of the plot
+    + Where do we place the legend
+    + What font size should our axis labels be
+    + The background colour scheme 
+    
+Usually, we deal with the first three as our key focus, then modify the scales & themes as needed
+
+### Initialising a Plot
+
+To start with, we'll need to call the function `ggplot()`
+
+::: {.callout-note}
+The **package** is called `ggplot2` because it was Hadley's second attempt as he developed the package during his PhD thesis.
+
+The **function** we call is `ggplot()`.
+:::
+
+```{r}
+ggplot(psen2VsWT)
+```
+
+This is the very first step, corresponding to the "data" layer.
+It's an empty plotting panel because we haven't mapped any columns to plotting aesthetics.
+
+### Adding Aesthetics
+
+Now we've initialised the plot, we can add aesthetics.
+Let's recreate that MA-plot from earlier, so we'll map `logCPM` to the x-axis and `logFC` to the y-axis
+
+```{r}
+ggplot(psen2VsWT) +
+  aes(x = logCPM, y = logFC)
+```
+
+::: {.callout-important}
+Notice that we've added the mappings by placing a `+` after the initial call to `ggplot()`.
+This effectively tells R *there is more to come*, and we use this to *add layers*, which hopefully feels relatively intuitive.
+It's subtly different to the pipe (or magrittr) because it doesn't really pass the data to the next function or place it in the first argument, although it does refer back to the original data still.
+
+To be honest, Hadley wrote `ggplot2` before the R base pipe or `magrittr` had been developed, so using the `+` was the best he had to work with.
+He did try a rewrite called `ggvis` which used the magrittr instead of the `+` symbol, but he abandoned it.
+:::
+
+Now you'll see the (still empty) plot, but the range of the columns we've assigned to the x & y axes will be visible as the axis limits.
+Once we assign the geometry, the points will be drawn
+
+### Adding Geometry
+
+To draw the points, we simply add `geom_point` (which uses `pch = 19` as the default, which is much nicer)
+
+```{r}
+ggplot(psen2VsWT) +
+  aes(x = logCPM, y = logFC) +
+  geom_point()
+```
+
+And that's the basics covered!
+Let's add some more layers.
+
+### Adding statistics
+
+There's no real need for sub-panels (or facets) so let's add a regression line using `stat_smooth()`.
+Unless we specify the method, `stat_smooth()` will automatically decide what statistical model should be applied.
+We know we want a linear regression line, so we can specify `method = "lm"` which will call the R function `lm()` which applies a linear model (or a linear regression model).
+
+By default, the standard errors of the regression would be shown, so we turn them off using `se = FALSE`.
+
+Finally, we decided we wanted a blue line so we chose `colour = "blue"`.
+Conveniently for Australians, Hadley Wickham is from New Zealand so he doesn't use American spelling for words like "colour", although it is recognised as an argument name if you really must use US spelling.
+
+```{r}
+ggplot(psen2VsWT) +
+  aes(x = logCPM, y = logFC) +
+  geom_point() +
+  stat_smooth(method = "lm", se = FALSE, colour = "blue")
+```
+
+**Try changing the colour to something else** noting that any colour name must be quoted.
+There are `r length(colours())` named colours recognised by R, so if you stick to the obvious colours, you'll likely be OK.
+
+::: {.callout-note}
+Regression lines like this are commonly used in MA plots to easily detect the presence of any systemic bias in transcriptomics data.
+A regression line through this type of data should be very, very close to the line $y=0$ and this line appears pretty close.
+There's always a little variation, but this dataset looks OK!
+
+Sometimes we fit a curve through the data, so if you're curious remove `method = "lm"` from the call to `stat_smooth` and a curve will be fitted by default.
+This too looks pretty close to the line $y=0$ even though it's actually a curve
+:::
+
+### Changing the Theme
+
+If you're like many researchers, you'll a little unhappy with that grey background.
+This is the default theme for `ggplot2` and as actually provided as a default theme called `theme_grey()`.
+We'll dig into themes later, but for now, let's apply a different theme, known as `theme_bw()` which is a common alternative default theme
+
+```{r}
+ggplot(psen2VsWT) +
+  aes(x = logCPM, y = logFC) +
+  geom_point() +
+  stat_smooth(method = "lm", se = FALSE, colour = "blue") +
+  theme_bw()
+```
+
+Because `theme_gery()` isn't a popular theme, we can actually set the default theme by adding the following line of code to change the default.
+
+```{r}
+theme_set(theme_bw())
+```
+
+This resets the default theme to be `theme_bw()` for every plot, saving us a little effort
+
+### Adding Coordinates (Scales)
+
+So far we have only mapped logCPM to the x-axis and logFC to the y-axis, but we can also apply other aesthetics, such as colour.
+For this, we'll switch to piping the data into the initial call to `ggplot()` and will modify the data on the way in, just like we saw in the last session.
+
+```{r}
+psen2VsWT %>% 
+  mutate(DE = FDR < 0.01) %>% 
+  ggplot() +
+  aes(x = logCPM, y = logFC, colour = DE) +
+  geom_point() +
+  stat_smooth(method = "lm", se = FALSE, colour = "blue") 
+```
+
+We didn't need to apply `theme_bw()` any more, which saved one line of code, but notice that `ggplot` has now mapped the `TRUE` and `FALSE` values to two different colours.
+Hopefully, you can now see why we spent so much time on the `magrittr` last session as we can do these "on the fly" operations without needing to modify the original data.
+
+The default `ggplot2` colour scheme is also a bit of a cliche at this point, so let's map each value to a co-ordinate using a scale function.
+We'll use the scale function `scale_colour_manual()` which allows us to specify colour exactly.
+
+```{r}
+psen2VsWT %>% 
+  mutate(DE = FDR < 0.01) %>% 
+  ggplot() +
+  aes(x = logCPM, y = logFC, colour = DE) +
+  geom_point() +
+  stat_smooth(method = "lm", se = FALSE, colour = "blue") +
+  scale_colour_manual(values = c("black", "red"))
+```
+
+::: {.callout-note}
+
+There are multiple options for setting the colour palette with some great options provided by `scale_colour_brewer()` where we can choose from the palettes visible using `RColorBrewer::display.brewer.all()`.
+These are discrete colour palettes, whilst some continuous color palettes are provided by `scale_colour_viridis_c()`, or a number of other functions.
+:::
+
+**Try changing `scale_colour_manual()` to `scale_colour_brewer(palette = "Set1")`**
+
+### Creating a Boxplot
+
+Now we've really explored plotting points, let's try a boxplot.
+We can start with the same one we tried earlier, where we show GC content as a function of gene biotype.
+Because of the way we map columns to aesthetics, we don't need the R formula syntax any more
+
+```{r}
+psen2VsWT %>% 
+  ggplot() +
+  aes(x = gene_biotype, y = gc_content) +
+  geom_boxplot()
+```
+
+This time all of the x-axis labels are shown, but they overlap & look terrible.
+We can use `theme()` to rotate these.
+
+```{r}
+psen2VsWT %>% 
+  ggplot() +
+  aes(x = gene_biotype, y = gc_content) +
+  geom_boxplot() +
+  theme(
+    axis.text.x = element_text(angle = 90, hjust = 1, vjust = 0.5)
+  )
+```
+
+That takes a little explaining, but most of our graphical parameters we can modify using a theme fall into three categories, where attributes are set using an `element_*()` function
+
+1. text: `element_text()`
+2. line: `element_line()`
+3. rectangles (or boxes): `element_rect()`
+
+In these we can set font size, line width and many other attributes for the specific theme element we wish to modify.
+In the above we wanted to rotate the x-axis labels, which are modified using `axis.text.x = element_text()`.
+We also added `hjust = 1` which sets the horizontal-adjustment of the text to be right aligned. 
+This places the label hard up against the axis.
+The final argument was `vjust = 0.5` which sets the vertical adjustment of the labels to be centre aligned.
+Sometimes the defaults don't quite look how we'd hoped so we need to add these.
+An Adelaide-based R developer (Jonathan Carroll) has also written a package called [`ggeasy`](https://cran.r-project.org/web/packages/ggeasy/index.html) which tries to simplify some of these operations.
+
+Themes are very powerful, but can be a little overwhelming.
+Check the help page `?theme` to see the extent of the options we can use.
+It's truly all-encompassing
+
+An alternative strategy for making those gene biotypes readable might be to switch the x & y axes, which is very easy to do using `ggplot2`
+
+```{r}
+psen2VsWT %>% 
+  ggplot() +
+  aes(x = gc_content, y = gene_biotype) +
+  geom_boxplot() 
+```
+
+## Modifying Categories With `forcats`
+
+The above boxplot has shown the gene biotypes in alpha-numeric order, with `antisense` at the bottom then moving in order to `unprocessed_pseudogene` at the top.
+R has silently coerced the `gene_biotype` column into a categorical variable (i.e. a `factor`) when we mapped a character column to an axis.
+In reality, this is what we'd want nearly every time, so this is a helpful decision.
+
+However, we might like to change the order of these along the axis, and if we *manually set the order of the categories*, we can gain much greater control over the ordering of the boxes.
+First, let's stick with the default function, `as.factor()`
+
+```{r}
+psen2VsWT %>% 
+  mutate(gene_biotype = as.factor(gene_biotype))
+```
+
+Notice that under the column name, this column is now showing `<fct>`, telling us that this is now a factor, which is a categorical variable in R.
+The default function will have used alpha-numeric order just like we've seen in the plot.
+The summary table below will be ordered using the category order (or "factor levels")
+
+```{r}
+psen2VsWT %>% 
+  mutate(gene_biotype = as.factor(gene_biotype)) %>% 
+  count(gene_biotype)
+```
+
+A sensible alternative might be to place the order of categories in order of how common they are.
+We can use `fct_infreq()` for this, which orders the categories by how many times they're seen.
+
+```{r}
+psen2VsWT %>% 
+  mutate(gene_biotype = fct_infreq(gene_biotype)) %>% 
+  count(gene_biotype)
+```
+
+Now if we plot these, `protein_coding` will be first on the y-axis.
+
+```{r}
+psen2VsWT %>% 
+  mutate(gene_biotype = fct_infreq(gene_biotype)) %>% 
+  ggplot() +
+  aes(x = gc_content, y = gene_biotype) +
+  geom_boxplot() 
+```
+
+We can reverse this using `fct_rev()` either inside the mutate, or in the aesthetic mappings.
+Let's try it using the mappings.
+
+```{r}
+psen2VsWT %>% 
+  mutate(gene_biotype = fct_infreq(gene_biotype)) %>% 
+  ggplot() +
+  aes(x = gc_content, y = fct_rev(gene_biotype)) +
+  geom_boxplot() 
+```
+
+(Notice the y-axis label changed according to this change)
+
+If we recall those summary tables we just created, there are a few biotypes with only one or two genes.
+Wouldn't it be nice to collapse these into a merged or "Other" category?
+We can do this using one of the `fct_lump_*()` functions, where 
+
+- `fct_lump_min()` sets a minimum number of observations to be in a group before lumping them into the "Other" category
+- `fct_lump_prop()` sets a minimum proportion of observations before being lumped into "Other"
+- `fct_lump_n()` sets a minimum number of groups
+
+```{r}
+psen2VsWT %>% 
+  mutate(
+    gene_biotype = gene_biotype %>% fct_infreq() %>% fct_lump_min(min = 5)
+  ) %>% 
+  count(gene_biotype)
+```
+
+::: {.callout-important}
+The above use of the magrittr **inside a function** is new, but commonly used.
+It allows us to perform multiple modifications to a column very easily
+:::
+
+As you can see from the table, the smallest group size is now 5 and all of the other biotypes have been merged into "Other"
+Let's see how that changes the plot
+
+```{r}
+psen2VsWT %>% 
+  mutate(
+    gene_biotype = gene_biotype %>% fct_infreq() %>% fct_lump_min(min = 5)
+  ) %>% 
+  ggplot() +
+  aes(x = gc_content, y = fct_rev(gene_biotype)) +
+  geom_boxplot() 
+```
+
+That's much less overwhelming!
+
+::: {.callout-tip title = "Factors"}
+Manipulating categorical data using factors is an extremely common operation.
+By default, the alpha-numeric ordering of the chromosomes would be chr1, chr10, chr11 etc and we'd need to think carefully about how to reorder those.
+We can manually set the levels using `factor()` instead of `as.factor()`, and passing a character vector of levels using a trick like
+
+```{r}
+levels <-  paste0("chr", c(1:25, "M"))
+levels
+```
+
+We haven't spent any time really working character vectors yet, but that will happen soon enough
+
+:::
+
+### More Creative Geometry
+
+So far we've only seen boxplot and simple points, but there are many more options in ggplot such as:
+
+- Lines: `geom_line()`, `geom_abline()`, `geom_hline()`, `geom_vline()`
+- Distributions: `geom_boxplot()`, `geom_violin()`
+- Histograms: `geom_histogram()`, `geom_density()`
+- Bar Plots: `geom_bar()`, `geom_col()` + `geom_errorbar()`
+- Heatmaps: `geom_tile()`, `geom_raster()`, `geom_rect()`
+
+Your data and the story your data tells will determine which type of plot you produce, and we won't have time to look at all of those, but let's browse a few just for fun.
+
+#### Violin Plots
+
+`geom_violin()` is becoming a popular alternative to boxplot as you see the true shape of the distribution a little more clearly.
+Let's switch that straight in for `geom_boxplot()` and adding a different fill colour using the biotype.
+We could've also done this for `geom_boxplot()`.
+We've also used one of the fill palettes from `scale_fill_brewer()` which is what we use when providing the coordinates for a fill, whereas `scale_colour_brewer()` would've been what we used if mapping a colour (i.e. boxplot outline colour)
+
+```{r}
+psen2VsWT %>% 
+  mutate(
+    gene_biotype = gene_biotype %>% fct_infreq() %>% fct_lump_min(min = 5)
+  ) %>% 
+  ggplot() +
+  aes(x = gc_content, y = fct_rev(gene_biotype), fill = gene_biotype) +
+  geom_violin(quantiles = 0.5, quantile.linetype = "solid") +
+  scale_fill_brewer(palette = "Paired")
+```
+
+### Histograms
+
+The default histogram in `ggplot2` is a little ugly
+
+```{r}
+psen2VsWT %>% 
+  ggplot() +
+  aes(x = PValue) +
+  geom_histogram()
+```
+
+However, we can set the bin-width easily and with some minor edits, this can look good really quickly
+
+```{r}
+psen2VsWT %>% 
+  ggplot() +
+  aes(x = PValue) +
+  geom_histogram(binwidth = 0.01, fill = "grey70", colour = "black")
+```
+
+Notice that we didn't set the y aesthetic as a histogram will automatically choose the count.
+We can set the frequency using `y = after_stat(density)` if we'd like though
+
+### Bar Plots
+
+Barplots also make great summary figures and piping the data can be really powerful as well.
+By default, `geom_bar()` will count the observations and summarise for us.
+
+In the following:
+
+- We've also applied those chromosome factor levels from earlier in the session
+- The DE column has been made a categorical variable
+- The manual colours have been set using a named vector
+
+```{r}
+psen2VsWT %>% 
+  mutate(
+    DE = as.factor(FDR < 0.01),
+    chromosome = factor(chromosome, levels = levels)
+  ) %>% 
+  ggplot(aes(chromosome, fill = fct_rev(DE))) +
+  geom_bar() +
+  scale_fill_manual(values = c("FALSE" = "black", "TRUE" = "red"), name = "DE")
+```
+
+# RMarkdown
+
+## A Brief Introduction
+
+Now that we've explored much of the `tidyverse`, we can move outside the `tidyverse` and look at using a file format called RMarkdown.
+This is the approach used by many bioinformaticians to manage extremely complex analyses, and allows us to to perform an analysis embedding nicely formatted text descriptions, tables and figures alongside our code, and where all results are actually generated by running the code as the document is compiled.
+
+R Scripts are still very heavily used for many tasks, such as package development, writing custom functions and submitting jobs to High-Performance Compute Clusters (HPCs), but RMarkdown allows us to build our analysis interactively, describing what we see as we go, the compiling it all together as a PDF, MS Word document or even an HTML page.
+
+The entire transcriptomics practical series (and the lectures) were written using the latest generation of RMarkdown called `quarto`.
+However, the strategy and format is near identical.
+
+## Markdown
+
+Before we learn RMarkdown, we need to understand the simpler format "markdown" which is what RMarkdown extends.
+For those who are familiar with [github](www.github.com), most README files are written using this syntax, along with quite a bit of comprehensive documentation.
+For example, the Release Notes for most R packages on CRAN or Bioconductor are documented in a file called "NEWS.md", with an example [here](https://github.com/tidyverse/ggplot2/blob/main/NEWS.md).
+
+
+Let's start by creating a new file
+
+```
+1. File > New File > MarkdownFile
+2. Save as README.md
+```
+
+::: {.callout-tip title = "Markdown Formatting"}
+
+These are plain text files, however we can denote important formatting features using some pre-defined syntax.
+They'll appear without formatting (beside the pretty things RStudio adds) but when we compile them, all of the formatting will be rendered as we expect:
+
+- Section Headers are denoted by one or more `#` symbols
+    + `#` is the highest level, `##` is next highest etc.
+- Italic text is set by enclosing text between a single asterisk (`*`) or underscore (`_`)
+- Bold text is set by using *two asterisks* (`**`) or *two underscores* (`__`)
+
+- Dot-point Lists are started by prefixing each line with `-`
+    + Next level indents are formed by adding 2 or 4 spaces before the next `-`
+- Numeric Lists are formed by starting a line with `1.`
+    + Subsequent lines don't need to be numbered in order
+
+:::
+
+Let's quickly edit our file so there's something informative.
+On the top line enter
+
+`# Transcriptomics Pratical Series`
+
+Two lines down add `## Course Outline`
+
+Leave another blank line then add
+
+`1. Introduction to R and R Studio`  
+`2. The Tidyverse`  
+`3. Data Visualisation`  
+`4. R Markdown`  
+
+`**All material**` can be found at \[the course homepage\]\(https://github.com/University-of-Adelaide-Bx-Masters/Bioinformatics_Sequencing_Technologies/\)
+
+Here we've set the first two words to appear in bold font.
+The section in the square brackets will appear as text with a hyperlink to the site in the round brackets
+
+Now...
+
+Click the `Preview Button` and an HTML document appears.
+Note that README.html has also been produced!
+
+::: {.callout-note}
+Sites like github/gitlab render this automatically, as does Obsidian
+:::
+
+This really is the basics to Markdown.
+It's simple & elegant way to produce clean documents with minimal overheads (like opening MS Word).
+Although we haven't seen it today, complex mathematical equations can also be described using Markdown.
+
+## RMarkdown
+
+### A Brief Introduction
+
+RMarkdown extends Markdown to incorporate executed R code alongside the standard Markdown formatting.
+We can easily produce a document with section headers, tables and formatted text, alongside figures, results and the code used to produce them.
+This ensure that all figures and results are taken directly from the executed code, avoiding any copy-paste errors, or the use of old results before the new samples arrived etc
+
+The file suffix for RMarkdown is .Rmd, and we can output our analysis directly as:
+
+* HTML
+* MS Word Documents
+* PDF Documents (If you have $\LaTeX$ installed)
+* HTML or PowerPoint presentations
+
+We never need to use MS Word, Excel or PowerPoint again!
+
+### The Structure of an RMarkdown File
+
+Let's create our first `rmarkdown` document
+
+1. Go to the `File` drop-down menu in RStudio
+2. New File -> R Markdown...
+
+![](assets/NewRMarkdown.png)
+
+1. Change the Title to: My First Report
+2. Change the Author to however you'd like to refer to yourself
+3. Leave everything else as it is & hit OK
+4. Save the file as `RMarkdownTutorial.Rmd`
+
+Before we compile the document, let's look through a few key features
+
+#### The YAML Header
+
+A *header section* is enclosed between the two sets of `---` lines at the top.
+__Nothing can be placed before this!__.
+This header uses YAML (**Y**AML **A**in't **M**arkup **L**anguage) format, and editing is beyond the scope of this course so let's leave it as is.
+However as your skills develop, you'll be able to set custom `.css` files, load LaTeX packages, define parameters etc.
+
+#### Code Chunks
+
+Lines 8 to 10 are a code `chunk`, which is really just one or more operations that make sense as a block.
+
+1. Chunks always begin with ```{r}
+2. Chunks always end with ```
+3 Executed `R` code goes between these two delineation marks
+
+Chunk names are optional and directly follow the letter `r`, usually using the format 'chunk-name'.
+Chunks can also be other languages (`bash`, `python` etc.), but R is really the main game.
+In this first chunk, the `r` tells RMarkdown the chunk is a chunk of `R` code
+
+Other key parameters are also set in the chunk header.
+
+1. `echo = TRUE` / `include = TRUE`: do we show/hide the code and the result
+2. `results = 'markup'`: Show the results using the conventional markup for R output
+3. `fig.width` / `fig.height`: control the size of any figures
+4. `fig.cap`: The figure caption
+
+The master reference is [here](https://yihui.org/knitr/options/#chunk-options) and shows there is actually a great deal of control we can apply to each chunk.
+
+If you want to execute the chunks into your interactive session, enter a chunk and use `Ctrl+Shift+Enter` (Linux/Windows) which is probably `Cmd+Shift+Enter` on OSX.
+You can jump to the next chunk using `Ctrl+Alt+N` (Linux/Windows) or `Option+Command+N` (OSX)
+
+#### Sections and Sub-Sections
+
+Line 12 is a Subsection Heading, starting with `##`.
+In order to make sure we can see all the chunks and section headers
+
+1. Click the _Outline_ symbol in the top-right of the Script Window
+2. Chunk names are shown in _italics_ (if set to be shown)
+    + If you can't see the chunk names go to `Tools` > `Global Options` > `R Markdown` 
+    + Select: Show in document outline - Sections and All Chunks
+3. Section Names are in plain text
+4. Chunks are indented within Sections
+5. By default Sections start with `##`
+    + Only the Document Title should be Level 1 `#` although this is only a loose guideline
+
+
+#### Compiling The Report
+
+Now we've had a look around, click the `Knit` (or `Render`) button at the top of the file, about 1/3 of the way across.
+This should open up the compiled document as an HTML file, which is the default format.
+
+Look through the compiled document and compare it to the source file.
+
+- Can you see how the YAML header has rendered in the document?
+- Can you spot the code chunks
+- The section headers & the hyperlink?
+
+### Making Our Own Report
+
+Now we're going to produce our own report, as if we've produce the file `psen2VsWT.csv` ourselves and are presenting our results to share publicly.
+Leave the entire YAML header, and the very first chunk named `setup`, but delete all of the content below that.
+
+The first step we should perform in an RMarkdown analysis is to load all the packages we need.
+We only need the `tidyverse`, so add a couple of blank lines after the `setup` chunk, then create a new chunk using the shortcut `Alt+Ctrl+I` (Windows/Linux) or `Cmd+Option+I` (OSX).
+You'll see an empty R chunk appear with all of the backticks and `{r}` as is needed.
+
+Edit the chunk header placing a space after the `r` and add the chunk name `load-packages`. 
+(No need for a comma, just add the space.)
+
+Inside the chunk enter `library(tidyverse)`, followed by `theme_set(theme_bw())` to make sure all of our figures look fire.
+Compile the document!
+
+Remember all of those "helpful" messages that the `tidyverse` likes to give to us?
+They look pretty rubbish here, so after the chunk name, add a comma, then add the argument `message = FALSE` and recompile.
+Hopefully now the output file looks much more acceptable
+
+Underneath that chunk, create a new one then give it the chunk name `load-data` and enter the code
+
+```{r}
+psen2VsWT <- read_csv("data/psen2VsWT.csv")
+```
+
+::: {.callout-caution}
+File paths can be a bit more difficult to wrangle when compiling an RMarkdown document, so if RStudio tells you it can't find the file "psen2VsWT.csv" call a tutor over.
+The most common causes of this issue are:
+
+1. Not being in a R Project
+2. Not having the file in the directory "data", with "data" being in the same directory as the RMarkdown document.
+:::
+
+Now add the text describing the file, which might be something like
+
+> Differential Gene Expression analysis was performed on two groups of zebrafish.
+> One group had the wild-type genetic background, whilst for the other group a mutation was induced in the gene *psen2*
+> In total, 16021 genes were considered to be detected with 2470 genes being considerd to be differentially expressed using an FDR of 0.01
+
+**Don't forget to put the gene name in italics** using RMarkdown formatting
+
+Now compile and make sure the text looks how you want it to look.
+
+#### Using Inline R Code
+
+One of the brilliant things about RMarkdown is that can pull all results directly from our R objects, meaning we avoid typos (except in our code) when presenting results.
+In your text as above:
+
+1. Change the number `16021` to be the exact text  \``r` `nrow(psen2VsWT)`\`
+2. Change 2470 to be \``r` `sum(psen2VsWT$FDR < 0.01)`\`
+
+Now recompile the document.
+
+If everything worked as it should, you'll have these numbers printed in your compiled document, but *they have been taken directly from your results*
+
+::: {.callout-important title="Reproducible Code"}
+Every time we compile the document, a new R session is created by RStudio, which is completely separate to the interactive session we can access using the R Console.
+Even if you have the data object in your interactive session, during compilation, the data will be reloaded and all code chunks run in a completely new, isolated R session that is closed down once the compilation has completed.
+
+This ensures that all code can be run as a complete, self-contained analysis, making the entire process reproducible
+:::
+
+#### Creating Tables
+
+Let's summarise our DE genes by gene_biotype using the tricks from the `tidyverse` in the previous practical.
+Try executing this chunk interactively first and make sure you understand each line.
+There's a new function in there called `relocate()` which moves a column to different position.
+
+```{r}
+psen2VsWT %>% 
+  mutate(DE = FDR < 0.01) %>% 
+  count(gene_biotype, DE) %>% 
+  pivot_wider(names_from = DE, values_from = n, values_fill = 0) %>% 
+  rename(NotDE = `FALSE`, DE = `TRUE`) %>% 
+  mutate(
+    Detected = NotDE + DE,
+    pDE = DE / Detected
+  ) %>% 
+  relocate(Detected, .after = gene_biotype) %>% 
+  arrange(desc(Detected))
+```
+
+Now compile the document and this table should appear with a series of hashes in front of each line.
+Doesn't really look great to be honest.
+
+Fortunately, there are bunch of packages which can take this type of table an produce a beautiful RMarkdown table, with `pander` being a great all-rounder.
+
+In your `load-packages` chunk, add `library(pander)` after `library(tidyverse)` and execute that interactively so the package `pander` is in your interactive session.
+Now pipe that last `arrange(desc(Detected))` into the function `pander()` and you'll see a table appear in markdown format.
+
+We can now add a table caption by placing some text inside the function `pander()` such as `pander(caption = "Summary of detected and DE genes by gene biotype, with the proportion of DE genes from each biotype shown in the final column")`
+
+**Recompile after piping the table into `pander()`**
+
+The table should now look beautifully formatted in the HTML document
+
+#### Adding Figures
+
+Let's make a volcano plot, which shows logFC against a measure of significance, like the $p$-value, usually transformed using log~10~.
+Begin a new chunk called `volcano-plot` and add the following, and execute interactively.
+
+::: {.callout-note}
+Notice that we've shifted the initial call to `aes()` inside the initial call to `ggplot`.
+This is a very common way to being the plot with the previous approach and this one both being totally acceptable.
+
+Importantly, any mapping in that initial call to `aes()` is passed down to every additional layer
+:::
+
+```{r}
+psen2VsWT %>% 
+  mutate(
+    DE = FDR < 0.01,
+    log10p = log10(PValue)
+  ) %>% 
+  ggplot(aes(logFC, -log10p, colour = DE)) +
+  geom_point() +
+  scale_colour_manual(values = c("black", "red"))
+```
+
+This is a nice looking plot, but let's add some gene names to really tell a story.
+We'll use the function `geom_text_repel()` from the package `ggrepel`, which adds text labels, that repel fro each other so they overlap as little as possible.
+
+Go back to your `load-packages` chunk and add `library(ggrepel)` then execute so it's in your interactive session.
+Now modify the above chunk to be
+
+```{r}
+#| echo: false
+library(ggrepel)
+```
+
+
+```{r}
+psen2VsWT %>% 
+  mutate(
+    DE = FDR < 0.01,
+    log10p = log10(PValue)
+  ) %>% 
+  ggplot(aes(logFC, -log10p, colour = DE)) +
+  geom_point() +
+  geom_text_repel(
+    aes(label = gene_name),
+    data = . %>% slice(1:10)
+  ) +
+  scale_colour_manual(values = c("black", "red"))
+```
+
+::: {.callout-important}
+The call to `geom_text_repel()` uses a very neat trick, that is specific to the `magrittr`, and that doesn't work with the base pipe.
+We've modified the data object, passed down as `.`, by calling `slice(1:10)` which will just return the first two rows inside the function `geom_text_repel()` only.
+This is a great way of adding the top 10 gene names, instead of all 16,000, which would look terrible and would also take minutes to plot.
+:::
+
+In the chunk header for this figure, add `fig.cap = "Volcano plot with the top10 genes labelled"` and recompile.
+
+**Now add the MA plot below that, also labelling the top 10 genes by fold-change instead of PValue**
+
+## Conclusion
+
+We'll be using RMarkdown for all remaining transcriptomics practicals, so you'll be able to familiarise yourself with it over the coming weeks.
+Today will have made an excellent primer for you.
+
+# References
+
+
+

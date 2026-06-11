@@ -1,0 +1,1313 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+<script src="transcriptomics-session2_files/libs/clipboard/clipboard.min.js"></script>
+<script src="transcriptomics-session2_files/libs/quarto-html/tabby.min.js"></script>
+<script src="transcriptomics-session2_files/libs/quarto-html/popper.min.js"></script>
+<script src="transcriptomics-session2_files/libs/quarto-html/tippy.umd.min.js"></script>
+<link href="transcriptomics-session2_files/libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="transcriptomics-session2_files/libs/quarto-html/light-border.css" rel="stylesheet">
+<link href="transcriptomics-session2_files/libs/quarto-html/quarto-syntax-highlighting-37eea08aefeeee20ff55810ff984fec1.css" rel="stylesheet" id="quarto-text-highlighting-styles"><meta charset="utf-8">
+  <meta name="generator" content="quarto-1.7.32">
+
+  <meta name="author" content="Dr Stevie Pederson (They/Them)  stevie.pederson@thekids.org.au">
+  <title>Transcriptomics Session 2</title>
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, minimal-ui">
+  <link rel="stylesheet" href="transcriptomics-session2_files/libs/revealjs/dist/reset.css">
+  <link rel="stylesheet" href="transcriptomics-session2_files/libs/revealjs/dist/reveal.css">
+  <style>
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    ul.task-list{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+      vertical-align: middle;
+    }
+    /* CSS for citations */
+    div.csl-bib-body { }
+    div.csl-entry {
+      clear: both;
+      margin-bottom: 0em;
+    }
+    .hanging-indent div.csl-entry {
+      margin-left:2em;
+      text-indent:-2em;
+    }
+    div.csl-left-margin {
+      min-width:2em;
+      float:left;
+    }
+    div.csl-right-inline {
+      margin-left:2em;
+      padding-left:1em;
+    }
+    div.csl-indent {
+      margin-left: 2em;
+    }  </style>
+  <link rel="stylesheet" href="transcriptomics-session2_files/libs/revealjs/dist/theme/quarto-6a216ba96c5c25e91d68b44b6d1a2940.css">
+  <link href="transcriptomics-session2_files/libs/revealjs/plugin/quarto-line-highlight/line-highlight.css" rel="stylesheet">
+  <link href="transcriptomics-session2_files/libs/revealjs/plugin/reveal-menu/menu.css" rel="stylesheet">
+  <link href="transcriptomics-session2_files/libs/revealjs/plugin/reveal-menu/quarto-menu.css" rel="stylesheet">
+  <link href="transcriptomics-session2_files/libs/revealjs/plugin/quarto-support/footer.css" rel="stylesheet">
+  <style type="text/css">
+    .reveal div.sourceCode {
+      margin: 0;
+      overflow: auto;
+    }
+    .reveal div.hanging-indent {
+      margin-left: 1em;
+      text-indent: -1em;
+    }
+    .reveal .slide:not(.center) {
+      height: 100%;
+    }
+    .reveal .slide.scrollable {
+      overflow-y: auto;
+    }
+    .reveal .footnotes {
+      height: 100%;
+      overflow-y: auto;
+    }
+    .reveal .slide .absolute {
+      position: absolute;
+      display: block;
+    }
+    .reveal .footnotes ol {
+      counter-reset: ol;
+      list-style-type: none; 
+      margin-left: 0;
+    }
+    .reveal .footnotes ol li:before {
+      counter-increment: ol;
+      content: counter(ol) ". "; 
+    }
+    .reveal .footnotes ol li > p:first-child {
+      display: inline-block;
+    }
+    .reveal .slide ul,
+    .reveal .slide ol {
+      margin-bottom: 0.5em;
+    }
+    .reveal .slide ul li,
+    .reveal .slide ol li {
+      margin-top: 0.4em;
+      margin-bottom: 0.2em;
+    }
+    .reveal .slide ul[role="tablist"] li {
+      margin-bottom: 0;
+    }
+    .reveal .slide ul li > *:first-child,
+    .reveal .slide ol li > *:first-child {
+      margin-block-start: 0;
+    }
+    .reveal .slide ul li > *:last-child,
+    .reveal .slide ol li > *:last-child {
+      margin-block-end: 0;
+    }
+    .reveal .slide .columns:nth-child(3) {
+      margin-block-start: 0.8em;
+    }
+    .reveal blockquote {
+      box-shadow: none;
+    }
+    .reveal .tippy-content>* {
+      margin-top: 0.2em;
+      margin-bottom: 0.7em;
+    }
+    .reveal .tippy-content>*:last-child {
+      margin-bottom: 0.2em;
+    }
+    .reveal .slide > img.stretch.quarto-figure-center,
+    .reveal .slide > img.r-stretch.quarto-figure-center {
+      display: block;
+      margin-left: auto;
+      margin-right: auto; 
+    }
+    .reveal .slide > img.stretch.quarto-figure-left,
+    .reveal .slide > img.r-stretch.quarto-figure-left  {
+      display: block;
+      margin-left: 0;
+      margin-right: auto; 
+    }
+    .reveal .slide > img.stretch.quarto-figure-right,
+    .reveal .slide > img.r-stretch.quarto-figure-right  {
+      display: block;
+      margin-left: auto;
+      margin-right: 0; 
+    }
+  </style>
+</head>
+<body class="quarto-light">
+  <div class="reveal">
+    <div class="slides">
+
+<section id="title-slide" class="quarto-title-block center">
+  <h1 class="title">Transcriptomics Session 2</h1>
+  <p class="subtitle">Microarray Technology</p>
+
+<div class="quarto-title-authors">
+<div class="quarto-title-author">
+<div class="quarto-title-author-name">
+Dr Stevie Pederson (They/Them) <br>stevie.pederson@thekids.org.au 
+</div>
+        <p class="quarto-title-affiliation">
+            Black Ochre Data Labs, The Kids Research Institute Australia
+          </p>
+    </div>
+</div>
+
+</section>
+<section id="acknowledgement-of-country" class="slide level2">
+<h2><span class="text-red">Acknowledgement Of Country</span></h2>
+<div class="text-red">
+<p>I’d like to acknowledge the Kaurna people as the traditional owners and custodians of the land we know today as the Adelaide Plains, where I live &amp; work.</p>
+<p>I also acknowledge the deep feelings of attachment and relationship of the Kaurna people to their place.</p>
+<p>I pay my respects to the cultural authority of Aboriginal and Torres Strait Islander peoples from other areas of Australia, and pay my respects to Elders past, present and emerging, and acknowledge any Aboriginal Australians who may be with us today</p>
+</div>
+</section>
+<section>
+<section id="technology-development" class="title-slide slide level1 center">
+<h1>Technology Development</h1>
+
+</section>
+<section id="microarray-technology" class="slide level2">
+<h2>Microarray Technology</h2>
+<ul>
+<li>Marked the birth of the modern transcriptomics era (~1996)
+<ul>
+<li>Thousands of genes analysed simultaneously</li>
+<li>Microarrays are still in use!</li>
+</ul></li>
+<li>Developed alongside Human Genome Project (+ other organisms)
+<ul>
+<li>Reference genome was nearing completion</li>
+<li>Gene/Transcript sequences available at scale</li>
+</ul></li>
+<li>Focus was quantitative analysis <span class="math inline">\(\implies\)</span> <em>differential gene expression</em></li>
+</ul>
+</section>
+<section id="microarray-technology-1" class="slide level2 slide-only unlisted">
+<h2>Microarray Technology</h2>
+<ul>
+<li>Compute resources were increasing rapidly
+<ul>
+<li>CPU multi-threading becoming commonplace</li>
+<li><code>python 2.0</code> released in 2000</li>
+<li><code>R</code> v1.0.0 released in 2000</li>
+<li>Bioconductor release 1.0 in 2002</li>
+<li>High Performance Computing (HPC) becoming accessible</li>
+</ul></li>
+</ul>
+</section>
+<section id="microarray-technology-2" class="slide level2 slide-only unlisted">
+<h2>Microarray Technology</h2>
+<ul>
+<li>Probes complementary to target sequence positioned on array</li>
+<li>RNA <span class="math inline">\(\rightarrow\)</span> fluorescently labelled cDNA</li>
+</ul>
+<ol type="1">
+<li class="fragment">Labelled cDNA binds to probe</li>
+<li class="fragment">Microarray excited with laser</li>
+<li class="fragment">Fluorescence at a given probe <span class="math inline">\(\propto\)</span> target RNA abundance</li>
+</ol>
+<div class="fragment">
+<div class="cell" data-layout-align="left">
+<div class="cell-output-display">
+<div class="quarto-figure quarto-figure-left">
+<figure>
+<p><img data-src="assets/Microarray_exp_horizontal.png" style="width:75.0%"></p>
+<figcaption>Image courtesy of Squidonius, Public domain, via Wikimedia Commons</figcaption>
+</figure>
+</div>
+</div>
+</div>
+</div>
+</section>
+<section id="two-colour-arrays" class="slide level2">
+<h2>Two Colour Arrays</h2>
+<div class="columns">
+<div class="column" style="width:42%;">
+<div class="quarto-figure quarto-figure-left">
+<figure>
+<p><img data-src="assets/2colour.jpg" style="width:100.0%"></p>
+<figcaption>Section of two-colour array taken from <span class="citation" data-cites="Shalon01071996">Shalon, Smith, and Brown (<a href="#/section" role="doc-biblioref" onclick="">1996</a>)</span></figcaption>
+</figure>
+</div>
+</div><div class="column" style="width:58%;">
+<ul>
+<li>Two colour microarrays were printed microscope slides</li>
+<li>Known probe sequences were <em>printed</em> to the surface in defined locations
+<ul>
+<li>60-75mer oligonucleotide probes</li>
+<li>Highly customisable by project</li>
+</ul></li>
+</ul>
+<div class="fragment" data-fragment-index="1">
+<ul>
+<li>Two samples per array
+<ul>
+<li>Samples labelled with Cy5 (Red) or Cy3 (Green)</li>
+</ul></li>
+<li>Scanned at 570nm (Cy3) and 670nm (Cy5)</li>
+</ul>
+</div>
+</div></div>
+</section>
+<section id="ma-plots" class="slide level2">
+<h2>MA Plots</h2>
+<div class="columns">
+<div class="column">
+<div class="quarto-figure quarto-figure-center">
+<figure>
+<p><img data-src="assets/dudoit_ma_plot.png"></p>
+<figcaption>Image from <span class="citation" data-cites="dudoit02-ma">Dudoit et al. (<a href="#/section" role="doc-biblioref" onclick="">2002</a>)</span></figcaption>
+</figure>
+</div>
+</div><div class="column">
+<ul>
+<li>Mean of Differences<br><span class="math inline">\(M = \log_2(\frac{R}{G}) = \log_2(R) - \log_2(G)\)</span></li>
+<li>Average Signal<br><span class="math inline">\(A = \frac{1}{2}\log_2(RG) = \frac{\log_2(R) + \log_2(G)}{2}\)</span></li>
+</ul>
+<div class="fragment">
+<ul>
+<li>Assess bias within and between arrays</li>
+<li>Also to show DE genes</li>
+</ul>
+</div>
+<div class="fragment">
+<ul>
+<li>Term “MA Plot” still used in RNA-Seq despite no connection to formula</li>
+</ul>
+</div>
+</div></div>
+</section>
+<section id="single-channel-arrays" class="slide level2">
+<h2>Single Channel Arrays</h2>
+<div class="columns">
+<div class="column" style="width:45%;">
+<div style="font-size: 80%">
+<div class="quarto-figure quarto-figure-center">
+<figure>
+<p><img data-src="assets/Affymetrix.jpg"></p>
+<figcaption>No author known. Schutz assumed based on copyright claims. <a href="http://creativecommons.org/licenses/by-sa/3.0/">CC BY-SA 3.0</a>, via Wikimedia Commons</figcaption>
+</figure>
+</div>
+</div>
+</div><div class="column" style="width:55%;">
+<ul>
+<li><p>Affymetrix Arrays became dominant</p>
+<ul>
+<li>Factory manufactured</li>
+</ul></li>
+<li><p>Standardised layout for each organism</p></li>
+<li><p>Single sample per array</p>
+<ul>
+<li>Only scanned at one frequency<br><span class="math inline">\(\implies\)</span> no dye bias</li>
+</ul></li>
+<li><p>More genes/array</p></li>
+<li><p>25mer probes targeting 3’ end of transcript</p>
+<ul>
+<li>Captured only intact transcripts</li>
+</ul></li>
+</ul>
+</div></div>
+</section>
+<section id="single-channel-arrays-1" class="slide level2 slide-only unlisted">
+<h2>Single Channel Arrays</h2>
+<div class="columns">
+<div class="column" style="width:85%;">
+<p><br></p>
+<div class="quarto-figure quarto-figure-center">
+<figure>
+<p><img data-src="assets/microarrayLayout.jpg" style="width:100.0%"></p>
+<figcaption>The basic methodology underpinning Affymetrix array design. Source Affymetrix</figcaption>
+</figure>
+</div>
+</div></div>
+</section>
+<section id="arrays" class="slide level2">
+<h2>3’ Arrays</h2>
+<ul>
+<li>Each 3’ exon targeted by 11 unique 25mer probes <span class="math inline">\(\implies\)</span> <em>a probeset</em></li>
+<li>Possible to detect different transcripts only if 3’ exons differ</li>
+</ul>
+<ul>
+<li class="fragment"><em>Perfect Match</em> (PM) probes <span class="math inline">\(\implies\)</span> exactly matches target sequence
+<ul>
+<li class="fragment">Known to capture off-target signal <span class="math inline">\(\implies\)</span> non-specific binding (NSB)</li>
+</ul></li>
+<li class="fragment">3’ arrays include paired <em>mismatch</em> probes (MM) with a change at the 13th position
+<ul>
+<li class="fragment">Literally half the array</li>
+<li class="fragment">Intended to quantify NSB properties of each probe</li>
+<li class="fragment">Sometimes returned more signal than PM probes 🤪 <!-- - Gene-level expression estimate obtained taking a robust average across probeset --> <!--     + Model also included BG signal (but not always from MM probes) --></li>
+</ul></li>
+</ul>
+</section>
+<section id="other-array-types" class="slide level2">
+<h2>Other Array Types</h2>
+<div class="columns">
+<div class="column" style="width:45%;">
+<ul>
+<li>3’ Arrays replaced by whole transcript (WT) arrays
+<ul>
+<li>Exon/Gene Arrays</li>
+<li>Maximum of 4 probes/exon</li>
+<li>Multiple probes target missing exons</li>
+</ul></li>
+<li>Illumina Bead arrays
+<ul>
+<li>65-mer probes</li>
+<li>Used barcoded beads instead of set probe locations</li>
+</ul></li>
+</ul>
+</div><div class="column" style="width:55%;">
+<div class="quarto-figure quarto-figure-center">
+<figure>
+<p><img data-src="assets/ArrayProbeLayout.png"></p>
+<figcaption>Source: Affymetrix Technical Note</figcaption>
+</figure>
+</div>
+</div></div>
+</section></section>
+<section>
+<section id="differential-gene-expression" class="title-slide slide level1 center">
+<h1>Differential Gene Expression</h1>
+
+</section>
+<section id="motivation" class="slide level2">
+<h2>Motivation</h2>
+<ul>
+<li>The aim is to detect <em>differentially expressed</em> (DE) genes</li>
+<li>Classic design is Control samples vs Treated samples e.g.
+<ul>
+<li>Resting T cells vs Stimulated T cells</li>
+<li>T47D + Estrogen vs T47D + Estrogen + Testosterone</li>
+</ul></li>
+<li>What genes are DE between conditions</li>
+<li>Need replicates for each condition <span class="math inline">\(\implies t\)</span>-test for each gene
+<ul>
+<li>Anything with <span class="math inline">\(n &lt; 3\)</span> per condition is unacceptable</li>
+<li>What values do we use for <span class="math inline">\(t\)</span>-test?</li>
+</ul></li>
+</ul>
+</section>
+<section id="quantile-normalisation" class="slide level2">
+<h2>Quantile Normalisation</h2>
+<div class="columns">
+<div class="column" style="width:55%;">
+<div class="quarto-figure quarto-figure-left">
+<figure>
+<p><img data-src="assets/quantileNorm.png"></p>
+<figcaption>Example of raw log<sub>2</sub>PM probe intensities. Taken from <span class="citation" data-cites="pmid12538238">Bolstad et al. (<a href="#/section" role="doc-biblioref" onclick="">2003</a>)</span></figcaption>
+</figure>
+</div>
+</div><div class="column" style="width:45%;">
+<ul>
+<li>Need to summarise probes to a probeset
+<ul>
+<li>Probes can be very noisy</li>
+<li>BG signal + inconsistent binding</li>
+</ul></li>
+<li>Individual arrays give different fluorescence distributions <span class="math inline">\(\implies\)</span> technical noise
+<ul>
+<li>Normalisation between arrays <!-- - $t$-tests require an estimate of fold-change + standard error of estimate --></li>
+</ul></li>
+</ul>
+</div></div>
+</section>
+<section id="quantile-normalisation-1" class="slide level2 slide-only unlisted">
+<h2>Quantile Normalisation</h2>
+<ul>
+<li>Quantile normalisation is perfect for arrays with probes and probesets
+<ul>
+<li>Normalise probe-level signal, but estimate gene expression at the probeset level</li>
+<li>Smooths out any normalisation artefacts</li>
+</ul></li>
+</ul>
+<ol type="1">
+<li class="fragment">Select the lowest signal probe on each array<br><span class="math inline">\(\rightarrow\)</span> Likely to be a different probe on each array</li>
+<li class="fragment">Calculate the average signal across all arrays</li>
+<li class="fragment">Give each of the selected probes the average signal</li>
+<li class="fragment">Move to the next lowest signal probe until finished</li>
+</ol>
+<div class="fragment">
+<ul>
+<li>Effectively randomises noise</li>
+<li>Leads to arrays with identical distributions</li>
+</ul>
+</div>
+</section>
+<section id="quantile-normalisation-2" class="slide level2 slide-only unlisted">
+<h2>Quantile Normalisation</h2>
+<div class="columns">
+<div class="column">
+<div class="quarto-figure quarto-figure-center">
+<figure>
+<p><img data-src="assets/preNorm.png"></p>
+<figcaption>Before quantile normalisation</figcaption>
+</figure>
+</div>
+</div><div class="column">
+<div class="quarto-figure quarto-figure-center">
+<figure>
+<p><img data-src="assets/postNorm.png"></p>
+<figcaption>After quantile normalisation<sup>1</sup></figcaption>
+</figure>
+</div>
+</div></div>
+<div style="font-size:95%">
+<ul>
+<li>Now we have identical distributions of signal across all arrays</li>
+<li>Equivalent to having identical amounts of source material (mRNA)</li>
+<li>Reduces technical noise across dataset <span class="math inline">\(\implies\)</span> more statistical power</li>
+</ul>
+</div>
+<aside><ol class="aside-footnotes"><li id="fn1"><p>Images taken from: Bolstad, Probe Level Quantile Normalization for High Density Oligonucleotide Array Data Unpublished Manuscript, 2001</p></li></ol></aside></section>
+<section id="background-correction" class="slide level2">
+<h2>Background Correction</h2>
+<ul>
+<li>Background Correction performed <em>simultaneously with estimation of signal</em></li>
+<li>Robust Multichip Average (RMA) <span class="citation" data-cites="rma2003">(<a href="#/section" role="doc-biblioref" onclick="">Irizarry et al. 2003</a>)</span>
+<ul>
+<li>Estimates signal for each array (<span class="math inline">\(\mu_i\)</span>) <span class="text-red"><span class="math inline">\(\implies\)</span> used for differential expression</span></li>
+<li>Model includes probe affinities (<span class="math inline">\(\alpha_j\)</span>)</li>
+<li><span class="text-red">Doesn’t include MM probes</span></li>
+<li>Fitted using robust statistics to reduce impact of outlier probes</li>
+</ul></li>
+</ul>
+<p><span class="math display">\[
+\log_2 PM_{ij} = \mu_i + \alpha_j + \epsilon_{ij}
+\]</span></p>
+<div class="fragment">
+<ul>
+<li>Extended to GC-RMA <span class="citation" data-cites="wu2004model">(<a href="#/section" role="doc-biblioref" onclick="">Wu et al. 2004</a>)</span> to include GC content of probes</li>
+</ul>
+</div>
+</section>
+<section id="differential-gene-expression-1" class="slide level2">
+<h2>Differential Gene Expression</h2>
+<ul>
+<li>We can take the array-level estimates of gene expression (<span class="math inline">\(\mu_{gi}\)</span>) for gene <span class="math inline">\(g\)</span></li>
+<li>Perform a <span class="math inline">\(t\)</span>-test grouped by treatment group
+<ul>
+<li>Estimates variance (<span class="math inline">\(\sigma^2_g\)</span>)</li>
+<li>Estimate change in expression: <em>logFC</em> = <span class="math inline">\(\beta_g\)</span></li>
+</ul></li>
+<li>logFC is on log<sub>2</sub> scale:
+<ul>
+<li>logFC = 0 <span class="math inline">\(\implies\)</span> unchanged expression</li>
+<li>logFC = 1 <span class="math inline">\(\implies\)</span> doubling in RNA abundance</li>
+</ul></li>
+</ul>
+<div class="fragment">
+<ul>
+<li>logFC estimates can also be from fitting linear regression models
+<ul>
+<li>Might use a covariate (e.g.&nbsp;age) alongside key predictor (i.e.&nbsp;diagnosis)</li>
+</ul></li>
+</ul>
+</div>
+</section>
+<section id="differential-gene-expression-2" class="slide level2 slide-only unlisted">
+<h2>Differential Gene Expression</h2>
+<p><span class="math display">\[
+T_g = \frac{\beta_g}{\sigma_g/\sqrt{n}}
+\]</span></p>
+<ul>
+<li>Some estimates of variance will be over/under-estimates
+<ul>
+<li><span class="math inline">\(\hat{\sigma}_g\)</span> too low <span class="math inline">\(\implies T \uparrow\)</span> <span class="fragment"><span class="math inline">\(\implies\)</span> significant result where no change</span></li>
+<li><span class="math inline">\(\hat{\sigma}_g\)</span> too high <span class="math inline">\(\implies T\downarrow\)</span> <span class="fragment"><span class="math inline">\(\implies\)</span> no significant result where there is change</span></li>
+</ul></li>
+</ul>
+<div class="fragment">
+<ul>
+<li>Variance estimates moderated by <em>taking distribution of</em> <span class="math inline">\(\sigma\)</span> <em>across all genes</em>
+<ul>
+<li>Bayesian posterior estimate of variance <span class="math inline">\(\implies\)</span> moderated <span class="math inline">\(t\)</span>-statistic <span class="citation" data-cites="pmid16646809">(<a href="#/section" role="doc-biblioref" onclick="">Smyth 2004</a>)</span></li>
+</ul></li>
+</ul>
+</div>
+</section>
+<section id="differential-gene-expression-3" class="slide level2 slide-only unlisted">
+<h2>Differential Gene Expression</h2>
+<ul>
+<li><span class="math inline">\(t\)</span>-test for each gene <span class="math inline">\(\implies\)</span> <span class="math inline">\(p\)</span>-value for each gene</li>
+<li>Use False Discovery Rate <span class="citation" data-cites="BenjaminiHochbergFDR">(<a href="#/section" role="doc-biblioref" onclick="">Benjamini and Hochberg 1995</a>)</span> to adjust <span class="math inline">\(p\)</span>-values
+<ul>
+<li>Allows an expected <span class="math inline">\(\alpha\)</span> as a proportion of false discoveries</li>
+<li>Usually <span class="math inline">\(\alpha = 0.05 \implies \leq\)</span> 5% of genes accepted as DE are <em>false discoveries</em></li>
+<li>Assumes a bit of noise will be drowned out by true discoveries</li>
+</ul></li>
+</ul>
+</section>
+<section id="presentation-of-results-from-dge-analysis" class="slide level2">
+<h2>Presentation Of Results From DGE Analysis</h2>
+<div class="columns">
+<div class="column">
+<p><img data-src="assets/volcanoKOVsWT-1.png"></p>
+</div><div class="column">
+<ul>
+<li>MA plots
+<ul>
+<li>Often used to check bias</li>
+<li>Show logFC vs Average signal</li>
+</ul></li>
+<li>Volcano plots:
+<ul>
+<li>logFC vs Significance (e.g.&nbsp;-log<sub>10</sub>p)</li>
+<li>Label genes as chosen</li>
+</ul></li>
+</ul>
+</div></div>
+</section></section>
+<section>
+<section id="functional-enrichment" class="title-slide slide level1 center">
+<h1>Functional Enrichment</h1>
+
+</section>
+<section id="functional-enrichment-1" class="slide level2">
+<h2>Functional Enrichment</h2>
+<ul>
+<li>Once we have a list of DE genes <span class="math inline">\(\implies\)</span> what’s the biological story?
+<ul>
+<li>Approach is dependent on the biology under investigation</li>
+</ul></li>
+<li>Compare to databases which define
+<ul>
+<li><em>Pathways</em>: KEGG; WikiPathways; Reactome</li>
+<li><em>Structured Ontologies</em>: Gene Ontology (BP, MF &amp; CC)</li>
+<li><em>Existing Experimental Results</em>: ImmuneSigDB; VAX</li>
+<li>Multiple other options</li>
+</ul></li>
+</ul>
+<div class="fragment">
+<p>We use enrichment testing on suitable <em>gene-sets</em></p>
+</div>
+</section>
+<section id="fishers-exact-test" class="slide level2">
+<h2>Fisher’s Exact Test</h2>
+<ul>
+<li>Are genes from a <em>gene-set</em> in my DE genes at random or unexpectedly often
+<ul>
+<li><span class="math inline">\(H_0:\)</span> No enrichment of genes from a gene-set</li>
+<li><span class="math inline">\(H_A\)</span>: Some enrichment of genes from a gene-set</li>
+</ul></li>
+<li>Fisher’s Exact Test <span class="math inline">\(\implies\)</span> is there an association between groups in a table
+<ul>
+<li>Formally tests for independence of rows &amp; columns in a table</li>
+<li>Usually applied to a <span class="math inline">\(2\times2\)</span> table</li>
+</ul></li>
+<li>Similar to a <span class="math inline">\(\chi^2\)</span>-test but no model assumptions
+<ul>
+<li>Computationally more demanding</li>
+</ul></li>
+</ul>
+</section>
+<section id="fishers-exact-test-1" class="slide level2 slide-only unlisted">
+<h2>Fisher’s Exact Test</h2>
+<div style="font-size:90%">
+<table class="caption-top" style="width:100%;">
+<colgroup>
+<col style="width: 19%">
+<col style="width: 25%">
+<col style="width: 30%">
+<col style="width: 24%">
+</colgroup>
+<thead>
+<tr class="header">
+<th style="text-align: left;"></th>
+<th style="text-align: right;">In Gene-set</th>
+<th style="text-align: right;">Not In Gene-set</th>
+<th style="text-align: right;"><span class="fragment text-red" data-fragment-index="1">Row Totals</span></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">DE Genes</td>
+<td style="text-align: right;"><span class="math inline">\(a\)</span></td>
+<td style="text-align: right;"><span class="math inline">\(b\)</span></td>
+<td style="text-align: right;"><span class="fragment text-red" data-fragment-index="1"><span class="math inline">\(a+b\)</span></span></td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Not DE</td>
+<td style="text-align: right;"><span class="math inline">\(c\)</span></td>
+<td style="text-align: right;"><span class="math inline">\(d\)</span></td>
+<td style="text-align: right;"><span class="fragment text-red" data-fragment-index="1"><span class="math inline">\(c+d\)</span></span></td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;"><span class="fragment text-red" data-fragment-index="2"><strong>Column Totals</strong></span></td>
+<td style="text-align: right;"><span class="fragment text-red" data-fragment-index="2"><span class="math inline">\(a+c\)</span></span></td>
+<td style="text-align: right;"><span class="fragment text-red" data-fragment-index="2"><span class="math inline">\(b+d\)</span></span></td>
+<td style="text-align: right;"><span class="fragment text-red" data-fragment-index="3"><span class="math inline">\(a+b+c+d\)</span></span></td>
+</tr>
+</tbody>
+</table>
+</div>
+<ul>
+<li class="fragment"><span class="math inline">\(p\)</span>-value is the probability of observing a ‘more-extreme’ table than observed <em>holding marginal totals fixed</em>
+<ul>
+<li class="fragment">This is an exact number <span class="math inline">\(\implies\)</span> no model assumptions</li>
+</ul></li>
+<li class="fragment">Perform this test on all selected gene-sets or pathways</li>
+<li class="fragment">Multiple-testing: FWER control may be better than FDR control
+<ul>
+<li class="fragment">FWER (e.g.&nbsp;Bonferroni): <span class="math inline">\(\alpha \implies\)</span> probability of any errors at all</li>
+<li class="fragment">FDR (e.g.&nbsp;Benjamini Hochberg): <span class="math inline">\(\alpha \implies\)</span> rate of errors within ‘significant’ results</li>
+</ul></li>
+</ul>
+</section>
+<section id="fishers-exact-test-2" class="slide level2 slide-only unlisted">
+<h2>Fisher’s Exact Test</h2>
+<div style="font-size:90%">
+<table class="caption-top" style="width:100%;">
+<colgroup>
+<col style="width: 13%">
+<col style="width: 27%">
+<col style="width: 32%">
+<col style="width: 26%">
+</colgroup>
+<thead>
+<tr class="header">
+<th style="text-align: left;"></th>
+<th style="text-align: right;">In Gene-set</th>
+<th style="text-align: right;">Not In Gene-set</th>
+<th style="text-align: right;"><span class="fragment text-red" data-fragment-index="1">Row Totals</span></th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">DE Genes</td>
+<td style="text-align: right;">100</td>
+<td style="text-align: right;">900</td>
+<td style="text-align: right;"><span class="fragment text-red" data-fragment-index="1">100 + 900 = 1000</span></td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Not DE</td>
+<td style="text-align: right;">100</td>
+<td style="text-align: right;">13900</td>
+<td style="text-align: right;"><span class="fragment text-red" data-fragment-index="1">100 + 13900 = 14000</span></td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;"><span class="fragment text-red" data-fragment-index="2"><strong>Column Totals</strong></span></td>
+<td style="text-align: right;"><span class="fragment text-red" data-fragment-index="2">100 + 100 = 200<br>50% DE</span></td>
+<td style="text-align: right;"><span class="fragment text-red" data-fragment-index="2">900 + 13900 = 14800<br>6% DE</span></td>
+<td style="text-align: right;"><span class="fragment text-red" data-fragment-index="3"><strong>1000 + 14000 = 15000</strong><br><strong>6.7% DE</strong></span></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="fragment">
+<ul>
+<li>Looks intuitively enriched:
+<ul>
+<li>50% of gene set is DE</li>
+<li>6% outside of gene set is DE</li>
+</ul></li>
+<li>The p-value here is 3.80e-64<br>
+</li>
+<li>Same result if matrix can be transposed (rows <span class="math inline">\(\leftrightarrow\)</span> columns)
+<ul>
+<li>Same marginal totals held fixed</li>
+</ul></li>
+</ul>
+</div>
+</section>
+<section id="fishers-exact-test-3" class="slide level2 slide-only unlisted">
+<h2>Fisher’s Exact Test</h2>
+<ul>
+<li>Fisher’s Exact Test requires a list of DE genes
+<ul>
+<li>Also known as an <em>over-representation analysis</em></li>
+</ul></li>
+<li>Sensitive to hard cutoffs (e.g.&nbsp;<span class="math inline">\(p&lt;0.05\)</span>)
+<ul>
+<li>Is a gene with p = 0.0499 DE whilst one with p = 0.0501 isn’t?</li>
+</ul></li>
+<li>Might also choose top-ranked 100/200/500 if preferable</li>
+</ul>
+</section>
+<section id="gene-set-enrichment-analysis" class="slide level2">
+<h2>Gene Set Enrichment Analysis</h2>
+<div class="columns">
+<div class="column" style="width:60%;">
+<ul>
+<li>Gene Set Enrichment Analysis (GSEA) <span class="citation" data-cites="Subramanian2005-lx">(<a href="#/section" role="doc-biblioref" onclick="">Subramanian et al. 2005</a>)</span>
+<ul>
+<li>Uses complete ranked list (e.g.&nbsp;<span class="math inline">\(t\)</span>-statistic)</li>
+</ul></li>
+<li>Walks along ranked list
+<ul>
+<li>Enrichment score <span class="math inline">\(\uparrow\)</span> if gene in gene-set</li>
+<li>Enrichment score <span class="math inline">\(\downarrow\)</span> if not in gene-set</li>
+</ul></li>
+<li>Walk usually performed from either end of list
+<ul>
+<li>Results implicitly directional</li>
+</ul></li>
+</ul>
+</div><div class="column" style="width:40%;">
+<div class="quarto-figure quarto-figure-center">
+<figure>
+<p><img data-src="assets/enrichment-score.jpg" style="width:100.0%"></p>
+<figcaption>https://docs.gsea-msigdb.org/</figcaption>
+</figure>
+</div>
+</div></div>
+</section>
+<section id="gene-set-enrichment-analysis-1" class="slide level2 slide-only unlisted">
+<h2>Gene Set Enrichment Analysis</h2>
+<ul>
+<li>The Enrichment Score depends on the gene-set size
+<ul>
+<li>Calculate Normalised Enrichment Score (NES)</li>
+</ul></li>
+<li><span class="math inline">\(p\)</span>-value obtained uses permutation-based methods
+<ul>
+<li>Random shuffling of genes and/or samples</li>
+<li>Can subtly change results between analyses</li>
+</ul></li>
+</ul>
+</section>
+<section id="closing-comments" class="slide level2">
+<h2>Closing Comments</h2>
+<ul>
+<li>The microarray era defined the analytic approaches still taken
+<ul>
+<li>FDR-adjustment, statistical modelling, enrichment testing etc</li>
+<li>Most methods use log<sub>2</sub> transformed + normally-distributed data (<span class="math inline">\(t\)</span>-tests)</li>
+<li>Bioconductor packages (e.g.&nbsp;<code>limma</code>) <span class="citation" data-cites="ritchie2015-lm">(<a href="#/section" role="doc-biblioref" onclick="">Ritchie et al. 2015</a>)</span></li>
+</ul></li>
+<li>Functional enrichment testing still commonplace
+<ul>
+<li>Genes belong to multiple gene-sets/pathways <br><span class="math inline">\(\implies\)</span> results can be interconnected and difficult to interpret</li>
+<li>Highly redundant results <span class="math inline">\(\implies\)</span> challenging to visualise</li>
+<li>RNA-Seq has additional biases (e.g.&nbsp;GC content, gene length)</li>
+</ul></li>
+</ul>
+</section></section>
+<section>
+<section id="references" class="title-slide slide level1 center">
+<h1>References</h1>
+
+</section>
+<section id="section" class="slide level2 smaller scrollable">
+<h2></h2>
+<!-- This is where the bibliography gets injected -->
+<div id="refs" class="references csl-bib-body hanging-indent" data-entry-spacing="0" role="list">
+<div id="ref-BenjaminiHochbergFDR" class="csl-entry" role="listitem">
+Benjamini, Yoav, and Yosef Hochberg. 1995. <span>“Controlling the False Discovery Rate: A Practical and Powerful Approach to Multiple Testing.”</span> <em>Journal of the Royal Statistical Society. Series B (Methodological)</em> 57 (1): 289–300. <a href="http://www.jstor.org/stable/2346101">http://www.jstor.org/stable/2346101</a>.
+</div>
+<div id="ref-pmid12538238" class="csl-entry" role="listitem">
+Bolstad, B. M., R. A. Irizarry, M. Astrand, and T. P. Speed. 2003. <span>“<span class="nocase"><span>A</span> comparison of normalization methods for high density oligonucleotide array data based on variance and bias</span>.”</span> <em>Bioinformatics</em> 19 (2): 185–93.
+</div>
+<div id="ref-dudoit02-ma" class="csl-entry" role="listitem">
+Dudoit, Sandrine, Yee Hwa Yang, Matthew J. Callow, and Terence P. Speed. 2002. <span>“STATISTICAL METHODS FOR IDENTIFYING DIFFERENTIALLY EXPRESSED GENES IN REPLICATED cDNA MICROARRAY EXPERIMENTS.”</span> <em>Statistica Sinica</em> 12 (1): 111–39. <a href="http://www.jstor.org/stable/24307038">http://www.jstor.org/stable/24307038</a>.
+</div>
+<div id="ref-rma2003" class="csl-entry" role="listitem">
+Irizarry, Rafael A., Bridget Hobbs, Francois Collin, Yasmin D. Beazer‐Barclay, Kristen J. Antonellis, Uwe Scherf, and Terence P. Speed. 2003. <span>“Exploration, Normalization, and Summaries of High Density Oligonucleotide Array Probe Level Data.”</span> <em>Biostatistics</em> 4 (2): 249–64. <a href="https://doi.org/10.1093/biostatistics/4.2.249">https://doi.org/10.1093/biostatistics/4.2.249</a>.
+</div>
+<div id="ref-ritchie2015-lm" class="csl-entry" role="listitem">
+Ritchie, Matthew E, Belinda Phipson, Di Wu, Yifang Hu, Charity W Law, Wei Shi, and Gordon K Smyth. 2015. <span>“<span class="nocase">limma</span> Powers Differential Expression Analyses for <span>RNA</span>-Sequencing and Microarray Studies.”</span> <em>Nucleic Acids Research</em> 43 (7): e47. <a href="https://doi.org/10.1093/nar/gkv007">https://doi.org/10.1093/nar/gkv007</a>.
+</div>
+<div id="ref-Shalon01071996" class="csl-entry" role="listitem">
+Shalon, D, S J Smith, and P O Brown. 1996. <span>“A DNA Microarray System for Analyzing Complex DNA Samples Using Two-Color Fluorescent Probe Hybridization.”</span> <em>Genome Research</em> 6 (7): 639–45. <a href="https://doi.org/10.1101/gr.6.7.639">https://doi.org/10.1101/gr.6.7.639</a>.
+</div>
+<div id="ref-pmid16646809" class="csl-entry" role="listitem">
+Smyth, G. K. 2004. <span>“<span class="nocase"><span>L</span>inear models and empirical bayes methods for assessing differential expression in microarray experiments</span>.”</span> <em>Stat Appl Genet Mol Biol</em> 3: Article3.
+</div>
+<div id="ref-Subramanian2005-lx" class="csl-entry" role="listitem">
+Subramanian, Aravind, Pablo Tamayo, Vamsi K Mootha, Sayan Mukherjee, Benjamin L Ebert, Michael A Gillette, Amanda Paulovich, et al. 2005. <span>“Gene Set Enrichment Analysis: A Knowledge-Based Approach for Interpreting Genome-Wide Expression Profiles.”</span> <em>Proc. Natl. Acad. Sci. U. S. A.</em> 102 (43): 15545–50.
+</div>
+<div id="ref-wu2004model" class="csl-entry" role="listitem">
+Wu, Zhijin, Rafael A Irizarry, Robert Gentleman, Francisco Martinez-Murillo, and Forrest Spencer. 2004. <span>“A Model-Based Background Adjustment for Oligonucleotide Expression Arrays.”</span> <em>Journal of the American Statistical Association</em> 99 (468): 909–17.
+</div>
+</div>
+
+</section></section>
+
+    </div>
+  <div class="quarto-auto-generated-content" style="display: none;">
+<div class="footer footer-default">
+
+</div>
+</div></div>
+
+  <script>window.backupDefine = window.define; window.define = undefined;</script>
+  <script src="transcriptomics-session2_files/libs/revealjs/dist/reveal.js"></script>
+  <!-- reveal.js plugins -->
+  <script src="transcriptomics-session2_files/libs/revealjs/plugin/quarto-line-highlight/line-highlight.js"></script>
+  <script src="transcriptomics-session2_files/libs/revealjs/plugin/pdf-export/pdfexport.js"></script>
+  <script src="transcriptomics-session2_files/libs/revealjs/plugin/reveal-menu/menu.js"></script>
+  <script src="transcriptomics-session2_files/libs/revealjs/plugin/reveal-menu/quarto-menu.js"></script>
+  <script src="transcriptomics-session2_files/libs/revealjs/plugin/quarto-support/support.js"></script>
+  
+
+  <script src="transcriptomics-session2_files/libs/revealjs/plugin/notes/notes.js"></script>
+  <script src="transcriptomics-session2_files/libs/revealjs/plugin/search/search.js"></script>
+  <script src="transcriptomics-session2_files/libs/revealjs/plugin/zoom/zoom.js"></script>
+  <script src="transcriptomics-session2_files/libs/revealjs/plugin/math/math.js"></script>
+  <script>window.define = window.backupDefine; window.backupDefine = undefined;</script>
+
+  <script>
+
+      // Full list of configuration options available at:
+      // https://revealjs.com/config/
+      Reveal.initialize({
+'controlsAuto': true,
+'previewLinksAuto': false,
+'pdfSeparateFragments': false,
+'autoAnimateEasing': "ease",
+'autoAnimateDuration': 1,
+'autoAnimateUnmatched': true,
+'jumpToSlide': true,
+'menu': {"side":"left","useTextContentForMissingTitles":true,"markers":false,"loadIcons":false,"custom":[{"title":"Tools","icon":"<i class=\"fas fa-gear\"></i>","content":"<ul class=\"slide-menu-items\">\n<li class=\"slide-tool-item active\" data-item=\"0\"><a href=\"#\" onclick=\"RevealMenuToolHandlers.fullscreen(event)\"><kbd>f</kbd> Fullscreen</a></li>\n<li class=\"slide-tool-item\" data-item=\"1\"><a href=\"#\" onclick=\"RevealMenuToolHandlers.speakerMode(event)\"><kbd>s</kbd> Speaker View</a></li>\n<li class=\"slide-tool-item\" data-item=\"2\"><a href=\"#\" onclick=\"RevealMenuToolHandlers.overview(event)\"><kbd>o</kbd> Slide Overview</a></li>\n<li class=\"slide-tool-item\" data-item=\"3\"><a href=\"#\" onclick=\"RevealMenuToolHandlers.togglePdfExport(event)\"><kbd>e</kbd> PDF Export Mode</a></li>\n<li class=\"slide-tool-item\" data-item=\"4\"><a href=\"#\" onclick=\"RevealMenuToolHandlers.toggleScrollView(event)\"><kbd>r</kbd> Scroll View Mode</a></li>\n<li class=\"slide-tool-item\" data-item=\"5\"><a href=\"#\" onclick=\"RevealMenuToolHandlers.keyboardHelp(event)\"><kbd>?</kbd> Keyboard Help</a></li>\n</ul>"}],"openButton":true},
+'smaller': false,
+ 
+        // Display controls in the bottom right corner
+        controls: false,
+
+        // Help the user learn the controls by providing hints, for example by
+        // bouncing the down arrow when they first encounter a vertical slide
+        controlsTutorial: false,
+
+        // Determines where controls appear, "edges" or "bottom-right"
+        controlsLayout: 'edges',
+
+        // Visibility rule for backwards navigation arrows; "faded", "hidden"
+        // or "visible"
+        controlsBackArrows: 'faded',
+
+        // Display a presentation progress bar
+        progress: true,
+
+        // Display the page number of the current slide
+        slideNumber: 'c',
+
+        // 'all', 'print', or 'speaker'
+        showSlideNumber: 'all',
+
+        // Add the current slide number to the URL hash so that reloading the
+        // page/copying the URL will return you to the same slide
+        hash: true,
+
+        // Start with 1 for the hash rather than 0
+        hashOneBasedIndex: false,
+
+        // Flags if we should monitor the hash and change slides accordingly
+        respondToHashChanges: true,
+
+        // Push each slide change to the browser history
+        history: true,
+
+        // Enable keyboard shortcuts for navigation
+        keyboard: true,
+
+        // Enable the slide overview mode
+        overview: true,
+
+        // Disables the default reveal.js slide layout (scaling and centering)
+        // so that you can use custom CSS layout
+        disableLayout: false,
+
+        // Vertical centering of slides
+        center: false,
+
+        // Enables touch navigation on devices with touch input
+        touch: true,
+
+        // Loop the presentation
+        loop: false,
+
+        // Change the presentation direction to be RTL
+        rtl: false,
+
+        // see https://revealjs.com/vertical-slides/#navigation-mode
+        navigationMode: 'linear',
+
+        // Randomizes the order of slides each time the presentation loads
+        shuffle: false,
+
+        // Turns fragments on and off globally
+        fragments: true,
+
+        // Flags whether to include the current fragment in the URL,
+        // so that reloading brings you to the same fragment position
+        fragmentInURL: false,
+
+        // Flags if the presentation is running in an embedded mode,
+        // i.e. contained within a limited portion of the screen
+        embedded: false,
+
+        // Flags if we should show a help overlay when the questionmark
+        // key is pressed
+        help: true,
+
+        // Flags if it should be possible to pause the presentation (blackout)
+        pause: true,
+
+        // Flags if speaker notes should be visible to all viewers
+        showNotes: false,
+
+        // Global override for autoplaying embedded media (null/true/false)
+        autoPlayMedia: null,
+
+        // Global override for preloading lazy-loaded iframes (null/true/false)
+        preloadIframes: null,
+
+        // Number of milliseconds between automatically proceeding to the
+        // next slide, disabled when set to 0, this value can be overwritten
+        // by using a data-autoslide attribute on your slides
+        autoSlide: 0,
+
+        // Stop auto-sliding after user input
+        autoSlideStoppable: true,
+
+        // Use this method for navigation when auto-sliding
+        autoSlideMethod: null,
+
+        // Specify the average time in seconds that you think you will spend
+        // presenting each slide. This is used to show a pacing timer in the
+        // speaker view
+        defaultTiming: null,
+
+        // Enable slide navigation via mouse wheel
+        mouseWheel: false,
+
+        // The display mode that will be used to show slides
+        display: 'block',
+
+        // Hide cursor if inactive
+        hideInactiveCursor: true,
+
+        // Time before the cursor is hidden (in ms)
+        hideCursorTime: 5000,
+
+        // Opens links in an iframe preview overlay
+        previewLinks: false,
+
+        // Transition style (none/fade/slide/convex/concave/zoom)
+        transition: 'none',
+
+        // Transition speed (default/fast/slow)
+        transitionSpeed: 'default',
+
+        // Transition style for full page slide backgrounds
+        // (none/fade/slide/convex/concave/zoom)
+        backgroundTransition: 'none',
+
+        // Number of slides away from the current that are visible
+        viewDistance: 3,
+
+        // Number of slides away from the current that are visible on mobile
+        // devices. It is advisable to set this to a lower number than
+        // viewDistance in order to save resources.
+        mobileViewDistance: 2,
+
+        // The "normal" size of the presentation, aspect ratio will be preserved
+        // when the presentation is scaled to fit different resolutions. Can be
+        // specified using percentage units.
+        width: 1280,
+
+        height: 720,
+
+        // Factor of the display size that should remain empty around the content
+        margin: 0.1,
+
+        math: {
+          mathjax: 'https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.9/MathJax.js',
+          config: 'TeX-AMS_HTML-full',
+          tex2jax: {
+            inlineMath: [['\\(','\\)']],
+            displayMath: [['\\[','\\]']],
+            balanceBraces: true,
+            processEscapes: false,
+            processRefs: true,
+            processEnvironments: true,
+            preview: 'TeX',
+            skipTags: ['script','noscript','style','textarea','pre','code'],
+            ignoreClass: 'tex2jax_ignore',
+            processClass: 'tex2jax_process'
+          },
+        },
+
+        // reveal.js plugins
+        plugins: [QuartoLineHighlight, PdfExport, RevealMenu, QuartoSupport,
+
+          RevealMath,
+          RevealNotes,
+          RevealSearch,
+          RevealZoom
+        ]
+      });
+    </script>
+    <div id="logo-tki" style="position: fixed; z-index: 1000;">
+      <img src="https://www.thekids.org.au/Static/Theme/images/TheKids-RGB_Logo_Colour-Pattern.svg" style="height: 80px;">
+    </div>
+    <div id="logo-bodl" style="position: fixed; z-index: 1000;">
+      <img src="assets/bodl_logo_white_background.jpg" style="height: 80px;">
+    </div>
+    <div id="logo-uoa" style="z-index: 1000;">
+      <img src="assets/UoA_logo_col_vert.png" style="height: 80px;">
+    </div>
+
+
+    <script>
+    function positionLogos() {
+      const tkiLogo = document.getElementById('logo-tki');
+      const uoaLogo = document.getElementById('logo-uoa');
+      const bodlLogo = document.getElementById('logo-bodl');
+
+      // Check if this is RevealJS
+      const isRevealJS = document.body.classList.contains('reveal') ||
+                         document.querySelector('.reveal') !== null ||
+                         typeof Reveal !== 'undefined';
+
+      if (isRevealJS) {
+        // RevealJS - both logos at bottom
+        tkiLogo.style.bottom = '10px';
+        tkiLogo.style.right = '340px';
+        tkiLogo.style.top = 'auto';
+        tkiLogo.style.display = 'block';
+
+        bodlLogo.style.bottom = '10px';
+        bodlLogo.style.right = '160px';
+        bodlLogo.style.top = 'auto';
+        bodlLogo.style.display = 'block';
+
+        uoaLogo.style.bottom = '10px';
+        uoaLogo.style.right = '40px';
+        uoaLogo.style.top = 'auto';
+        uoaLogo.style.display = 'block';
+        uoaLogo.style.position = 'fixed';
+      } else {
+        // Flat HTML - only right logo at top
+        tkiLogo.style.display = 'none';
+        bodlLogo.style.display = 'none';
+
+        uoaLogo.style.top = '30px';
+        uoaLogo.style.left = '60%';
+        uoaLogo.style.bottom = 'auto';
+        uoaLogo.style.position = 'absolute';
+        uoaLogo.style.display = 'block';
+      }
+    }
+
+    // Run positioning
+    document.addEventListener('DOMContentLoaded', positionLogos);
+    setTimeout(positionLogos, 100);
+    </script>
+    
+    <script>
+      // htmlwidgets need to know to resize themselves when slides are shown/hidden.
+      // Fire the "slideenter" event (handled by htmlwidgets.js) when the current
+      // slide changes (different for each slide format).
+      (function () {
+        // dispatch for htmlwidgets
+        function fireSlideEnter() {
+          const event = window.document.createEvent("Event");
+          event.initEvent("slideenter", true, true);
+          window.document.dispatchEvent(event);
+        }
+
+        function fireSlideChanged(previousSlide, currentSlide) {
+          fireSlideEnter();
+
+          // dispatch for shiny
+          if (window.jQuery) {
+            if (previousSlide) {
+              window.jQuery(previousSlide).trigger("hidden");
+            }
+            if (currentSlide) {
+              window.jQuery(currentSlide).trigger("shown");
+            }
+          }
+        }
+
+        // hookup for slidy
+        if (window.w3c_slidy) {
+          window.w3c_slidy.add_observer(function (slide_num) {
+            // slide_num starts at position 1
+            fireSlideChanged(null, w3c_slidy.slides[slide_num - 1]);
+          });
+        }
+
+      })();
+    </script>
+
+    <script id="quarto-html-after-body" type="application/javascript">
+      window.document.addEventListener("DOMContentLoaded", function (event) {
+        const tabsets =  window.document.querySelectorAll(".panel-tabset-tabby")
+        tabsets.forEach(function(tabset) {
+          const tabby = new Tabby('#' + tabset.id);
+        });
+        const isCodeAnnotation = (el) => {
+          for (const clz of el.classList) {
+            if (clz.startsWith('code-annotation-')) {                     
+              return true;
+            }
+          }
+          return false;
+        }
+        const onCopySuccess = function(e) {
+          // button target
+          const button = e.trigger;
+          // don't keep focus
+          button.blur();
+          // flash "checked"
+          button.classList.add('code-copy-button-checked');
+          var currentTitle = button.getAttribute("title");
+          button.setAttribute("title", "Copied!");
+          let tooltip;
+          if (window.bootstrap) {
+            button.setAttribute("data-bs-toggle", "tooltip");
+            button.setAttribute("data-bs-placement", "left");
+            button.setAttribute("data-bs-title", "Copied!");
+            tooltip = new bootstrap.Tooltip(button, 
+              { trigger: "manual", 
+                customClass: "code-copy-button-tooltip",
+                offset: [0, -8]});
+            tooltip.show();    
+          }
+          setTimeout(function() {
+            if (tooltip) {
+              tooltip.hide();
+              button.removeAttribute("data-bs-title");
+              button.removeAttribute("data-bs-toggle");
+              button.removeAttribute("data-bs-placement");
+            }
+            button.setAttribute("title", currentTitle);
+            button.classList.remove('code-copy-button-checked');
+          }, 1000);
+          // clear code selection
+          e.clearSelection();
+        }
+        const getTextToCopy = function(trigger) {
+            const codeEl = trigger.previousElementSibling.cloneNode(true);
+            for (const childEl of codeEl.children) {
+              if (isCodeAnnotation(childEl)) {
+                childEl.remove();
+              }
+            }
+            return codeEl.innerText;
+        }
+        const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+          text: getTextToCopy
+        });
+        clipboard.on('success', onCopySuccess);
+        if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+          const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+            text: getTextToCopy,
+            container: window.document.getElementById('quarto-embedded-source-code-modal')
+          });
+          clipboardModal.on('success', onCopySuccess);
+        }
+          var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+          var mailtoRegex = new RegExp(/^mailto:/);
+            var filterRegex = new RegExp('/' + window.location.host + '/');
+          var isInternal = (href) => {
+              return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+          }
+          // Inspect non-navigation links and adorn them if external
+         var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+          for (var i=0; i<links.length; i++) {
+            const link = links[i];
+            if (!isInternal(link.href)) {
+              // undo the damage that might have been done by quarto-nav.js in the case of
+              // links that we want to consider external
+              if (link.dataset.originalHref !== undefined) {
+                link.href = link.dataset.originalHref;
+              }
+            }
+          }
+        function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+          const config = {
+            allowHTML: true,
+            maxWidth: 500,
+            delay: 100,
+            arrow: false,
+            appendTo: function(el) {
+                return el.closest('section.slide') || el.parentElement;
+            },
+            interactive: true,
+            interactiveBorder: 10,
+            theme: 'light-border',
+            placement: 'bottom-start',
+          };
+          if (contentFn) {
+            config.content = contentFn;
+          }
+          if (onTriggerFn) {
+            config.onTrigger = onTriggerFn;
+          }
+          if (onUntriggerFn) {
+            config.onUntrigger = onUntriggerFn;
+          }
+            config['offset'] = [0,0];
+            config['maxWidth'] = 700;
+          window.tippy(el, config); 
+        }
+        const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+        for (var i=0; i<noterefs.length; i++) {
+          const ref = noterefs[i];
+          tippyHover(ref, function() {
+            // use id or data attribute instead here
+            let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+            try { href = new URL(href).hash; } catch {}
+            const id = href.replace(/^#\/?/, "");
+            const note = window.document.getElementById(id);
+            if (note) {
+              return note.innerHTML;
+            } else {
+              return "";
+            }
+          });
+        }
+        const findCites = (el) => {
+          const parentEl = el.parentElement;
+          if (parentEl) {
+            const cites = parentEl.dataset.cites;
+            if (cites) {
+              return {
+                el,
+                cites: cites.split(' ')
+              };
+            } else {
+              return findCites(el.parentElement)
+            }
+          } else {
+            return undefined;
+          }
+        };
+        var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+        for (var i=0; i<bibliorefs.length; i++) {
+          const ref = bibliorefs[i];
+          const citeInfo = findCites(ref);
+          if (citeInfo) {
+            tippyHover(citeInfo.el, function() {
+              var popup = window.document.createElement('div');
+              citeInfo.cites.forEach(function(cite) {
+                var citeDiv = window.document.createElement('div');
+                citeDiv.classList.add('hanging-indent');
+                citeDiv.classList.add('csl-entry');
+                var biblioDiv = window.document.getElementById('ref-' + cite);
+                if (biblioDiv) {
+                  citeDiv.innerHTML = biblioDiv.innerHTML;
+                }
+                popup.appendChild(citeDiv);
+              });
+              return popup.innerHTML;
+            });
+          }
+        }
+      });
+      </script>
+    
+
+</body></html>

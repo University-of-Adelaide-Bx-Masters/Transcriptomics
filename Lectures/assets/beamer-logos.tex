@@ -1,0 +1,85 @@
+% Define logo positioning
+\usepackage{tikz}
+\usepackage{graphicx}
+\usepackage{xcolor}
+
+% Define custom colors from your SCSS
+\definecolor{bodlblue}{HTML}{368AC4}
+\definecolor{bodlorange}{HTML}{F58C05}
+\definecolor{bodlred}{HTML}{9E2900}
+\definecolor{bodlgreen}{HTML}{759C78}
+\definecolor{bodlteal}{HTML}{68B0E3}
+\definecolor{bodlcyan}{HTML}{85B8DB}
+\definecolor{bodlgray200}{HTML}{EAEEE8}
+\definecolor{bodlgray800}{HTML}{4D5256}
+\definecolor{bodlblack}{HTML}{2B3036}
+
+% Apply colors to theme elements
+\setbeamercolor{frametitle}{fg=bodlblack}
+\setbeamercolor{title}{fg=bodlblack}
+\setbeamercolor{structure}{fg=bodlblue}
+\setbeamercolor{normal text}{fg=bodlblack}
+\setbeamercolor{alerted text}{fg=bodlred}
+\setbeamercolor{example text}{fg=bodlgreen}
+
+% Add logos to every slide except first slide and section slides
+\setbeamertemplate{sidebar right}{
+  \vfill
+  % Skip logos on frame 1 (title slide)
+  \ifnum\insertframenumber>1
+    % Skip logos if this is a section slide (you can identify these by checking if frame has a section title)
+    \ifx\insertsectionhead\empty
+      % Regular slide - show logos
+      \begin{tikzpicture}[remember picture,overlay]
+        % UoA Logo (rightmost)
+        \node[anchor=south east] at ([xshift=-10pt,yshift=0pt]current page.south east) {
+          \includegraphics[height=0.75cm]{assets/au_logo.png}
+        };
+        % BODL Logo (middle)
+        \node[anchor=south east] at ([xshift=-80pt,yshift=0pt]current page.south east) {
+          \includegraphics[height=0.8cm]{assets/bodl_logo_white_background.jpg}
+        };
+        % TKI Logo (leftmost of the group)
+        \node[anchor=south east] at ([xshift=-130pt,yshift=0pt]current page.south east) {
+          \includegraphics[height=0.8cm]{assets/TheKids-RGB_Logo_Colour-Pattern.png}
+        };
+      \end{tikzpicture}
+    \else
+      % This might be a section slide - you can add additional logic here
+      \begin{tikzpicture}[remember picture,overlay]
+        % UoA Logo (rightmost)
+        \node[anchor=south east] at ([xshift=-10pt,yshift=0pt]current page.south east) {
+          \includegraphics[height=0.75cm]{assets/au_logo.png}
+        };
+        % BODL Logo (middle)
+        \node[anchor=south east] at ([xshift=-80pt,yshift=0pt]current page.south east) {
+          \includegraphics[height=0.8cm]{assets/bodl_logo_white_background.jpg}
+        };
+        % TKI Logo (leftmost of the group)
+        \node[anchor=south east] at ([xshift=-130pt,yshift=0pt]current page.south east) {
+          \includegraphics[height=0.8cm]{assets/TheKids-RGB_Logo_Colour-Pattern.png}
+        };
+      \end{tikzpicture}
+    \fi
+  \fi
+}
+
+% Restore default frametitle without internal commands
+\setbeamercolor{frametitle}{bg=white,fg=bodlblack}
+
+\setbeamertemplate{frametitle}{
+  \nointerlineskip
+  \begin{beamercolorbox}[wd=\paperwidth,sep=0pt,leftskip=12pt,rightskip=12pt,ht=2.5ex,dp=0.5ex]{frametitle}
+    \usebeamerfont{frametitle}\insertframetitle
+  \end{beamercolorbox}
+  \vspace{-1em} % Reduce space after title
+}
+
+\usepackage{caption}
+\captionsetup[figure]{
+  font=footnotesize,
+  labelfont=bf,
+  justification=raggedright,
+  singlelinecheck=false
+}
+

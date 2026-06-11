@@ -1,0 +1,1050 @@
+---
+title: "Transcriptomics Practical"
+subtitle: "Differential Gene Expression"
+author: "Stevie Pederson & Zhipeng Qu"
+institute: "Adelaide University & Black Ochre Data Labs"
+bibliography: 'assets/references.bib'
+format: 
+  html: 
+    toc: true
+    toc-depth: 3
+---
+
+```{r opts-chunk, echo = FALSE, eval = TRUE}
+knitr::opts_chunk$set(
+  eval = FALSE, message = FALSE, warning = FALSE
+)
+```
+
+
+# Introduction
+
+In this practical, we will be performing a *Differential Gene Expression* (DGE) analysis.
+This type of analysis compares the expression level of each gene in response to a given predictor variable (i.e. a drug-treatment), which commonly requires a control group of samples and a treated group of samples.
+The aim of DGE analysis using RNA-Seq (or other transcriptomic data) is to detect the level of transcription at each gene, then determine if any changes are evident due to the specific biological question.
+
+The basic data type we work with when performing this type of analysis is a set of *gene counts*.
+These are obtained after 1) aligning RNA-Seq reads to a reference genome, then 2) counting how many reads align to exonic regions of each gene.
+As gene counts are *discrete values* (i.e. not continuous values) these are commonly analysed using a statistical model based on the Negative Binomial Distribution, and fitted as a specific type Generalised Linear Model (GLM).
+A GLM is very much like linear regression, except models allow for data from other distributions beyond the Normal Distribution.
+
+For normally distributed data (such as microarray data) the mean is commonly referred to as the *expected value* so we might describe the distribution as follows:
+
+$$
+\text{For } y \sim \mathcal{N}(\mu, \sigma) \implies E[y] = \mu \text{ and Var}[y] = \sigma^2
+$$
+
+Count data is commonly modelled using a Poisson distribution and a common example might involve counting the number of phone calls per second at a mobile phone tower.
+More formally, a Poisson distribution with rate parameter $\lambda$ would have a mean (or expected value) and variance with the same values.
+
+$$
+\text{For } y \sim \text{Poisson}(\lambda) \implies E[y] = \lambda \text{ and Var}[y] = \lambda
+$$
+
+So if $\lambda=10$ for phone calls per second at a mobile phone tower, we would expect to observe 10 phone calls per second, but across multiple observations these would have a variance of 10.
+In the example code below, we're simulating 1 million observations from a Poisson distribution with $\lambda=10$ and you'll see that the mean and variances behaves very similarly to how we've just learnt.
+
+```{r rpois, eval = TRUE}
+y <- rpois(1e6, 10)
+mean(y)
+var(y)
+```
+
+This is quite different to the Normal Distribution were the mean and variance are completely independent variables.
+
+The Negative Binomial (NB) distribution can be considered as being very similar to a Poisson Distribution where we would fit the number of events per fixed unit (e.g. phone calls / sec), but the NB distribution allows for extra variability.
+Poisson models often capture technical or systemic variability very well, but for RNA-Seq data the additional biological variability found between different replicates leads to this additional variability, which is commonly referred to as *overdispersion*.
+
+There are multiple mathematical derivations of the Negative Binomial Distribution giving rise to multiple ways to specify the parameters, but the definition most commonly used in RNA-Seq is for a rate parameter $\lambda$ and overdispersion parameter $\theta$, we would expect a mean $\lambda$ and variance $\lambda + \frac{\lambda^2}{\theta}$.
+Simulating with the same rate as previously, but accounting for overdispersion, we can see the difference in the returned values.
+
+```{r rnegbin, eval = TRUE}
+y <- MASS::rnegbin(1e6, 10, theta = 10)
+mean(y)
+var(y)
+```
+
+
+When fitting a linear regression model, we can use simple linear algebra to obtain our parameter estimates, with the near-universal approach being to use a formula known as Least Squares.
+For *generalised linear models* the linear algebra is less convenient and parameter estimates are commonly obtained using maximum likelihood approaches.
+In RNA-Seq, the overdispersion parameter as fitted as a function of the mean, leading to the most commonly fitted models using  Quasi-Likelihood methods for fitting data.
+A detailed, but quite readable description of these approaches can be found in @Lun2016-vb.
+
+When we perform RNA-Seq analysis, we end up with a matrix of gene counts where each row represents a gene and each column represents a sample, or library.
+The rates of counts that we fit use the total library size (or column sums) as the unit of measurement, allowing for counts to be comparable for libraries where sequences has been inconsistent.
+These statistical approaches use the actual counts to fit the models, but we often choose values such as *counts per million* (CPM) or a log~2~ transformed version of this (logCPM) to compare between samples for the purposes of visualisation.
+These values are simply the counts, divided by the total library size and multiplied by one million and are on a convenient numerical scale for visualisation.
+Importantly, we don't use these values for statistical analysis, unless using specific models explicitly designed for this data type [@Law2018-mk].
+
+In this practical, we will be using a RNA-Seq dataset from model plant *Arabidopsis thaliana* to carry out a typical DGE analysis where we have two groups, a control and a treated group. 
+The small size of this genome makes it extremely suitable for our VMs, whilst still being a complete genome.
+The reads have been down-samples to 2m read-pairs per sample to enable analysis on the VMs.
+A typical RNA-Seq experiment might have 20-50m reads per sample.
+
+## Dataset
+
+The dataset used in this practical is sub-sampled from RNA-Seq of two groups of samples from study of @Herbst2023-pj. 
+We will be doing a pairwise DE analysis between Arabidopsis seedlings treated with 80 µg/ml Zeocin (treatment group) and mock-treated seedlings (control group).
+The researchers designed this experiment trying to understand what kinds of genes/pathways might be impacted by Zeocin treatment, which can be used as a radiomimetic drug to understand the molecular mechanisms of DNA damage in plants.
+
+Here are some key pieces of information for Arabidopsis and this RNA-Seq dataset:
+
+- Reference genome build: TAIR10 (<https://www.arabidopsis.org/index.jsp>)
+- Number of chromosomes: 5 chromosomes + Chloroplast + Mitochondria
+- Genome size: ~135 Mb
+
+- Number of samples: 6
+- Number of groups: 2, zeocin-treated and mock-treated
+- Number of biological replicates per group: 3
+- Sequencing type: PE150 (i.e. paired-end 150nt reads)
+- Number of raw reads per sample (sub-sampled): ~2 million pairs
+
+## Tools and R packages pipeline
+
+The pipeline of this Prac is shown in the following flowchart:
+
+![Transcriptomics DE analysis flowchart](./assets/DE_pipeline.png)
+
+Here are some tools used in this Prac:
+
+| Tools    | Version  | Link                                                                                       |
+|----------|----------|--------------------------------------------------------------------------------------------|
+| fastqc   | v0.11.9  | https://www.bioinformatics.babraham.ac.uk/projects/fastqc                                  |
+| cutadapt | v3.5     | https://cutadapt.readthedocs.io/en/stable/                                                 |
+| STAR     | v2.7.10a | https://github.com/alexdobin/STAR                                                          |
+
+And also, we will mainly use R to perform DGE analysis, and there is a list of R packages that we will require, which have all been installed on the VMs ready to use:
+
+| Package   | Archive       | Link                                                               |
+|-----------|---------------|--------------------------------------------------------------------|
+| edgeR     | bioconductor  | https://bioconductor.org/packages/release/bioc/html/edgeR.html     |
+| ggplot2   | CRAN          | https://ggplot2.tidyverse.org/                                     |
+| ggrepel   | CRAN          | https://cran.r-project.org/web/packages/ggrepel/index.html         |
+| goseq     | bioconductor  | https://bioconductor.org/packages/release/bioc/html/goseq.html     |
+| limma     | bioconductor  | https://bioconductor.org/packages/release/bioc/html/limma.html     |
+| ngsReports | bioconductor | https://bioconductor.org/packages/release/bioc/html/ngsReports.html |
+| pheatmap  | CRAN          | https://cran.r-project.org/web/packages/pheatmap/index.html        |
+| rtracklayer | bioconductor | https://bioconductor.org/packages/release/bioc/html/rtracklayer.html |
+| scales    | CRAN          | https://scales.r-lib.org/                                          |
+| tidyverse | CRAN          | https://www.tidyverse.org/                                         |
+
+## Running time estimate (based on teaching VM)
+
+Some of the steps will take time to run on your VM so please use that time to read any relevant material.
+The following table shows the estimated run time in VM for the major steps:
+
+| Step        | Tool/Package| Estimated run time |
+| ----------- | ----------- | ----------- |
+| QC                            | fastQC      | 5 mins   |
+| Sequence trimming             | cutadapt    | 10 mins  |
+| Genome mapping for short reads| STAR        | 20 mins  |
+
+**The practical is designed to run across 2x2hr sessions.**
+
+## What you will learn in this Practical
+
+- Practice the bash commands and develop our scripting skills
+- Practice NGS QC and alignment 
+- Learn how to do pairwise DE analysis using RNA-Seq
+- Enrichment testing
+
+
+# Practical 
+
+There are two major steps (5 parts actually) in this Prac. 
+Please follow the instructions __in order__, because some commands will rely on the results from previous commands. 
+Please discuss the outputs and processes with the tutors/instructors to ensure everything makes logical sense to you. 
+
+## Set up and project preparation
+
+Planning your directory structure from the beginning makes your work easier to follow for both yourself and others. 
+This forms an important part of every bioinformatics analysis.
+
+We'll be using a reference genome which as researchers we'd most likely use repeatedly for multiple experiments.
+It can make sense to place this in a standalone folder, along with any annotation files.
+
+```bash
+cd ~
+mkdir references
+```
+
+Now we've set that up, let's put some data there .
+The reference genome can be downloaded from https://ftp.ensemblgenomes.ebi.ac.uk/pub/plants/release-62/fasta/arabidopsis_thaliana/dna/, and the file we need is the one called `Arabidopsis_thaliana.TAIR10.dna.toplevel.fa.gz`.
+This is the complete DNA sequence, with the remainder being the sequence separated by chromosome or with different regions hard or soft masked (rm/sm respectively).
+Genome masking is not usually of concern for transcriptomics so we don't need to worry about those alternatives.
+
+<!-- REFERENCES MAY BE BETTER BEING PROVIDED AS SYMLINKS ON THE VMs!!! -->
+<!-- IF SO CHANGE THIS SECTION TO REFLECT THIS APPROACH -->
+
+Download the file using
+
+```bash
+cd ~/references
+wget https://ftp.ensemblgenomes.ebi.ac.uk/pub/plants/release-62/fasta/arabidopsis_thaliana/dna/Arabidopsis_thaliana.TAIR10.dna.toplevel.fa.gz
+```
+
+We'll also need gene annotations as well and these are most commonly provided in GTF or GFF format.
+These are subtly different file formats and many tools use the abbreviations interchangeably as format detection is a trivial task for most bioinformatics tools.
+
+To obtain the GTF file execute the following.
+
+```bash
+wget https://ftp.ensemblgenomes.ebi.ac.uk/pub/plants/release-62/gtf/arabidopsis_thaliana/Arabidopsis_thaliana.TAIR10.62.gtf.gz
+```
+
+Ensembl is a comprehensive data resource containing reference genomes, annotations and multiple layers of information, as managed by the EMBL.
+Regular releases are made as new genes are predicted or discovered and, at the time of writing, Ensembl Plants Release 62 was the latest available release.
+
+Additionally, place the file `ensembl62_tair10_goterms.tsv.gz` in `~/references`.
+
+Before we start looking at the actual sequencing data, let's first create an index for this reference genome.
+We will be using a *splice-aware* aligner called `STAR` [@Dobin2013-us] to do the genome mapping in this Prac, with the manual available [here](https://github.com/alexdobin/STAR/blob/5e8a99c8892b9a4455288579fefaf5825960c371/doc/STARmanual.pdf)
+
+Before we do the genome mapping, `STAR` requires the reference genome to be indexed.
+Indexing the reference genome enables each read to be mapped to the reference by greatly speeding up the sequence searching as part of the alignment process.
+We can build the `Arabidopsis` reference genome index using following command (run interactively)
+
+```bash
+gunzip ~/references/Arabidopsis_thaliana.TAIR10.dna.toplevel.fa.gz
+gunzip ~/references/Arabidopsis_thaliana.TAIR10.62.gtf.gz
+STAR \
+  --runThreadN 2 \
+  --runMode genomeGenerate \
+  --genomeDir ~/references/TAIR10/STAR149 \
+  --genomeFastaFiles ~/references/Arabidopsis_thaliana.TAIR10.dna.toplevel.fa \
+  --sjdbGTFfile ~/references/Arabidopsis_thaliana.TAIR10.62.gtf \
+  --sjdbOverhang 149 \
+  --genomeSAindexNbases 12
+```
+
+As we work on each separate project, a common strategy is to put the initial sequencing data into a folder named `data`, 
+with the output files from different processing stages then being placed into separate folders, such as an `output` or a `results` folder. 
+Scripts may be stored in a separate `scripts` folder (we won't use this folder in this Prac). 
+All naming rules are just personal preference, and feel free to build your own project folder structure rules that will help you manage large datasets
+
+The following is the suggested folder structure for this DE analysis project:
+
+```
+transcriptomics_dge_practical/
+├── analysis
+├── data
+│   ├── bam
+│   ├── raw_fastq
+│   └── trimmed_fastq
+├── scripts
+└── output
+    ├── counts
+    ├── logs
+    ├── raw_fastqc
+    └── trimmed_fastqc
+```
+
+Some people prefer to put `bash` scripts in the `scripts` folder, keeping them separate from the `rmarkdown` files in `analysis`, however this is personal preference.
+Additionally, the `data` folder is a common place for the *large data files* used in each analysis.
+These are commonly the .fastq files and the alignment, usually saved as .bam files.
+Smaller output files can go in the `output` folder making any data transfer to local compute resources simpler.
+
+We can use following commands to build this folder structure:
+
+```bash
+cd ~/
+mkdir transcriptomics_dge_practical 
+cd ~/transcriptomics_dge_practical
+mkdir analysis scripts 
+mkdir -p output/counts output/raw_fastqc output/trimmed_fastqc output/logs
+mkdir -p data/bam data/raw_fastq data/trimmed_fastq
+```
+
+If you want to check your folder structure:
+
+```{bash}
+cd ~/
+tree transcriptomics_dge_practical
+```
+
+Next we can build symlinks of data files in our corresponding project folders
+
+<!-- THESE PATHS NEED TO BE CHECKED ON THE 2026 VMs -->
+<!-- ESPECIALLY IF SYMLINKING REFERENCE FILES As THEY NEED TO BE ADDED -->
+
+```bash
+cd ~/transcriptomics_dge_practical/data/raw_fastq
+ln -s /shared/data/transcriptomics_dge_practical_data/01_raw_data/*.fastq.gz ./
+```
+
+Finally, it's good practice to create an R Project, so using RStudio:
+
+1. Go to `File/New Project...`
+2. Select Existing Directory
+3. Navigate to the `transcriptomics_dge_practical` directory we just created
+4. Create project
+
+
+Now all the setup work is done. Let's move to part 2.
+
+## QC And Pre-processing
+
+In this part, we will check the sequencing quality of all raw sequencing data first, and then trim adapter and low-quality sequences from the raw sequencing data.
+These are the preliminary steps needed to perform before we can align our *best quality* reads to the reference genome.
+
+### QC for Illumina Reads (FASTQ)
+
+The first step is to perform a QC analysis for the raw sequencing data using fastQC. 
+Check the arguments required by `fastqc` using `fastqc --help` to make sure you understand the code provided.
+You can process all files all in one script.
+
+```bash
+touch scripts/raw_fastqc.sh
+```
+
+Now open this file in RStudio (it's simpler than `nano`)
+
+```bash
+#! /bin/bash
+PROJROOT="${HOME}/transcriptomics_dge_practical"
+FQDIR="${PROJROOT}/data/raw_fastq"
+FQCDIR="${PROJROOT}/output/raw_fastqc"
+
+echo -e "fastqc -t 2 -o ${FQCDIR} ${FQDIR}/*fastq.gz"
+```
+
+Now save and run the script, noting that we've provided *absolute paths* for all input/output directories.
+
+After `fastQC` has finished running, we can check the QC report by opening the `html` files using web browser.
+For this practical, the dataset is small enough to check QC for each file individually,
+but additional tools like [`MultiQC`](https://seqera.io/multiqc/) can also be used to summarise QC reports across an entire dataset.
+Similarly, the Bioconductor package [`ngsReports`](https://bioconductor.org/packages/release/bioc/html/ngsReports.html) can be used to manually compile summary tables and figures.
+
+A simple strategy using `ngsReports` [@Ward2020-qf] might be the following.
+Feel free to execute these commands interactively as we'll perform a more complete analysis later in the session.
+
+```{r}
+library(ngsReports)
+f <- list.files("output/raw_fastqc", pattern = "fastqc.zip", full.names = TRUE)
+fdl <- FastqcDataList(f)
+readTotals(fdl)
+plotBaseQuals(fdl, plotType = "boxplot")
+plotAdapterContent(fdl, plotType = "line", usePlotly = TRUE)
+plotGcContent(
+  fdl, plotType = "line", gcType = "Transcriptome", species = "Athaliana",
+  usePlotly = TRUE
+)
+```
+
+::: {.callout-important}
+Do any files appear to be noticeably different from the others?
+:::
+
+### Adapter and Low-Quality Sequence Trimming
+
+Now we've checked the raw reads, we can trim any adapter sequences from the ends and discard low-quality sequences from the raw reads.
+The adapters for this RNA-Seq dataset are Illumina TruSeq adapters as `AGATCGGAAGAGCACACGTCTGAACTCCAGTCA` and `AGATCGGAAGAGCGTCGTGTAGGGAAAGAGTGT`.
+Again, check the arguments required by typing `cutadapt --help` or check the [online manual](https://cutadapt.readthedocs.io/en/v3.5/)
+
+Following is an example commands to trim adapter and low-quality sequences for one sample, noting that we need to trim paired reads as a pair.
+(Ask a tutor if you're unsure why?)
+
+Try modify this command into a script which will loop through your files
+
+```bash
+touch scripts/cutadapt.sh
+```
+
+Now using RStudio to edit the file
+
+```bash
+#! /bin/bash
+PROJROOT="${HOME}/transcriptomics_dge_practical"
+RAWDIR="${PROJROOT}/data/raw_fastq"
+TRIMDIR="${PROJROOT}/data/trimmed_fastq"
+LOGDIR="${PROJROOT}/output/logs"
+
+# trim adapter and low-quality sequences using cutadapt for one sample
+## Can you think of how to modify this to run on all files?
+## You'll need to consider which parts change across files and which stay the same
+cutadapt \
+  -a AGATCGGAAGAGCACACGTCTGAACTCCAGTCA \
+  -A AGATCGGAAGAGCGTCGTGTAGGGAAAGAGTGT \
+  -o ${TRIMDIR}/Col_0_mock_rep1_R1.trimmed.fastq.gz \
+  -p ${TRIMDIR}/Col_0_mock_rep1_R2.trimmed.fastq.gz \
+  --minimum-length 35 \
+  --quality-cutoff 30 \
+  --cores 2 \
+  ${RAWDIR}/Col_0_mock_rep1_R1.fastq.gz \
+  ${RAWDIR}/Col_0_mock_rep1_R2.fastq.gz > ${LOGDIR}/Col_0_mock_rep1_cutadapt.log
+```
+
+Writing a script like this is best practice for what we refer to as *reproducible research* where we keep strict records of every step that we perform, along with all tool version numbers and parameters.
+This is a good moment for you to practice the skills that you learned in previous practical sessions. 
+ 
+After we trim the adapter and low-quality sequences from the raw data, we have *trimmed data* ready for genome mapping.
+Before we do the genome mapping, we can run `fastQC` again on the trimmed to check how we did with the trimming and to ensure that `cutadapt` has resolved our QC concerns.
+
+::: {.callout-important}
+
+- Create a copy of your script `scripts/raw_fastqc.sh` as `scripts/trimmed_fastqc.sh`
+- Now modify this script to run on the trimmed fastq files.
+- Inspect the trimmed html files or using `ngsReports`
+
+:::
+
+::: {.callout-tip}
+- If you'd like to inspect the cutadapt log files using `ngsReports` and you still have your R session open, try the following
+
+```{r}
+list.files("output/logs", pattern = "cutadapt.log", full.names = TRUE) |>
+  importNgsLogs("cutadapt") |>
+  glimpse()
+```
+
+:::
+
+## Genome Mapping
+
+For a typical differential gene expression analysis using RNA-Seq,we normally  have the reference genome available.
+If you don't have the reference genome, you can do de novo transcriptome assembly first, as discussed an a separate practical, and then do DE analysis based on transcriptome mapping, which involves a slightly different pathway, given we would be aligning to a reference transcriptome.
+
+After we have the reference genome indexed, we can align the clean reads against the reference genome. 
+The following is an example command to map one sample followed by indexing the bam file with `samtools`.
+`STAR` also creates some log files which we'll move to the `output/logs` directory.
+
+::: {.callout-tip}
+1. Why do you think we might need to index the bam file using `samtools`?
+:::
+
+```bash
+STAR \
+  --genomeDir ${HOME}/references/TAIR10/STAR149 \
+  --readFilesIn ${TRIMDIR}/Col_0_mock_rep1_R1.trimmed.fastq.gz ${TRIMDIR}/Col_0_mock_rep1_R2.trimmed.fastq.gz \
+  --readFilesCommand zcat \
+  --runThreadN 2 \
+  --outFilterMultimapNmax 3 \
+  --outSAMattributes All \
+  --outSAMtype BAM SortedByCoordinate \
+  --outFileNamePrefix ${BAMDIR}/Col_0_mock_rep1. 
+samtools index -@2 ${BAMDIR}/Col_0_mock_rep1.Aligned.sortedByCoord.out.bam  
+mv ${BAMDIR}/Col_0_mock_rep1.Log* ${LOGDIR}/
+```
+
+Create the file `scripts/star_align_reads.sh` then write a loop using the above example to align all of our samples to the reference genome.
+
+::: {.callout-important}
+When writing the alignment script, please consider what variables we might like to declare and place these at the top of your script before entering the loop.
+:::
+
+STAR will output multiple files with prefix `Col_0_mock_rep1`.
+To get an idea about the mapping info, you can check `Col_0_mock_rep1.final.Log.out` which we moved to the `output/logs` directory. 
+
+The mapped reads are stored in a `bam` file called `Col_0_mock_rep1.Aligned.sortedByCoord.out.bam`. 
+To view this file in IGV, we needed to create an index file.
+
+## Counting Alignments
+
+The final step is to use `featureCounts` [@Liao2014-gy] to count reads which overlap exonic regions, as defined in the GTF.
+For this step we'll use the same GTF that we passed to STAR when indexing the genome.
+
+Create the file `scripts/count_reads.sh` then copy the following code into this file
+
+```
+#! /bin/bash
+REFDIR="${HOME}/references"
+PROJROOT="${HOME}/transcriptomics_dge_practical"
+BAMDIR="${PROJROOT}/data/bam"
+OUTDIR="${PROJROOT}/output/counts"
+
+featureCounts \
+  -a ${REFDIR}/Arabidopsis_thaliana.TAIR10.62.gtf \
+  -p --countReadPairs \
+  -B -C \
+  -M --fraction \
+  -s 2 \
+  --minOverlap 35 --fracOverlap 0.9 \
+  -T 2 \
+  -o ${OUTDIR}/all_samples.counts.out \
+  ${BAMDIR}/*bam
+```
+
+::: {.callout-important}
+- What does the parameter `-s 2` mean? How would we determine this?
+- Do you think `--minOverlap 35 --fracOverlap 0.9` are reasonable choices?
+:::
+
+We have now finished all the steps in the first section of DE analysis, which are mainly processed using tools/commands in `bash.` 
+Next we will move to the next section in which we will be using different `R` packages using `RStudio` and is a more interactive session.
+
+::: {.callout-tip}
+Although we've run the above as separate scripts, we cold now write a master script which runs everything from scratch.
+Approaching data processing in a modular manner like this can help manage data well and if problems are identified, individual steps are easily run again.
+A series of checks for the existence of files might also be nice additions to this type of approach.
+:::
+
+## DGE Analysis
+
+There are multiple packages which have been developed to enable Differential Gene Expression analysis, most of them are R-based packages. 
+The DE analysis in this Prac will be mainly based on the `R` package `edgeR`. 
+This package implements a range of statistical methodology based on the negative binomial distributions, including normalisation, generalized linear models and quasi-likelihood tests [@Lun2016-vb].
+
+The original authors extend many of the approaches developed for microarray analysis in the package `limma` [@Ritchie2015-lm], which was developed as *LInear Models for MicroArrays* and remains one of the best supported and most widely used Bioconductor packages, since it's initial release in 2002, and is still being actively developed.
+In the companion package `edgeR`, the terminology `tag` also being used here to refer to a gene, and harking back to Serial Analysis of Gene Expression (SAGE).
+
+If you want to understand more about `edgeR`, 
+please read one of their more recent published [papers](https://academic.oup.com/nar/article/53/2/gkaf018/7973897). 
+
+#### R Setup
+
+You should already be familiar with `R/Rstudio` environment by now based on what you have learned from your previous Pracs. 
+We have installed all required packages in your VM, and in the setup steps of this practical we also created an R Project.
+Please make sure you're in the correct R Project before proceeding.
+
+We'll perform today's analysis using `rmarkdown` with all code provided, but please include your own notes to help you understand the process.
+If there are helpful sections of text in the practical guide, these can also be copied across.
+As we work through the analysis, please think about how you might name each chunk, with the recommended syntax being `chunk-name` (using dashes to separate words).
+The section headers here may also be a useful guide
+
+Create the RMarkdown file `analysis/dge_analysis.Rmd` and change the YAML header to 
+
+```yaml
+---
+title: "Differential Gene Expression Analysis"
+author: 'your preferred name'
+output: 
+  html_document:
+    toc: yes
+editor_options:
+  chunk_output_type: console
+---
+```
+
+Below this add a chunk which will help our RMarkdown document compile nicely.
+Give this chunk the name `set-opts` with settings `include = FALSE`.
+This hides the chunk from the compiled document, but sets the key options `message = FALSE`, which hides all the friendly messages `tidyverse` packages commonly provide, along with any more troublesome `warnings`, which we'll no doubt see as we work interactively.
+
+```r
+knitr::opts_chunk$set(message = FALSE, warning = FALSE)
+```
+
+#### Load required R packages
+
+First, we need to load all required R packages into our R workspace.
+Create a new chunk (`Ctrl/Cmd + shift + I`) called `load-packages` and place the following in this chunk.
+To execute this interactively in your `R` session, make sure the cursor is in the chunk then hit `Ctrl/Cmd + Shift + Enter`.
+Doing this with each chunk will allow you to step through the analysis as we build it, but will also ensure the final Rmd file is able to be compiled to html successfully.
+
+```{r load-packages}
+# Bioinformatics Packages
+library(limma)
+library(edgeR)
+library(rtracklayer)
+library(goseq)
+
+# General R Packages for plotting and other functions
+library(tidyverse)
+library(ggrepel)
+library(scales)
+library(pheatmap)
+library(magrittr)
+
+# A global setting for nicer plots
+theme_set(theme_bw())
+```
+
+
+
+#### Loading Gene Annotations
+
+We normally want to have some additional information about the reference genes so that when we get the differential expressed genes,
+we can have some ideas about their functions. 
+In this Prac, we can use following R code to get a gene annotation table for all annotated Arabidopsis reference genes.
+
+```{r load-gtf}
+gtf <- file.path("~/references/Arabidopsis_thaliana.TAIR10.62.gtf") %>%
+  import.gff(feature.type = "gene")
+gtf
+```
+
+This is a GenomicRanges (or `GRanges`) object with the genomic regions defining each gene on the left, including strand information, and the metadata columns (or `mcols`) on the right.
+The `mcols` element is a `DataFrame` which is a variant on the base R `data.frame`, but using the `S4` class system.
+They don't play nicely with the `tidyverse`, but can be easily coerced to a data.frame using approaches similar to the following.
+
+```{r count-gene-types}
+mcols(gtf) %>% 
+  as.data.frame() %>% 
+  dplyr::count(gene_biotype)
+```
+
+
+
+#### Loading the Gene Count Matrix
+
+The counts produced by `featureCounts` are in the file `output/counts/all_samples.counts.out` and we need to load this file, the convert from a `data.frame` to a count matrix.
+Although it has the suffix `out` it's in tab-separated format, but with a comment (starting with `#`) in the first line providing the exact code run to create the file.
+This type of data structure is not uncommon in bioinformatics, but we do need to exclude that first line.
+
+```{r}
+counts_tbl <- file.path("output/counts/all_samples.counts.out") |>
+  read_tsv(comment = "#")
+```
+
+Now we understand what we're dealing with as we have the columns:
+
+1. `Geneid`: The gene id taken from the GTF
+2. `Chr`: The chromosome each exon lives on, with this format enabling the possibility of genes that span chromosomes
+3. `Start`, `End` and `Strand` also containing exon-level co-ordinates and structure
+4. `Length`: the overall spliced gene length (not the complete range of the gene on the chromosome)
+5. A series of columns containing the full file paths to each `bam` file we counted
+
+In order to create a count matrix, we can perform the following operations:
+
+1. Select the gene_ids and columns that end with `bam`
+2. Remove the directory path using `basename()`
+3. Remove the suffix `Aligned.sortedByCoord.out.bam`
+4. Coerce to a `data.frame` to allow the use of rownames
+5. Place the gene ids as the rownames
+6. Coerce to a `matrix`
+
+
+```{r}
+counts_matrix <- counts_tbl %>% 
+  dplyr::select(Geneid, ends_with("bam")) %>% 
+  rename_with(basename) %>% 
+  rename_with(\(x) str_remove_all(x, ".Aligned.+")) %>% 
+  as.data.frame() %>% 
+  column_to_rownames("Geneid") %>% 
+  as.matrix()
+```
+
+
+#### Create `DGEList` objects
+
+The type of object we will use in `R` for DGE analysis using `edgeR` is known as a `DGEList`, except here DGE stands for Digital Gene Expression, which does feel a bit confusing for some.
+We'll need to set our data up as this object type before being able to do any meaningful analysis.
+
+A `DGEList` has 3 elements which are required during formation
+
+1. A count matrix (We've already created this)
+2. Annotations for the genes (taken from our GTF as loaded)
+3. A description of the samples
+
+We only need to create our samples data.frame and we're ready to form the `DGEList` object.
+Using the skills we learned in earlier practicals, we can use `stringr` and `dplyr` again to setup this data.frame.
+
+```{r}
+samples_tbl <- tibble(sample = colnames(counts_matrix)) %>% 
+  mutate(
+    replicate = str_extract(sample, "rep[0-9]"),
+    treatment = str_extract(sample, "Zeocin|mock") %>% factor(levels = c("mock", "Zeocin"))
+  )
+```
+
+
+```{r}
+dge <- DGEList(
+  counts = counts_matrix, 
+  samples = samples_tbl,
+  group = as.integer(samples_tbl$treatment),
+  genes = gtf
+)
+dge
+```
+
+Notice in the `samples` component, there is also a column called `lib.size`.
+This is the total number of reads aligned to genes within each sample.
+If you see any fractions, this is due to our settings in `featureCounts` where we specified fractional counts.
+
+Notice that the `group` column also defines the treatment groups.
+
+Let's see if we have much difference in library sizes between samples & groups?
+
+```{r}
+dge$samples %>%
+  ggplot(aes(x = sample, y = lib.size / 1e6, fill = treatment)) +
+  geom_bar(stat = "identity") +
+  ylab("Library size (millions)") + 
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+```
+
+In today's data, we don't have a huge difference, but this can vary greatly in many experiments.
+When analysing counts, the number of counts will clearly be affected by the total library size (i.e. the total number of reads counted as aligning to genes).
+In some libraries, a small number of highly expressed genes can markedly inflate the library size.
+Before passing this data to any statistical models, we need to calculate a scaling factor that compensates for this, with the default approach being known as *The trimmed mean of M-values normalization method* (`TMM`) [@Robinson2010-qp].
+This approach trims the highest and lowest fraction of genes, then calculates the mean of average expression (i.e. `M`) values which can compensate for libraries where a single gene, or groups of genes, dominate the counts.
+This might be the case for whole blood samples, where the haemoglobin genes dwarf the remaining genes and the library sizes for non-haemoglobin genes can be quite heavily impacted.
+
+```{r tmm}
+dge <- calcNormFactors(dge)
+```
+
+Notice that now the column `norm.factors`is no longer all `1`.
+This is used by all downstream functions in `edgeR` to scale the library size when fitting negative binomial models.
+Given they are all within a couple of decimal points of the value 1, this dataset is not heavily impacted by these dominating genes.
+
+#### Removing Undetectable Genes
+
+Genes with low count numbers give us minimal statistical power to detect an changes in expression level, so a common approach is to filter out these genes, along with those were no counts were observed at all.
+This reduces the issues which we will face due to multiple hypothesis testing, effectively increasing the statistical power of a study.
+We often refer to this as removing undetectable genes, although we will discard some genes with very low counts.
+
+A common method would be to remove any genes which are below a specific CPM threshold in the majority of samples.
+In this dataset, we might like to remove genes which have $<1$ CPM in 4 or more samples.
+For a dataset with an average library size of 20m reads, this roughly equates to 20 counts, but using CPM allows for significant variability in library sizes.
+
+Any number of strategies can be applied for this stage.
+
+We can plot the densities of each of our samples using log-transformed CPM values, and the clear peak in the range of very low expression is clearly visible.
+
+```{r}
+plotDensities(cpm(dge, log = TRUE), main = "All Genes", legend = "topright")
+```
+
+Let's filter our dataset, and remove genes with low signal.
+
+```{r}
+genes2keep <- rowSums(cpm(dge) > 1) > 3
+```
+
+Here we've created a logical vector defining which genes to keep.
+To get a quick summary of this enter
+
+```{r}
+summary(genes2keep)
+```
+
+Now let's look at the densities after filtering.
+Notice how all of the genes with low signal (at the LHS of the original plot) are no longer included and only the secondary peak, corresponding to higher signal (or detected) genes is retained.
+
+```{r}
+plotDensities(
+  cpm(dge, log = TRUE)[genes2keep, ], 
+  main = "Detected Genes Only", legend = "topright"
+)
+```
+
+::: {.callout-important}
+Before filtering there appeared to be two very clear peaks.
+The one on the left was the genes with low expression, whilst the peak on the right represented the genes which were 'detectable'.
+After filtering our genes, the density plot now just shows the genes which were originally i the second peak.
+:::
+
+
+Now we're happy that we have the genes we can extract meaningful results from, let's remove them from our dataset.
+Notice that we're now over-writing our object called `dge` so any earlier plots and summaries will be impacted by this
+
+```{r}
+dge <- dge[genes2keep, ]
+```
+
+#### Data Exploration
+
+One of the things we look for in a dataset, is that the samples from each treatment,group together when we apply dimensional reduction techniques such as Principal Component Analysis (PCA) or Multi Dimensional Scaling (MDS).
+The package `edgeR` comes with a convenient function to allow this.
+
+```{r plot-mds}
+cols <- c("red3", "blue3")
+plotMDS(dge, labels = dge$samples$sample, col = cols[dge$samples$group])
+```
+
+Here we can see a clear pattern of separation between the groups.
+
+(If we don't see this, it may mean we have some difficult decisions to make.
+Maybe we need to check our samples for mislabelling?
+Maybe there is some other experimental factor which we're unaware of.)
+
+Many people prefer a PCA plot, which is not implemented by default in `edgeR` or `limma`, however, the following code uses logCPM values to produce the figure, and you'll notice it's very similar to the MDS plot.
+It's also more flexible as we're using `ggplot2`, but takes a bit more work to get there.
+
+```{r}
+dge %>% 
+  cpm(log = TRUE) %>% 
+  t() %>% 
+  prcomp() %>% 
+  broom::tidy() %>% 
+  pivot_wider(names_from = "PC", values_from = "value", names_prefix = "PC") %>% 
+  dplyr::rename(sample = row) %>% 
+  left_join(dge$samples, by = "sample") %>% 
+  ggplot(aes(PC1, PC2, colour = treatment)) +
+  geom_point(size = 2) +
+  geom_text_repel(aes(label = sample), show.legend = FALSE) +
+  scale_colour_brewer(palette = "Set1")
+```
+
+
+#### Calculating moderated dispersions
+
+Most RNA-Seq analysis is performed using the *Negative Binomial Distribution*.
+This is similar to a *Poisson* distribution, where we **count** the number of times something appears in a given interval.
+The difference with a Negative Binomial approach is that we can model data which is more variable.
+Under the Poisson assumptions, the variance equals the mean, whilst under the *NB* this is no longer required.
+
+This extra variability is known as the *dispersion*, and our estimates of dispersion will be too high for some genes, and too low for others.
+Taking advantage of the large numbers of genes in an experiment, we can shrink the ones that are too high, and increase the ones that are too small.
+This is an important step in RNA Seq analysis, as it reduces the number of false positives, and increase the numbers of true positives.
+
+Before we do this, we need to define our statistical model.
+Here, our term of interest is in the column `treatment`, and we're using `R`'s formula notation `~ treatment`.
+This can be read as *depends on* treatment, where the dependent variable is not defined, but can be considered to be the gene expression values for all genes.
+
+```{r design}
+design <- model.matrix(~ treatment, data = dge$samples)
+design
+```
+
+::: {.callout-important}
+Notice that every samples is set to 1 for the Intercept column.
+The value returned by this column ends up becoming the average across all untreated samples, whilst the difference between untreated & treated is estimated by the second column, effectively setting this column to estimate logFC.
+The actual average expression values are the sums of the indicator variables in each column, multiplied by the average expression estimates (i.e. logCPM) and the logFC estimates.
+:::
+
+Now we have our design matrix, we can estimate the dispersions using `edgeR`, which then allows us to fit the model specified for differential gene expression.
+
+
+```{r estimate-disp}
+dge <- estimateDisp(dge, design = design)
+dge
+```
+
+You'll notice that the `DGEList` now has some extra elements added, which define values like `AveLogCPM` and different types of dispersion, which will be used as input when fitting the Quasi-Likelihood models.
+
+#### Performing Differential Expression Analysis
+
+The most common analytic approach we use is the Quasi-Likelihood approach to the Generalised Linear Model used to fit Negative Binomially distributed data.
+
+In the following line of code, we are comparing the first two groups in our data.
+Clearly we only have two groups in this dataset, but it is quite common to have multiple groups in other analyses.
+Sometimes, continuous variables (like age, or time since diagnosis) might be fitted in the models as well.
+
+Let's fit the underlying model
+
+```{r fit}
+fit <- glmQLFit(dge)
+```
+
+This simply fits the model without the final step of testing for significance.
+The full table of results can be returned using the Quasi-Likelihood F-Test, 
+then using some `tidyverse` skills to extract the `topTags()` (i.e. genes) and return a `tibble`
+
+```{r}
+results <- glmQLFTest(fit)
+topTable <- results %>% 
+  topTags(n = Inf) %>%
+  pluck("table") %>% 
+  as_tibble()
+```
+
+Find the highest ranked gene in this dataset
+If it's been given a negative value for logFC, this means lower expression is likely to be observed in the second of the two conditions.
+The opposite is true for a positive value for logFC.
+
+Now we can visualise the pattern of logFC to expression level across the complete dataset. 
+We can use `plotMD` to generate MD (mean-difference) plots (these are also known as MA plots) showing the library size-adjusted log-fold change between two libraries (the difference) against the average log-expression across those libraries (the mean). 
+We can use the following command to compare sample 1 (`Col_0_mock_rep1`) to an artificial reference library constructed from the average of all other samples.
+
+```{r}
+plotMD(dge)
+```
+
+Summarised plots can sometimes be more informative and we can use our `ggplot` skills to create an MA-plot for the fitted values.
+
+```{r}
+topTable %>% 
+  ggplot(aes(logCPM, logFC)) +
+  geom_point() +
+  geom_smooth(se = FALSE)
+```
+
+The smoothed curve shown in blue is very useful for identifying any systemic bias and if this line doesn't resemble the line $y = 0$, we might need to revisit our normalisation strategy.
+Genes above the zero line are tending towards increased expression, whilst those below zero are tending towards decreased expression.
+Interestingly, there appear to be more genes showing increased expression so it's good to notice that our smoothed curve through the data sticks closely to $y = 0$ suggesting that there's no systemic bias, and these genes are truly increased in expression.
+
+In order to identify those with statistical support for differential expression, so we can add annotations to this plot to show differentially expressed genes by colour, labelling the top 10 genes as they appear in our top-table.
+
+
+```{r}
+topTable %>% 
+  mutate(DE = FDR < 0.05) %>% 
+  ggplot(aes(logCPM, logFC, colour = DE)) +
+  geom_point() +
+  geom_smooth(se = FALSE, colour = "blue") +
+  geom_text_repel(
+    aes(label = gene_name),
+    data = . %>% dplyr::slice(1:10), show.legend = FALSE
+  ) +
+  scale_colour_manual(values = c("black", "red"))
+```
+
+A common figure people use for differential gene expression is a volcano plot where we show logFC on the x-axis and a measure of significance on the y-axis.
+Taking log~10~p gives quite large negative values for low p-values, so if we plot the -log~10~p, the more significant points (i.e. lower p-values) will be shown at the top.
+
+```{r}
+topTable %>% 
+  mutate(
+    DE = FDR < 0.05, log10p = log10(PValue)
+  ) %>% 
+  ggplot(aes(logFC, -log10p, colour = DE)) +
+  geom_point() +
+  geom_text_repel(
+    aes(label = gene_name),
+    data = . %>% dplyr::slice(1:10), show.legend = FALSE
+  ) +
+  scale_colour_manual(values = c("black", "red"))
+```
+
+
+Now let's check the raw counts for our top-ranked gene
+
+```{r}
+counts_matrix["AT3G27630",]
+```
+
+Clearly this gene is undetectable in the mock treatment samples, but shows active transcription in the Zeocin treated samples.
+
+::: {.callout-tip}
+Inspect a few more of the highly ranked genes, so make sure you can understand these results.
+:::
+
+We can also check the top-ranked genes using logCPM values and boxplots.
+
+```{r}
+ids <- topTable$gene_id[1:6]
+cpm(dge, log = TRUE)[ids,] %>% 
+  as_tibble(rownames = "gene_id") %>% 
+  pivot_longer(starts_with("Col"), names_to = "sample", values_to = "logCPM") %>% 
+  left_join(dge$samples, by = "sample") %>% 
+  left_join(dge$genes, by = "gene_id") %>% 
+  mutate(gene_name = fct_inorder(gene_name)) %>% 
+  ggplot(aes(treatment, logCPM, fill = treatment)) +
+  geom_boxplot() +
+  facet_wrap(~gene_name) +
+  scale_fill_brewer(palette = "Set1")
+```
+
+
+Let's get a list of significant genes, by using an FDR of 0.01 to really pull out the most confident results.
+
+```{r}
+sigIDs <- filter(topTable, FDR < 0.01)$gene_id
+sigGeneNames <- filter(topTable, FDR < 0.01)$gene_name
+```
+
+And we can check the number of significant genes
+
+```{r}
+length(sigIDs)
+```
+
+We might even like to show these genes using a heatmap so we can see which genes have similar patterns.
+Here we'll scale each gene by subtracting the mean expression so genes from samples with higher expression will plot as positive values, whilst those from samples with lower expression will become negative values, whilst retaining the range of differences between groups.
+
+```{r}
+topCPM <- cpm(dge, log = TRUE)[sigGenes,] %>% 
+  subtract(rowMeans(.)) %>% 
+  set_rownames(sigGeneNames) %>% 
+  t()
+pheatmap(topCPM, fontsize_col = 8, fontsize_row = 10)
+```
+
+Some clusters of genes showing similar behaviour are clearly visible.
+
+
+## Enrichment Analysis
+
+After we get a list of DE genes between groups (e.g. treatment group vs control group in our dataset), we can do all different kinds downstream analyses based on this DE gene list.
+One common downstream analysis is the functional enrichment/over-representation analysis.
+Some people prefer tools like the web-based [DAVID](https://davidbioinformatics.nih.gov) (Database for Annotation, Visualization and Integrated Discovery). 
+However, we'll continue in `R` using the tools available there.
+
+The first data we'll need is the gene-sets or functional descriptions that each gene belongs to.
+One has been prepared for us as `ensembl62_tair10_goterms.tsv.gz` which maps genes to GO terms where possible.
+GO terms are a formal way to describe biological attributes, as defined by the [Gene Ontology (GO) database](https://geneontology.org/docs/ontology-documentation/).
+There are three domains within the GO database:
+
+1. Biological Process
+2. Molecular Function
+3. Cellular Component
+
+An example term, showing how each term is connected to parent terms can be seen [here](https://www.ebi.ac.uk/QuickGO/GTerm?id=GO:0006412)
+
+These are all defined independently of any organism, and then genes from each organism are mapped to these terms.
+Sometimes this occurs as a result of experimental results, but for Arabidposis genes are generally mapped to GO terms by inference using homology across species.
+
+```{r}
+go_terms <- read_tsv("~/references/ensembl62_tair10_goterms.tsv.gz")
+go_terms 
+```
+
+We can gain a little information about the structure that we have using the tidyverse.
+First we can check how many GO terms we have included in this dataset
+
+```{r}
+go_terms %>% 
+  distinct(domain, pick(starts_with("term"))) %>% 
+  dplyr::count(domain)
+```
+
+Next we could check how many genes are mapped to a GO term, noting that many genes will not have any functional annotation.
+
+```{r}
+go_terms %>% 
+  distinct(gene_id) %>% 
+  nrow()
+```
+
+Or we could subset this to our detected genes
+
+```{r}
+go_terms %>% 
+  dplyr::filter(gene_id %in% rownames(dge)) %>% 
+  distinct(gene_id) %>% 
+  nrow()
+```
+
+To perform enrichment analysis, the fundamental model is the hypergeometric distribution as defined by Fisher's Exact test.
+However, as we noticed in our MA plot, low-expressed genes may be more likely to be considered as DE which means our results will be biased towards gene-sets with shorter, or low-expressed genes.
+This is a result of the way RNA-seq maps fragments to counts, and this bias is not observed in microarray data.
+The package `goseq` [@Young2010-gs] implements a version of the hypergeometric model which allows for genes to have a different weight based on their probability of being DE.
+By using a cutoff value of FDR < 0.01, we're defining a set of DE genes and asking if any functional terms are found within these DE genes at a rate that looks higher than might be expected y chance.
+
+First we can define a named, logical vector containing DE genes, then we calculate the Probability Weight Function (PWF) using gene-length as the potential bias term, to identify if gene length influences the probability of a gene being considered as DE.
+
+```{r}
+de_genes <- setNames(topTable$FDR < 0.01, topTable$gene_id)
+pwf <- nullp(de_genes, bias.data = log10(topTable$width))
+```
+
+To perform enrichment analysis with `goseq`, we need to structure our enrichment terms so that we have a list of GO terms, separated by each gene_id.
+
+```{r}
+go_by_id <- go_terms %>% 
+  distinct(gene_id, term_accession) %>% 
+  split(.$gene_id) %>% 
+  lapply(pluck, "term_accession")
+```
+
+
+Now we can pass this to the function `goseq()` to perform our enrichment analysis
+
+```{r}
+goseq(pwf, gene2cat = go_by_id) %>% 
+  head()
+```
+
+The column we should be checking is the `over_represented_pvalue` column, so let's modify our results and save the object.
+
+```{r}
+goseq_results <- goseq(pwf, gene2cat = go_by_id) %>% 
+  dplyr::select(
+    ontology, term, category,  ends_with("Cat"), PValue = over_represented_pvalue
+  ) %>% 
+  mutate(FDR = p.adjust(PValue, "fdr")) %>% 
+  as_tibble()
+goseq_results %>% dplyr::filter(FDR < 0.01)
+```
+
+Now we have some insight into which biological process are associated with the genes that respond to Zeocin treatment.
+
+::: {.callout-important}
+Repeat this process using an FDR < 0.05 to declare a gene as *differentially expressed*. Did the results change in any meaningful way?
+:::
+
+<!-- If possible, gsea (using `fgsea` could be included, but the length of the session may not permit) -->
+
+# References

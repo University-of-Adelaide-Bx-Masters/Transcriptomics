@@ -1,0 +1,1536 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.7.32">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+<meta name="author" content="Stevie Pederson &amp; Zhipeng Qu">
+
+<title>Transcriptomics Practical</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+html { -webkit-text-size-adjust: 100%; }
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+/* CSS for citations */
+div.csl-bib-body { }
+div.csl-entry {
+  clear: both;
+  margin-bottom: 0em;
+}
+.hanging-indent div.csl-entry {
+  margin-left:2em;
+  text-indent:-2em;
+}
+div.csl-left-margin {
+  min-width:2em;
+  float:left;
+}
+div.csl-right-inline {
+  margin-left:2em;
+  padding-left:1em;
+}
+div.csl-indent {
+  margin-left: 2em;
+}</style>
+
+
+<script src="differential_gene_expression_files/libs/clipboard/clipboard.min.js"></script>
+<script src="differential_gene_expression_files/libs/quarto-html/quarto.js" type="module"></script>
+<script src="differential_gene_expression_files/libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="differential_gene_expression_files/libs/quarto-html/popper.min.js"></script>
+<script src="differential_gene_expression_files/libs/quarto-html/tippy.umd.min.js"></script>
+<script src="differential_gene_expression_files/libs/quarto-html/anchor.min.js"></script>
+<link href="differential_gene_expression_files/libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="differential_gene_expression_files/libs/quarto-html/quarto-syntax-highlighting-37eea08aefeeee20ff55810ff984fec1.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="differential_gene_expression_files/libs/bootstrap/bootstrap.min.js"></script>
+<link href="differential_gene_expression_files/libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="differential_gene_expression_files/libs/bootstrap/bootstrap-1e1b6d7d3018d0281420745e134191b0.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+
+  <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
+
+<script type="text/javascript">
+const typesetMath = (el) => {
+  if (window.MathJax) {
+    // MathJax Typeset
+    window.MathJax.typeset([el]);
+  } else if (window.katex) {
+    // KaTeX Render
+    var mathElements = el.getElementsByClassName("math");
+    var macros = [];
+    for (var i = 0; i < mathElements.length; i++) {
+      var texText = mathElements[i].firstChild;
+      if (mathElements[i].tagName == "SPAN") {
+        window.katex.render(texText.data, mathElements[i], {
+          displayMode: mathElements[i].classList.contains('display'),
+          throwOnError: false,
+          macros: macros,
+          fleqn: false
+        });
+      }
+    }
+  }
+}
+window.Quarto = {
+  typesetMath
+};
+</script>
+
+</head>
+
+<body class="quarto-light">
+
+<div id="quarto-content" class="page-columns page-rows-contents page-layout-article">
+<div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+  <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">Table of contents</h2>
+   
+  <ul>
+  <li><a href="#introduction" id="toc-introduction" class="nav-link active" data-scroll-target="#introduction">Introduction</a>
+  <ul class="collapse">
+  <li><a href="#dataset" id="toc-dataset" class="nav-link" data-scroll-target="#dataset">Dataset</a></li>
+  <li><a href="#tools-and-r-packages-pipeline" id="toc-tools-and-r-packages-pipeline" class="nav-link" data-scroll-target="#tools-and-r-packages-pipeline">Tools and R packages pipeline</a></li>
+  <li><a href="#running-time-estimate-based-on-teaching-vm" id="toc-running-time-estimate-based-on-teaching-vm" class="nav-link" data-scroll-target="#running-time-estimate-based-on-teaching-vm">Running time estimate (based on teaching VM)</a></li>
+  <li><a href="#what-you-will-learn-in-this-practical" id="toc-what-you-will-learn-in-this-practical" class="nav-link" data-scroll-target="#what-you-will-learn-in-this-practical">What you will learn in this Practical</a></li>
+  </ul></li>
+  <li><a href="#practical" id="toc-practical" class="nav-link" data-scroll-target="#practical">Practical</a>
+  <ul class="collapse">
+  <li><a href="#set-up-and-project-preparation" id="toc-set-up-and-project-preparation" class="nav-link" data-scroll-target="#set-up-and-project-preparation">Set up and project preparation</a></li>
+  <li><a href="#qc-and-pre-processing" id="toc-qc-and-pre-processing" class="nav-link" data-scroll-target="#qc-and-pre-processing">QC And Pre-processing</a>
+  <ul class="collapse">
+  <li><a href="#qc-for-illumina-reads-fastq" id="toc-qc-for-illumina-reads-fastq" class="nav-link" data-scroll-target="#qc-for-illumina-reads-fastq">QC for Illumina Reads (FASTQ)</a></li>
+  <li><a href="#adapter-and-low-quality-sequence-trimming" id="toc-adapter-and-low-quality-sequence-trimming" class="nav-link" data-scroll-target="#adapter-and-low-quality-sequence-trimming">Adapter and Low-Quality Sequence Trimming</a></li>
+  </ul></li>
+  <li><a href="#genome-mapping" id="toc-genome-mapping" class="nav-link" data-scroll-target="#genome-mapping">Genome Mapping</a></li>
+  <li><a href="#counting-alignments" id="toc-counting-alignments" class="nav-link" data-scroll-target="#counting-alignments">Counting Alignments</a></li>
+  <li><a href="#dge-analysis" id="toc-dge-analysis" class="nav-link" data-scroll-target="#dge-analysis">DGE Analysis</a></li>
+  <li><a href="#enrichment-analysis" id="toc-enrichment-analysis" class="nav-link" data-scroll-target="#enrichment-analysis">Enrichment Analysis</a></li>
+  </ul></li>
+  <li><a href="#references" id="toc-references" class="nav-link" data-scroll-target="#references">References</a></li>
+  </ul>
+</nav>
+</div>
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<h1 class="title">Transcriptomics Practical</h1>
+<p class="subtitle lead">Differential Gene Expression</p>
+</div>
+
+
+<div class="quarto-title-meta-author">
+  <div class="quarto-title-meta-heading">Author</div>
+  <div class="quarto-title-meta-heading">Affiliation</div>
+  
+    <div class="quarto-title-meta-contents">
+    <p class="author">Stevie Pederson &amp; Zhipeng Qu </p>
+  </div>
+  <div class="quarto-title-meta-contents">
+        <p class="affiliation">
+            Adelaide University &amp; Black Ochre Data Labs
+          </p>
+      </div>
+  </div>
+
+<div class="quarto-title-meta">
+
+      
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<section id="introduction" class="level1">
+<h1>Introduction</h1>
+<p>In this practical, we will be performing a <em>Differential Gene Expression</em> (DGE) analysis. This type of analysis compares the expression level of each gene in response to a given predictor variable (i.e.&nbsp;a drug-treatment), which commonly requires a control group of samples and a treated group of samples. The aim of DGE analysis using RNA-Seq (or other transcriptomic data) is to detect the level of transcription at each gene, then determine if any changes are evident due to the specific biological question.</p>
+<p>The basic data type we work with when performing this type of analysis is a set of <em>gene counts</em>. These are obtained after 1) aligning RNA-Seq reads to a reference genome, then 2) counting how many reads align to exonic regions of each gene. As gene counts are <em>discrete values</em> (i.e.&nbsp;not continuous values) these are commonly analysed using a statistical model based on the Negative Binomial Distribution, and fitted as a specific type Generalised Linear Model (GLM). A GLM is very much like linear regression, except models allow for data from other distributions beyond the Normal Distribution.</p>
+<p>For normally distributed data (such as microarray data) the mean is commonly referred to as the <em>expected value</em> so we might describe the distribution as follows:</p>
+<p><span class="math display">\[
+\text{For } y \sim \mathcal{N}(\mu, \sigma) \implies E[y] = \mu \text{ and Var}[y] = \sigma^2
+\]</span></p>
+<p>Count data is commonly modelled using a Poisson distribution and a common example might involve counting the number of phone calls per second at a mobile phone tower. More formally, a Poisson distribution with rate parameter <span class="math inline">\(\lambda\)</span> would have a mean (or expected value) and variance with the same values.</p>
+<p><span class="math display">\[
+\text{For } y \sim \text{Poisson}(\lambda) \implies E[y] = \lambda \text{ and Var}[y] = \lambda
+\]</span></p>
+<p>So if <span class="math inline">\(\lambda=10\)</span> for phone calls per second at a mobile phone tower, we would expect to observe 10 phone calls per second, but across multiple observations these would have a variance of 10. In the example code below, we’re simulating 1 million observations from a Poisson distribution with <span class="math inline">\(\lambda=10\)</span> and you’ll see that the mean and variances behaves very similarly to how we’ve just learnt.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>y <span class="ot">&lt;-</span> <span class="fu">rpois</span>(<span class="fl">1e6</span>, <span class="dv">10</span>)</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="fu">mean</span>(y)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 9.997153</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="fu">var</span>(y)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 9.969851</code></pre>
+</div>
+</div>
+<p>This is quite different to the Normal Distribution were the mean and variance are completely independent variables.</p>
+<p>The Negative Binomial (NB) distribution can be considered as being very similar to a Poisson Distribution where we would fit the number of events per fixed unit (e.g.&nbsp;phone calls / sec), but the NB distribution allows for extra variability. Poisson models often capture technical or systemic variability very well, but for RNA-Seq data the additional biological variability found between different replicates leads to this additional variability, which is commonly referred to as <em>overdispersion</em>.</p>
+<p>There are multiple mathematical derivations of the Negative Binomial Distribution giving rise to multiple ways to specify the parameters, but the definition most commonly used in RNA-Seq is for a rate parameter <span class="math inline">\(\lambda\)</span> and overdispersion parameter <span class="math inline">\(\theta\)</span>, we would expect a mean <span class="math inline">\(\lambda\)</span> and variance <span class="math inline">\(\lambda + \frac{\lambda^2}{\theta}\)</span>. Simulating with the same rate as previously, but accounting for overdispersion, we can see the difference in the returned values.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>y <span class="ot">&lt;-</span> MASS<span class="sc">::</span><span class="fu">rnegbin</span>(<span class="fl">1e6</span>, <span class="dv">10</span>, <span class="at">theta =</span> <span class="dv">10</span>)</span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a><span class="fu">mean</span>(y)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 9.999662</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="fu">var</span>(y)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 20.03577</code></pre>
+</div>
+</div>
+<p>When fitting a linear regression model, we can use simple linear algebra to obtain our parameter estimates, with the near-universal approach being to use a formula known as Least Squares. For <em>generalised linear models</em> the linear algebra is less convenient and parameter estimates are commonly obtained using maximum likelihood approaches. In RNA-Seq, the overdispersion parameter as fitted as a function of the mean, leading to the most commonly fitted models using Quasi-Likelihood methods for fitting data. A detailed, but quite readable description of these approaches can be found in <span class="citation" data-cites="Lun2016-vb">Lun, Chen, and Smyth (<a href="#ref-Lun2016-vb" role="doc-biblioref">2016</a>)</span>.</p>
+<p>When we perform RNA-Seq analysis, we end up with a matrix of gene counts where each row represents a gene and each column represents a sample, or library. The rates of counts that we fit use the total library size (or column sums) as the unit of measurement, allowing for counts to be comparable for libraries where sequences has been inconsistent. These statistical approaches use the actual counts to fit the models, but we often choose values such as <em>counts per million</em> (CPM) or a log<sub>2</sub> transformed version of this (logCPM) to compare between samples for the purposes of visualisation. These values are simply the counts, divided by the total library size and multiplied by one million and are on a convenient numerical scale for visualisation. Importantly, we don’t use these values for statistical analysis, unless using specific models explicitly designed for this data type <span class="citation" data-cites="Law2018-mk">(<a href="#ref-Law2018-mk" role="doc-biblioref">Law et al. 2018</a>)</span>.</p>
+<p>In this practical, we will be using a RNA-Seq dataset from model plant <em>Arabidopsis thaliana</em> to carry out a typical DGE analysis where we have two groups, a control and a treated group. The small size of this genome makes it extremely suitable for our VMs, whilst still being a complete genome. The reads have been down-samples to 2m read-pairs per sample to enable analysis on the VMs. A typical RNA-Seq experiment might have 20-50m reads per sample.</p>
+<section id="dataset" class="level2">
+<h2 class="anchored" data-anchor-id="dataset">Dataset</h2>
+<p>The dataset used in this practical is sub-sampled from RNA-Seq of two groups of samples from study of <span class="citation" data-cites="Herbst2023-pj">Herbst et al. (<a href="#ref-Herbst2023-pj" role="doc-biblioref">2023</a>)</span>. We will be doing a pairwise DE analysis between Arabidopsis seedlings treated with 80 µg/ml Zeocin (treatment group) and mock-treated seedlings (control group). The researchers designed this experiment trying to understand what kinds of genes/pathways might be impacted by Zeocin treatment, which can be used as a radiomimetic drug to understand the molecular mechanisms of DNA damage in plants.</p>
+<p>Here are some key pieces of information for Arabidopsis and this RNA-Seq dataset:</p>
+<ul>
+<li><p>Reference genome build: TAIR10 (<a href="https://www.arabidopsis.org/index.jsp" class="uri">https://www.arabidopsis.org/index.jsp</a>)</p></li>
+<li><p>Number of chromosomes: 5 chromosomes + Chloroplast + Mitochondria</p></li>
+<li><p>Genome size: ~135 Mb</p></li>
+<li><p>Number of samples: 6</p></li>
+<li><p>Number of groups: 2, zeocin-treated and mock-treated</p></li>
+<li><p>Number of biological replicates per group: 3</p></li>
+<li><p>Sequencing type: PE150 (i.e.&nbsp;paired-end 150nt reads)</p></li>
+<li><p>Number of raw reads per sample (sub-sampled): ~2 million pairs</p></li>
+</ul>
+</section>
+<section id="tools-and-r-packages-pipeline" class="level2">
+<h2 class="anchored" data-anchor-id="tools-and-r-packages-pipeline">Tools and R packages pipeline</h2>
+<p>The pipeline of this Prac is shown in the following flowchart:</p>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="./assets/DE_pipeline.png" class="img-fluid figure-img"></p>
+<figcaption>Transcriptomics DE analysis flowchart</figcaption>
+</figure>
+</div>
+<p>Here are some tools used in this Prac:</p>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 8%">
+<col style="width: 8%">
+<col style="width: 82%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Tools</th>
+<th>Version</th>
+<th>Link</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>fastqc</td>
+<td>v0.11.9</td>
+<td>https://www.bioinformatics.babraham.ac.uk/projects/fastqc</td>
+</tr>
+<tr class="even">
+<td>cutadapt</td>
+<td>v3.5</td>
+<td>https://cutadapt.readthedocs.io/en/stable/</td>
+</tr>
+<tr class="odd">
+<td>STAR</td>
+<td>v2.7.10a</td>
+<td>https://github.com/alexdobin/STAR</td>
+</tr>
+</tbody>
+</table>
+<p>And also, we will mainly use R to perform DGE analysis, and there is a list of R packages that we will require, which have all been installed on the VMs ready to use:</p>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 11%">
+<col style="width: 15%">
+<col style="width: 72%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Package</th>
+<th>Archive</th>
+<th>Link</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>edgeR</td>
+<td>bioconductor</td>
+<td>https://bioconductor.org/packages/release/bioc/html/edgeR.html</td>
+</tr>
+<tr class="even">
+<td>ggplot2</td>
+<td>CRAN</td>
+<td>https://ggplot2.tidyverse.org/</td>
+</tr>
+<tr class="odd">
+<td>ggrepel</td>
+<td>CRAN</td>
+<td>https://cran.r-project.org/web/packages/ggrepel/index.html</td>
+</tr>
+<tr class="even">
+<td>goseq</td>
+<td>bioconductor</td>
+<td>https://bioconductor.org/packages/release/bioc/html/goseq.html</td>
+</tr>
+<tr class="odd">
+<td>limma</td>
+<td>bioconductor</td>
+<td>https://bioconductor.org/packages/release/bioc/html/limma.html</td>
+</tr>
+<tr class="even">
+<td>ngsReports</td>
+<td>bioconductor</td>
+<td>https://bioconductor.org/packages/release/bioc/html/ngsReports.html</td>
+</tr>
+<tr class="odd">
+<td>pheatmap</td>
+<td>CRAN</td>
+<td>https://cran.r-project.org/web/packages/pheatmap/index.html</td>
+</tr>
+<tr class="even">
+<td>rtracklayer</td>
+<td>bioconductor</td>
+<td>https://bioconductor.org/packages/release/bioc/html/rtracklayer.html</td>
+</tr>
+<tr class="odd">
+<td>scales</td>
+<td>CRAN</td>
+<td>https://scales.r-lib.org/</td>
+</tr>
+<tr class="even">
+<td>tidyverse</td>
+<td>CRAN</td>
+<td>https://www.tidyverse.org/</td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="running-time-estimate-based-on-teaching-vm" class="level2">
+<h2 class="anchored" data-anchor-id="running-time-estimate-based-on-teaching-vm">Running time estimate (based on teaching VM)</h2>
+<p>Some of the steps will take time to run on your VM so please use that time to read any relevant material. The following table shows the estimated run time in VM for the major steps:</p>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th>Step</th>
+<th>Tool/Package</th>
+<th>Estimated run time</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>QC</td>
+<td>fastQC</td>
+<td>5 mins</td>
+</tr>
+<tr class="even">
+<td>Sequence trimming</td>
+<td>cutadapt</td>
+<td>10 mins</td>
+</tr>
+<tr class="odd">
+<td>Genome mapping for short reads</td>
+<td>STAR</td>
+<td>20 mins</td>
+</tr>
+</tbody>
+</table>
+<p><strong>The practical is designed to run across 2x2hr sessions.</strong></p>
+</section>
+<section id="what-you-will-learn-in-this-practical" class="level2">
+<h2 class="anchored" data-anchor-id="what-you-will-learn-in-this-practical">What you will learn in this Practical</h2>
+<ul>
+<li>Practice the bash commands and develop our scripting skills</li>
+<li>Practice NGS QC and alignment</li>
+<li>Learn how to do pairwise DE analysis using RNA-Seq</li>
+<li>Enrichment testing</li>
+</ul>
+</section>
+</section>
+<section id="practical" class="level1">
+<h1>Practical</h1>
+<p>There are two major steps (5 parts actually) in this Prac. Please follow the instructions <strong>in order</strong>, because some commands will rely on the results from previous commands. Please discuss the outputs and processes with the tutors/instructors to ensure everything makes logical sense to you.</p>
+<section id="set-up-and-project-preparation" class="level2">
+<h2 class="anchored" data-anchor-id="set-up-and-project-preparation">Set up and project preparation</h2>
+<p>Planning your directory structure from the beginning makes your work easier to follow for both yourself and others. This forms an important part of every bioinformatics analysis.</p>
+<p>We’ll be using a reference genome which as researchers we’d most likely use repeatedly for multiple experiments. It can make sense to place this in a standalone folder, along with any annotation files.</p>
+<div class="sourceCode" id="cb9"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="bu">cd</span> ~</span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a><span class="fu">mkdir</span> references</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>Now we’ve set that up, let’s put some data there . The reference genome can be downloaded from https://ftp.ensemblgenomes.ebi.ac.uk/pub/plants/release-62/fasta/arabidopsis_thaliana/dna/, and the file we need is the one called <code>Arabidopsis_thaliana.TAIR10.dna.toplevel.fa.gz</code>. This is the complete DNA sequence, with the remainder being the sequence separated by chromosome or with different regions hard or soft masked (rm/sm respectively). Genome masking is not usually of concern for transcriptomics so we don’t need to worry about those alternatives.</p>
+<!-- REFERENCES MAY BE BETTER BEING PROVIDED AS SYMLINKS ON THE VMs!!! -->
+<!-- IF SO CHANGE THIS SECTION TO REFLECT THIS APPROACH -->
+<p>Download the file using</p>
+<div class="sourceCode" id="cb10"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="bu">cd</span> ~/references</span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a><span class="fu">wget</span> https://ftp.ensemblgenomes.ebi.ac.uk/pub/plants/release-62/fasta/arabidopsis_thaliana/dna/Arabidopsis_thaliana.TAIR10.dna.toplevel.fa.gz</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>We’ll also need gene annotations as well and these are most commonly provided in GTF or GFF format. These are subtly different file formats and many tools use the abbreviations interchangeably as format detection is a trivial task for most bioinformatics tools.</p>
+<p>To obtain the GTF file execute the following.</p>
+<div class="sourceCode" id="cb11"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="fu">wget</span> https://ftp.ensemblgenomes.ebi.ac.uk/pub/plants/release-62/gtf/arabidopsis_thaliana/Arabidopsis_thaliana.TAIR10.62.gtf.gz</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>Ensembl is a comprehensive data resource containing reference genomes, annotations and multiple layers of information, as managed by the EMBL. Regular releases are made as new genes are predicted or discovered and, at the time of writing, Ensembl Plants Release 62 was the latest available release.</p>
+<p>Additionally, place the file <code>ensembl62_tair10_goterms.tsv.gz</code> in <code>~/references</code>.</p>
+<p>Before we start looking at the actual sequencing data, let’s first create an index for this reference genome. We will be using a <em>splice-aware</em> aligner called <code>STAR</code> <span class="citation" data-cites="Dobin2013-us">(<a href="#ref-Dobin2013-us" role="doc-biblioref">Dobin et al. 2013</a>)</span> to do the genome mapping in this Prac, with the manual available <a href="https://github.com/alexdobin/STAR/blob/5e8a99c8892b9a4455288579fefaf5825960c371/doc/STARmanual.pdf">here</a></p>
+<p>Before we do the genome mapping, <code>STAR</code> requires the reference genome to be indexed. Indexing the reference genome enables each read to be mapped to the reference by greatly speeding up the sequence searching as part of the alignment process. We can build the <code>Arabidopsis</code> reference genome index using following command (run interactively)</p>
+<div class="sourceCode" id="cb12"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="fu">gunzip</span> ~/references/Arabidopsis_thaliana.TAIR10.dna.toplevel.fa.gz</span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a><span class="fu">gunzip</span> ~/references/Arabidopsis_thaliana.TAIR10.62.gtf.gz</span>
+<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a><span class="ex">STAR</span> <span class="dt">\</span></span>
+<span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">--runThreadN</span> 2 <span class="dt">\</span></span>
+<span id="cb12-5"><a href="#cb12-5" aria-hidden="true" tabindex="-1"></a>  <span class="at">--runMode</span> genomeGenerate <span class="dt">\</span></span>
+<span id="cb12-6"><a href="#cb12-6" aria-hidden="true" tabindex="-1"></a>  <span class="at">--genomeDir</span> ~/references/TAIR10/STAR149 <span class="dt">\</span></span>
+<span id="cb12-7"><a href="#cb12-7" aria-hidden="true" tabindex="-1"></a>  <span class="at">--genomeFastaFiles</span> ~/references/Arabidopsis_thaliana.TAIR10.dna.toplevel.fa <span class="dt">\</span></span>
+<span id="cb12-8"><a href="#cb12-8" aria-hidden="true" tabindex="-1"></a>  <span class="at">--sjdbGTFfile</span> ~/references/Arabidopsis_thaliana.TAIR10.62.gtf <span class="dt">\</span></span>
+<span id="cb12-9"><a href="#cb12-9" aria-hidden="true" tabindex="-1"></a>  <span class="at">--sjdbOverhang</span> 149 <span class="dt">\</span></span>
+<span id="cb12-10"><a href="#cb12-10" aria-hidden="true" tabindex="-1"></a>  <span class="at">--genomeSAindexNbases</span> 12</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>As we work on each separate project, a common strategy is to put the initial sequencing data into a folder named <code>data</code>, with the output files from different processing stages then being placed into separate folders, such as an <code>output</code> or a <code>results</code> folder. Scripts may be stored in a separate <code>scripts</code> folder (we won’t use this folder in this Prac). All naming rules are just personal preference, and feel free to build your own project folder structure rules that will help you manage large datasets</p>
+<p>The following is the suggested folder structure for this DE analysis project:</p>
+<pre><code>transcriptomics_dge_practical/
+├── analysis
+├── data
+│   ├── bam
+│   ├── raw_fastq
+│   └── trimmed_fastq
+├── scripts
+└── output
+    ├── counts
+    ├── logs
+    ├── raw_fastqc
+    └── trimmed_fastqc</code></pre>
+<p>Some people prefer to put <code>bash</code> scripts in the <code>scripts</code> folder, keeping them separate from the <code>rmarkdown</code> files in <code>analysis</code>, however this is personal preference. Additionally, the <code>data</code> folder is a common place for the <em>large data files</em> used in each analysis. These are commonly the .fastq files and the alignment, usually saved as .bam files. Smaller output files can go in the <code>output</code> folder making any data transfer to local compute resources simpler.</p>
+<p>We can use following commands to build this folder structure:</p>
+<div class="sourceCode" id="cb14"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="bu">cd</span> ~/</span>
+<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a><span class="fu">mkdir</span> transcriptomics_dge_practical </span>
+<span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a><span class="bu">cd</span> ~/transcriptomics_dge_practical</span>
+<span id="cb14-4"><a href="#cb14-4" aria-hidden="true" tabindex="-1"></a><span class="fu">mkdir</span> analysis scripts </span>
+<span id="cb14-5"><a href="#cb14-5" aria-hidden="true" tabindex="-1"></a><span class="fu">mkdir</span> <span class="at">-p</span> output/counts output/raw_fastqc output/trimmed_fastqc output/logs</span>
+<span id="cb14-6"><a href="#cb14-6" aria-hidden="true" tabindex="-1"></a><span class="fu">mkdir</span> <span class="at">-p</span> data/bam data/raw_fastq data/trimmed_fastq</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>If you want to check your folder structure:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb15"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="bu">cd</span> ~/</span>
+<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a><span class="ex">tree</span> transcriptomics_dge_practical</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>Next we can build symlinks of data files in our corresponding project folders</p>
+<!-- THESE PATHS NEED TO BE CHECKED ON THE 2026 VMs -->
+<!-- ESPECIALLY IF SYMLINKING REFERENCE FILES As THEY NEED TO BE ADDED -->
+<div class="sourceCode" id="cb16"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a><span class="bu">cd</span> ~/transcriptomics_dge_practical/data/raw_fastq</span>
+<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a><span class="fu">ln</span> <span class="at">-s</span> /shared/data/transcriptomics_dge_practical_data/01_raw_data/<span class="pp">*</span>.fastq.gz ./</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>Finally, it’s good practice to create an R Project, so using RStudio:</p>
+<ol type="1">
+<li>Go to <code>File/New Project...</code></li>
+<li>Select Existing Directory</li>
+<li>Navigate to the <code>transcriptomics_dge_practical</code> directory we just created</li>
+<li>Create project</li>
+</ol>
+<p>Now all the setup work is done. Let’s move to part 2.</p>
+</section>
+<section id="qc-and-pre-processing" class="level2">
+<h2 class="anchored" data-anchor-id="qc-and-pre-processing">QC And Pre-processing</h2>
+<p>In this part, we will check the sequencing quality of all raw sequencing data first, and then trim adapter and low-quality sequences from the raw sequencing data. These are the preliminary steps needed to perform before we can align our <em>best quality</em> reads to the reference genome.</p>
+<section id="qc-for-illumina-reads-fastq" class="level3">
+<h3 class="anchored" data-anchor-id="qc-for-illumina-reads-fastq">QC for Illumina Reads (FASTQ)</h3>
+<p>The first step is to perform a QC analysis for the raw sequencing data using fastQC. Check the arguments required by <code>fastqc</code> using <code>fastqc --help</code> to make sure you understand the code provided. You can process all files all in one script.</p>
+<div class="sourceCode" id="cb17"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a><span class="fu">touch</span> scripts/raw_fastqc.sh</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>Now open this file in RStudio (it’s simpler than <code>nano</code>)</p>
+<div class="sourceCode" id="cb18"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a><span class="co">#! /bin/bash</span></span>
+<span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a><span class="va">PROJROOT</span><span class="op">=</span><span class="st">"</span><span class="va">${HOME}</span><span class="st">/transcriptomics_dge_practical"</span></span>
+<span id="cb18-3"><a href="#cb18-3" aria-hidden="true" tabindex="-1"></a><span class="va">FQDIR</span><span class="op">=</span><span class="st">"</span><span class="va">${PROJROOT}</span><span class="st">/data/raw_fastq"</span></span>
+<span id="cb18-4"><a href="#cb18-4" aria-hidden="true" tabindex="-1"></a><span class="va">FQCDIR</span><span class="op">=</span><span class="st">"</span><span class="va">${PROJROOT}</span><span class="st">/output/raw_fastqc"</span></span>
+<span id="cb18-5"><a href="#cb18-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb18-6"><a href="#cb18-6" aria-hidden="true" tabindex="-1"></a><span class="bu">echo</span> <span class="at">-e</span> <span class="st">"fastqc -t 2 -o </span><span class="va">${FQCDIR}</span><span class="st"> </span><span class="va">${FQDIR}</span><span class="st">/*fastq.gz"</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>Now save and run the script, noting that we’ve provided <em>absolute paths</em> for all input/output directories.</p>
+<p>After <code>fastQC</code> has finished running, we can check the QC report by opening the <code>html</code> files using web browser. For this practical, the dataset is small enough to check QC for each file individually, but additional tools like <a href="https://seqera.io/multiqc/"><code>MultiQC</code></a> can also be used to summarise QC reports across an entire dataset. Similarly, the Bioconductor package <a href="https://bioconductor.org/packages/release/bioc/html/ngsReports.html"><code>ngsReports</code></a> can be used to manually compile summary tables and figures.</p>
+<p>A simple strategy using <code>ngsReports</code> <span class="citation" data-cites="Ward2020-qf">(<a href="#ref-Ward2020-qf" role="doc-biblioref">Ward, To, and Pederson 2020</a>)</span> might be the following. Feel free to execute these commands interactively as we’ll perform a more complete analysis later in the session.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb19"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(ngsReports)</span>
+<span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a>f <span class="ot">&lt;-</span> <span class="fu">list.files</span>(<span class="st">"output/raw_fastqc"</span>, <span class="at">pattern =</span> <span class="st">"fastqc.zip"</span>, <span class="at">full.names =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb19-3"><a href="#cb19-3" aria-hidden="true" tabindex="-1"></a>fdl <span class="ot">&lt;-</span> <span class="fu">FastqcDataList</span>(f)</span>
+<span id="cb19-4"><a href="#cb19-4" aria-hidden="true" tabindex="-1"></a><span class="fu">readTotals</span>(fdl)</span>
+<span id="cb19-5"><a href="#cb19-5" aria-hidden="true" tabindex="-1"></a><span class="fu">plotBaseQuals</span>(fdl, <span class="at">plotType =</span> <span class="st">"boxplot"</span>)</span>
+<span id="cb19-6"><a href="#cb19-6" aria-hidden="true" tabindex="-1"></a><span class="fu">plotAdapterContent</span>(fdl, <span class="at">plotType =</span> <span class="st">"line"</span>, <span class="at">usePlotly =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb19-7"><a href="#cb19-7" aria-hidden="true" tabindex="-1"></a><span class="fu">plotGcContent</span>(</span>
+<span id="cb19-8"><a href="#cb19-8" aria-hidden="true" tabindex="-1"></a>  fdl, <span class="at">plotType =</span> <span class="st">"line"</span>, <span class="at">gcType =</span> <span class="st">"Transcriptome"</span>, <span class="at">species =</span> <span class="st">"Athaliana"</span>,</span>
+<span id="cb19-9"><a href="#cb19-9" aria-hidden="true" tabindex="-1"></a>  <span class="at">usePlotly =</span> <span class="cn">TRUE</span></span>
+<span id="cb19-10"><a href="#cb19-10" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="callout callout-style-default callout-important callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Important
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Do any files appear to be noticeably different from the others?</p>
+</div>
+</div>
+</section>
+<section id="adapter-and-low-quality-sequence-trimming" class="level3">
+<h3 class="anchored" data-anchor-id="adapter-and-low-quality-sequence-trimming">Adapter and Low-Quality Sequence Trimming</h3>
+<p>Now we’ve checked the raw reads, we can trim any adapter sequences from the ends and discard low-quality sequences from the raw reads. The adapters for this RNA-Seq dataset are Illumina TruSeq adapters as <code>AGATCGGAAGAGCACACGTCTGAACTCCAGTCA</code> and <code>AGATCGGAAGAGCGTCGTGTAGGGAAAGAGTGT</code>. Again, check the arguments required by typing <code>cutadapt --help</code> or check the <a href="https://cutadapt.readthedocs.io/en/v3.5/">online manual</a></p>
+<p>Following is an example commands to trim adapter and low-quality sequences for one sample, noting that we need to trim paired reads as a pair. (Ask a tutor if you’re unsure why?)</p>
+<p>Try modify this command into a script which will loop through your files</p>
+<div class="sourceCode" id="cb20"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a><span class="fu">touch</span> scripts/cutadapt.sh</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>Now using RStudio to edit the file</p>
+<div class="sourceCode" id="cb21"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a><span class="co">#! /bin/bash</span></span>
+<span id="cb21-2"><a href="#cb21-2" aria-hidden="true" tabindex="-1"></a><span class="va">PROJROOT</span><span class="op">=</span><span class="st">"</span><span class="va">${HOME}</span><span class="st">/transcriptomics_dge_practical"</span></span>
+<span id="cb21-3"><a href="#cb21-3" aria-hidden="true" tabindex="-1"></a><span class="va">RAWDIR</span><span class="op">=</span><span class="st">"</span><span class="va">${PROJROOT}</span><span class="st">/data/raw_fastq"</span></span>
+<span id="cb21-4"><a href="#cb21-4" aria-hidden="true" tabindex="-1"></a><span class="va">TRIMDIR</span><span class="op">=</span><span class="st">"</span><span class="va">${PROJROOT}</span><span class="st">/data/trimmed_fastq"</span></span>
+<span id="cb21-5"><a href="#cb21-5" aria-hidden="true" tabindex="-1"></a><span class="va">LOGDIR</span><span class="op">=</span><span class="st">"</span><span class="va">${PROJROOT}</span><span class="st">/output/logs"</span></span>
+<span id="cb21-6"><a href="#cb21-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb21-7"><a href="#cb21-7" aria-hidden="true" tabindex="-1"></a><span class="co"># trim adapter and low-quality sequences using cutadapt for one sample</span></span>
+<span id="cb21-8"><a href="#cb21-8" aria-hidden="true" tabindex="-1"></a><span class="co">## Can you think of how to modify this to run on all files?</span></span>
+<span id="cb21-9"><a href="#cb21-9" aria-hidden="true" tabindex="-1"></a><span class="co">## You'll need to consider which parts change across files and which stay the same</span></span>
+<span id="cb21-10"><a href="#cb21-10" aria-hidden="true" tabindex="-1"></a><span class="ex">cutadapt</span> <span class="dt">\</span></span>
+<span id="cb21-11"><a href="#cb21-11" aria-hidden="true" tabindex="-1"></a>  <span class="at">-a</span> AGATCGGAAGAGCACACGTCTGAACTCCAGTCA <span class="dt">\</span></span>
+<span id="cb21-12"><a href="#cb21-12" aria-hidden="true" tabindex="-1"></a>  <span class="at">-A</span> AGATCGGAAGAGCGTCGTGTAGGGAAAGAGTGT <span class="dt">\</span></span>
+<span id="cb21-13"><a href="#cb21-13" aria-hidden="true" tabindex="-1"></a>  <span class="at">-o</span> <span class="va">${TRIMDIR}</span>/Col_0_mock_rep1_R1.trimmed.fastq.gz <span class="dt">\</span></span>
+<span id="cb21-14"><a href="#cb21-14" aria-hidden="true" tabindex="-1"></a>  <span class="at">-p</span> <span class="va">${TRIMDIR}</span>/Col_0_mock_rep1_R2.trimmed.fastq.gz <span class="dt">\</span></span>
+<span id="cb21-15"><a href="#cb21-15" aria-hidden="true" tabindex="-1"></a>  <span class="at">--minimum-length</span> 35 <span class="dt">\</span></span>
+<span id="cb21-16"><a href="#cb21-16" aria-hidden="true" tabindex="-1"></a>  <span class="at">--quality-cutoff</span> 30 <span class="dt">\</span></span>
+<span id="cb21-17"><a href="#cb21-17" aria-hidden="true" tabindex="-1"></a>  <span class="at">--cores</span> 2 <span class="dt">\</span></span>
+<span id="cb21-18"><a href="#cb21-18" aria-hidden="true" tabindex="-1"></a>  <span class="va">${RAWDIR}</span>/Col_0_mock_rep1_R1.fastq.gz <span class="dt">\</span></span>
+<span id="cb21-19"><a href="#cb21-19" aria-hidden="true" tabindex="-1"></a>  <span class="va">${RAWDIR}</span>/Col_0_mock_rep1_R2.fastq.gz <span class="op">&gt;</span> <span class="va">${LOGDIR}</span>/Col_0_mock_rep1_cutadapt.log</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>Writing a script like this is best practice for what we refer to as <em>reproducible research</em> where we keep strict records of every step that we perform, along with all tool version numbers and parameters. This is a good moment for you to practice the skills that you learned in previous practical sessions.</p>
+<p>After we trim the adapter and low-quality sequences from the raw data, we have <em>trimmed data</em> ready for genome mapping. Before we do the genome mapping, we can run <code>fastQC</code> again on the trimmed to check how we did with the trimming and to ensure that <code>cutadapt</code> has resolved our QC concerns.</p>
+<div class="callout callout-style-default callout-important callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Important
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<ul>
+<li>Create a copy of your script <code>scripts/raw_fastqc.sh</code> as <code>scripts/trimmed_fastqc.sh</code></li>
+<li>Now modify this script to run on the trimmed fastq files.</li>
+<li>Inspect the trimmed html files or using <code>ngsReports</code></li>
+</ul>
+</div>
+</div>
+<div class="callout callout-style-default callout-tip callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Tip
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<ul>
+<li>If you’d like to inspect the cutadapt log files using <code>ngsReports</code> and you still have your R session open, try the following</li>
+</ul>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb22"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a><span class="fu">list.files</span>(<span class="st">"output/logs"</span>, <span class="at">pattern =</span> <span class="st">"cutadapt.log"</span>, <span class="at">full.names =</span> <span class="cn">TRUE</span>) <span class="sc">|&gt;</span></span>
+<span id="cb22-2"><a href="#cb22-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">importNgsLogs</span>(<span class="st">"cutadapt"</span>) <span class="sc">|&gt;</span></span>
+<span id="cb22-3"><a href="#cb22-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">glimpse</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</div>
+</div>
+</section>
+</section>
+<section id="genome-mapping" class="level2">
+<h2 class="anchored" data-anchor-id="genome-mapping">Genome Mapping</h2>
+<p>For a typical differential gene expression analysis using RNA-Seq,we normally have the reference genome available. If you don’t have the reference genome, you can do de novo transcriptome assembly first, as discussed an a separate practical, and then do DE analysis based on transcriptome mapping, which involves a slightly different pathway, given we would be aligning to a reference transcriptome.</p>
+<p>After we have the reference genome indexed, we can align the clean reads against the reference genome. The following is an example command to map one sample followed by indexing the bam file with <code>samtools</code>. <code>STAR</code> also creates some log files which we’ll move to the <code>output/logs</code> directory.</p>
+<div class="callout callout-style-default callout-tip callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Tip
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<ol type="1">
+<li>Why do you think we might need to index the bam file using <code>samtools</code>?</li>
+</ol>
+</div>
+</div>
+<div class="sourceCode" id="cb23"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a><span class="ex">STAR</span> <span class="dt">\</span></span>
+<span id="cb23-2"><a href="#cb23-2" aria-hidden="true" tabindex="-1"></a>  <span class="at">--genomeDir</span> <span class="va">${HOME}</span>/references/TAIR10/STAR149 <span class="dt">\</span></span>
+<span id="cb23-3"><a href="#cb23-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">--readFilesIn</span> <span class="va">${TRIMDIR}</span>/Col_0_mock_rep1_R1.trimmed.fastq.gz <span class="va">${TRIMDIR}</span>/Col_0_mock_rep1_R2.trimmed.fastq.gz <span class="dt">\</span></span>
+<span id="cb23-4"><a href="#cb23-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">--readFilesCommand</span> zcat <span class="dt">\</span></span>
+<span id="cb23-5"><a href="#cb23-5" aria-hidden="true" tabindex="-1"></a>  <span class="at">--runThreadN</span> 2 <span class="dt">\</span></span>
+<span id="cb23-6"><a href="#cb23-6" aria-hidden="true" tabindex="-1"></a>  <span class="at">--outFilterMultimapNmax</span> 3 <span class="dt">\</span></span>
+<span id="cb23-7"><a href="#cb23-7" aria-hidden="true" tabindex="-1"></a>  <span class="at">--outSAMattributes</span> All <span class="dt">\</span></span>
+<span id="cb23-8"><a href="#cb23-8" aria-hidden="true" tabindex="-1"></a>  <span class="at">--outSAMtype</span> BAM SortedByCoordinate <span class="dt">\</span></span>
+<span id="cb23-9"><a href="#cb23-9" aria-hidden="true" tabindex="-1"></a>  <span class="at">--outFileNamePrefix</span> <span class="va">${BAMDIR}</span>/Col_0_mock_rep1. </span>
+<span id="cb23-10"><a href="#cb23-10" aria-hidden="true" tabindex="-1"></a><span class="ex">samtools</span> index <span class="at">-@2</span> <span class="va">${BAMDIR}</span>/Col_0_mock_rep1.Aligned.sortedByCoord.out.bam  </span>
+<span id="cb23-11"><a href="#cb23-11" aria-hidden="true" tabindex="-1"></a><span class="fu">mv</span> <span class="va">${BAMDIR}</span>/Col_0_mock_rep1.Log<span class="pp">*</span> <span class="va">${LOGDIR}</span>/</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>Create the file <code>scripts/star_align_reads.sh</code> then write a loop using the above example to align all of our samples to the reference genome.</p>
+<div class="callout callout-style-default callout-important callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Important
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>When writing the alignment script, please consider what variables we might like to declare and place these at the top of your script before entering the loop.</p>
+</div>
+</div>
+<p>STAR will output multiple files with prefix <code>Col_0_mock_rep1</code>. To get an idea about the mapping info, you can check <code>Col_0_mock_rep1.final.Log.out</code> which we moved to the <code>output/logs</code> directory.</p>
+<p>The mapped reads are stored in a <code>bam</code> file called <code>Col_0_mock_rep1.Aligned.sortedByCoord.out.bam</code>. To view this file in IGV, we needed to create an index file.</p>
+</section>
+<section id="counting-alignments" class="level2">
+<h2 class="anchored" data-anchor-id="counting-alignments">Counting Alignments</h2>
+<p>The final step is to use <code>featureCounts</code> <span class="citation" data-cites="Liao2014-gy">(<a href="#ref-Liao2014-gy" role="doc-biblioref">Liao, Smyth, and Shi 2014</a>)</span> to count reads which overlap exonic regions, as defined in the GTF. For this step we’ll use the same GTF that we passed to STAR when indexing the genome.</p>
+<p>Create the file <code>scripts/count_reads.sh</code> then copy the following code into this file</p>
+<pre><code>#! /bin/bash
+REFDIR="${HOME}/references"
+PROJROOT="${HOME}/transcriptomics_dge_practical"
+BAMDIR="${PROJROOT}/data/bam"
+OUTDIR="${PROJROOT}/output/counts"
+
+featureCounts \
+  -a ${REFDIR}/Arabidopsis_thaliana.TAIR10.62.gtf \
+  -p --countReadPairs \
+  -B -C \
+  -M --fraction \
+  -s 2 \
+  --minOverlap 35 --fracOverlap 0.9 \
+  -T 2 \
+  -o ${OUTDIR}/all_samples.counts.out \
+  ${BAMDIR}/*bam</code></pre>
+<div class="callout callout-style-default callout-important callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Important
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<ul>
+<li>What does the parameter <code>-s 2</code> mean? How would we determine this?</li>
+<li>Do you think <code>--minOverlap 35 --fracOverlap 0.9</code> are reasonable choices?</li>
+</ul>
+</div>
+</div>
+<p>We have now finished all the steps in the first section of DE analysis, which are mainly processed using tools/commands in <code>bash.</code> Next we will move to the next section in which we will be using different <code>R</code> packages using <code>RStudio</code> and is a more interactive session.</p>
+<div class="callout callout-style-default callout-tip callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Tip
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Although we’ve run the above as separate scripts, we cold now write a master script which runs everything from scratch. Approaching data processing in a modular manner like this can help manage data well and if problems are identified, individual steps are easily run again. A series of checks for the existence of files might also be nice additions to this type of approach.</p>
+</div>
+</div>
+</section>
+<section id="dge-analysis" class="level2">
+<h2 class="anchored" data-anchor-id="dge-analysis">DGE Analysis</h2>
+<p>There are multiple packages which have been developed to enable Differential Gene Expression analysis, most of them are R-based packages. The DE analysis in this Prac will be mainly based on the <code>R</code> package <code>edgeR</code>. This package implements a range of statistical methodology based on the negative binomial distributions, including normalisation, generalized linear models and quasi-likelihood tests <span class="citation" data-cites="Lun2016-vb">(<a href="#ref-Lun2016-vb" role="doc-biblioref">Lun, Chen, and Smyth 2016</a>)</span>.</p>
+<p>The original authors extend many of the approaches developed for microarray analysis in the package <code>limma</code> <span class="citation" data-cites="Ritchie2015-lm">(<a href="#ref-Ritchie2015-lm" role="doc-biblioref">Ritchie et al. 2015</a>)</span>, which was developed as <em>LInear Models for MicroArrays</em> and remains one of the best supported and most widely used Bioconductor packages, since it’s initial release in 2002, and is still being actively developed. In the companion package <code>edgeR</code>, the terminology <code>tag</code> also being used here to refer to a gene, and harking back to Serial Analysis of Gene Expression (SAGE).</p>
+<p>If you want to understand more about <code>edgeR</code>, please read one of their more recent published <a href="https://academic.oup.com/nar/article/53/2/gkaf018/7973897">papers</a>.</p>
+<section id="r-setup" class="level4">
+<h4 class="anchored" data-anchor-id="r-setup">R Setup</h4>
+<p>You should already be familiar with <code>R/Rstudio</code> environment by now based on what you have learned from your previous Pracs. We have installed all required packages in your VM, and in the setup steps of this practical we also created an R Project. Please make sure you’re in the correct R Project before proceeding.</p>
+<p>We’ll perform today’s analysis using <code>rmarkdown</code> with all code provided, but please include your own notes to help you understand the process. If there are helpful sections of text in the practical guide, these can also be copied across. As we work through the analysis, please think about how you might name each chunk, with the recommended syntax being <code>chunk-name</code> (using dashes to separate words). The section headers here may also be a useful guide</p>
+<p>Create the RMarkdown file <code>analysis/dge_analysis.Rmd</code> and change the YAML header to</p>
+<div class="sourceCode" id="cb25"><pre class="sourceCode yaml code-with-copy"><code class="sourceCode yaml"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a><span class="pp">---</span></span>
+<span id="cb25-2"><a href="#cb25-2" aria-hidden="true" tabindex="-1"></a><span class="fu">title</span><span class="kw">:</span><span class="at"> </span><span class="st">"Differential Gene Expression Analysis"</span></span>
+<span id="cb25-3"><a href="#cb25-3" aria-hidden="true" tabindex="-1"></a><span class="fu">author</span><span class="kw">:</span><span class="at"> </span><span class="st">'your preferred name'</span></span>
+<span id="cb25-4"><a href="#cb25-4" aria-hidden="true" tabindex="-1"></a><span class="fu">output</span><span class="kw">:</span><span class="at"> </span></span>
+<span id="cb25-5"><a href="#cb25-5" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="fu">html_document</span><span class="kw">:</span></span>
+<span id="cb25-6"><a href="#cb25-6" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">toc</span><span class="kw">:</span><span class="at"> </span><span class="ch">yes</span></span>
+<span id="cb25-7"><a href="#cb25-7" aria-hidden="true" tabindex="-1"></a><span class="fu">editor_options</span><span class="kw">:</span></span>
+<span id="cb25-8"><a href="#cb25-8" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="fu">chunk_output_type</span><span class="kw">:</span><span class="at"> console</span></span>
+<span id="cb25-9"><a href="#cb25-9" aria-hidden="true" tabindex="-1"></a><span class="pp">---</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>Below this add a chunk which will help our RMarkdown document compile nicely. Give this chunk the name <code>set-opts</code> with settings <code>include = FALSE</code>. This hides the chunk from the compiled document, but sets the key options <code>message = FALSE</code>, which hides all the friendly messages <code>tidyverse</code> packages commonly provide, along with any more troublesome <code>warnings</code>, which we’ll no doubt see as we work interactively.</p>
+<div class="sourceCode" id="cb26"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a>knitr<span class="sc">::</span>opts_chunk<span class="sc">$</span><span class="fu">set</span>(<span class="at">message =</span> <span class="cn">FALSE</span>, <span class="at">warning =</span> <span class="cn">FALSE</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</section>
+<section id="load-required-r-packages" class="level4">
+<h4 class="anchored" data-anchor-id="load-required-r-packages">Load required R packages</h4>
+<p>First, we need to load all required R packages into our R workspace. Create a new chunk (<code>Ctrl/Cmd + shift + I</code>) called <code>load-packages</code> and place the following in this chunk. To execute this interactively in your <code>R</code> session, make sure the cursor is in the chunk then hit <code>Ctrl/Cmd + Shift + Enter</code>. Doing this with each chunk will allow you to step through the analysis as we build it, but will also ensure the final Rmd file is able to be compiled to html successfully.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb27"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Bioinformatics Packages</span></span>
+<span id="cb27-2"><a href="#cb27-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(limma)</span>
+<span id="cb27-3"><a href="#cb27-3" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(edgeR)</span>
+<span id="cb27-4"><a href="#cb27-4" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(rtracklayer)</span>
+<span id="cb27-5"><a href="#cb27-5" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(goseq)</span>
+<span id="cb27-6"><a href="#cb27-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb27-7"><a href="#cb27-7" aria-hidden="true" tabindex="-1"></a><span class="co"># General R Packages for plotting and other functions</span></span>
+<span id="cb27-8"><a href="#cb27-8" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tidyverse)</span>
+<span id="cb27-9"><a href="#cb27-9" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(ggrepel)</span>
+<span id="cb27-10"><a href="#cb27-10" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(scales)</span>
+<span id="cb27-11"><a href="#cb27-11" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(pheatmap)</span>
+<span id="cb27-12"><a href="#cb27-12" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(magrittr)</span>
+<span id="cb27-13"><a href="#cb27-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb27-14"><a href="#cb27-14" aria-hidden="true" tabindex="-1"></a><span class="co"># A global setting for nicer plots</span></span>
+<span id="cb27-15"><a href="#cb27-15" aria-hidden="true" tabindex="-1"></a><span class="fu">theme_set</span>(<span class="fu">theme_bw</span>())</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+<section id="loading-gene-annotations" class="level4">
+<h4 class="anchored" data-anchor-id="loading-gene-annotations">Loading Gene Annotations</h4>
+<p>We normally want to have some additional information about the reference genes so that when we get the differential expressed genes, we can have some ideas about their functions. In this Prac, we can use following R code to get a gene annotation table for all annotated Arabidopsis reference genes.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb28"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb28-1"><a href="#cb28-1" aria-hidden="true" tabindex="-1"></a>gtf <span class="ot">&lt;-</span> <span class="fu">file.path</span>(<span class="st">"~/references/Arabidopsis_thaliana.TAIR10.62.gtf"</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb28-2"><a href="#cb28-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">import.gff</span>(<span class="at">feature.type =</span> <span class="st">"gene"</span>)</span>
+<span id="cb28-3"><a href="#cb28-3" aria-hidden="true" tabindex="-1"></a>gtf</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>This is a GenomicRanges (or <code>GRanges</code>) object with the genomic regions defining each gene on the left, including strand information, and the metadata columns (or <code>mcols</code>) on the right. The <code>mcols</code> element is a <code>DataFrame</code> which is a variant on the base R <code>data.frame</code>, but using the <code>S4</code> class system. They don’t play nicely with the <code>tidyverse</code>, but can be easily coerced to a data.frame using approaches similar to the following.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb29"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb29-1"><a href="#cb29-1" aria-hidden="true" tabindex="-1"></a><span class="fu">mcols</span>(gtf) <span class="sc">%&gt;%</span> </span>
+<span id="cb29-2"><a href="#cb29-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">as.data.frame</span>() <span class="sc">%&gt;%</span> </span>
+<span id="cb29-3"><a href="#cb29-3" aria-hidden="true" tabindex="-1"></a>  dplyr<span class="sc">::</span><span class="fu">count</span>(gene_biotype)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+<section id="loading-the-gene-count-matrix" class="level4">
+<h4 class="anchored" data-anchor-id="loading-the-gene-count-matrix">Loading the Gene Count Matrix</h4>
+<p>The counts produced by <code>featureCounts</code> are in the file <code>output/counts/all_samples.counts.out</code> and we need to load this file, the convert from a <code>data.frame</code> to a count matrix. Although it has the suffix <code>out</code> it’s in tab-separated format, but with a comment (starting with <code>#</code>) in the first line providing the exact code run to create the file. This type of data structure is not uncommon in bioinformatics, but we do need to exclude that first line.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb30"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb30-1"><a href="#cb30-1" aria-hidden="true" tabindex="-1"></a>counts_tbl <span class="ot">&lt;-</span> <span class="fu">file.path</span>(<span class="st">"output/counts/all_samples.counts.out"</span>) <span class="sc">|&gt;</span></span>
+<span id="cb30-2"><a href="#cb30-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">read_tsv</span>(<span class="at">comment =</span> <span class="st">"#"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>Now we understand what we’re dealing with as we have the columns:</p>
+<ol type="1">
+<li><code>Geneid</code>: The gene id taken from the GTF</li>
+<li><code>Chr</code>: The chromosome each exon lives on, with this format enabling the possibility of genes that span chromosomes</li>
+<li><code>Start</code>, <code>End</code> and <code>Strand</code> also containing exon-level co-ordinates and structure</li>
+<li><code>Length</code>: the overall spliced gene length (not the complete range of the gene on the chromosome)</li>
+<li>A series of columns containing the full file paths to each <code>bam</code> file we counted</li>
+</ol>
+<p>In order to create a count matrix, we can perform the following operations:</p>
+<ol type="1">
+<li>Select the gene_ids and columns that end with <code>bam</code></li>
+<li>Remove the directory path using <code>basename()</code></li>
+<li>Remove the suffix <code>Aligned.sortedByCoord.out.bam</code></li>
+<li>Coerce to a <code>data.frame</code> to allow the use of rownames</li>
+<li>Place the gene ids as the rownames</li>
+<li>Coerce to a <code>matrix</code></li>
+</ol>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb31"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb31-1"><a href="#cb31-1" aria-hidden="true" tabindex="-1"></a>counts_matrix <span class="ot">&lt;-</span> counts_tbl <span class="sc">%&gt;%</span> </span>
+<span id="cb31-2"><a href="#cb31-2" aria-hidden="true" tabindex="-1"></a>  dplyr<span class="sc">::</span><span class="fu">select</span>(Geneid, <span class="fu">ends_with</span>(<span class="st">"bam"</span>)) <span class="sc">%&gt;%</span> </span>
+<span id="cb31-3"><a href="#cb31-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">rename_with</span>(basename) <span class="sc">%&gt;%</span> </span>
+<span id="cb31-4"><a href="#cb31-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">rename_with</span>(\(x) <span class="fu">str_remove_all</span>(x, <span class="st">".Aligned.+"</span>)) <span class="sc">%&gt;%</span> </span>
+<span id="cb31-5"><a href="#cb31-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">as.data.frame</span>() <span class="sc">%&gt;%</span> </span>
+<span id="cb31-6"><a href="#cb31-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">column_to_rownames</span>(<span class="st">"Geneid"</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb31-7"><a href="#cb31-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">as.matrix</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+<section id="create-dgelist-objects" class="level4">
+<h4 class="anchored" data-anchor-id="create-dgelist-objects">Create <code>DGEList</code> objects</h4>
+<p>The type of object we will use in <code>R</code> for DGE analysis using <code>edgeR</code> is known as a <code>DGEList</code>, except here DGE stands for Digital Gene Expression, which does feel a bit confusing for some. We’ll need to set our data up as this object type before being able to do any meaningful analysis.</p>
+<p>A <code>DGEList</code> has 3 elements which are required during formation</p>
+<ol type="1">
+<li>A count matrix (We’ve already created this)</li>
+<li>Annotations for the genes (taken from our GTF as loaded)</li>
+<li>A description of the samples</li>
+</ol>
+<p>We only need to create our samples data.frame and we’re ready to form the <code>DGEList</code> object. Using the skills we learned in earlier practicals, we can use <code>stringr</code> and <code>dplyr</code> again to setup this data.frame.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb32"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb32-1"><a href="#cb32-1" aria-hidden="true" tabindex="-1"></a>samples_tbl <span class="ot">&lt;-</span> <span class="fu">tibble</span>(<span class="at">sample =</span> <span class="fu">colnames</span>(counts_matrix)) <span class="sc">%&gt;%</span> </span>
+<span id="cb32-2"><a href="#cb32-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
+<span id="cb32-3"><a href="#cb32-3" aria-hidden="true" tabindex="-1"></a>    <span class="at">replicate =</span> <span class="fu">str_extract</span>(sample, <span class="st">"rep[0-9]"</span>),</span>
+<span id="cb32-4"><a href="#cb32-4" aria-hidden="true" tabindex="-1"></a>    <span class="at">treatment =</span> <span class="fu">str_extract</span>(sample, <span class="st">"Zeocin|mock"</span>) <span class="sc">%&gt;%</span> <span class="fu">factor</span>(<span class="at">levels =</span> <span class="fu">c</span>(<span class="st">"mock"</span>, <span class="st">"Zeocin"</span>))</span>
+<span id="cb32-5"><a href="#cb32-5" aria-hidden="true" tabindex="-1"></a>  )</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb33"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb33-1"><a href="#cb33-1" aria-hidden="true" tabindex="-1"></a>dge <span class="ot">&lt;-</span> <span class="fu">DGEList</span>(</span>
+<span id="cb33-2"><a href="#cb33-2" aria-hidden="true" tabindex="-1"></a>  <span class="at">counts =</span> counts_matrix, </span>
+<span id="cb33-3"><a href="#cb33-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">samples =</span> samples_tbl,</span>
+<span id="cb33-4"><a href="#cb33-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">group =</span> <span class="fu">as.integer</span>(samples_tbl<span class="sc">$</span>treatment),</span>
+<span id="cb33-5"><a href="#cb33-5" aria-hidden="true" tabindex="-1"></a>  <span class="at">genes =</span> gtf</span>
+<span id="cb33-6"><a href="#cb33-6" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb33-7"><a href="#cb33-7" aria-hidden="true" tabindex="-1"></a>dge</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>Notice in the <code>samples</code> component, there is also a column called <code>lib.size</code>. This is the total number of reads aligned to genes within each sample. If you see any fractions, this is due to our settings in <code>featureCounts</code> where we specified fractional counts.</p>
+<p>Notice that the <code>group</code> column also defines the treatment groups.</p>
+<p>Let’s see if we have much difference in library sizes between samples &amp; groups?</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb34"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb34-1"><a href="#cb34-1" aria-hidden="true" tabindex="-1"></a>dge<span class="sc">$</span>samples <span class="sc">%&gt;%</span></span>
+<span id="cb34-2"><a href="#cb34-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> sample, <span class="at">y =</span> lib.size <span class="sc">/</span> <span class="fl">1e6</span>, <span class="at">fill =</span> treatment)) <span class="sc">+</span></span>
+<span id="cb34-3"><a href="#cb34-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_bar</span>(<span class="at">stat =</span> <span class="st">"identity"</span>) <span class="sc">+</span></span>
+<span id="cb34-4"><a href="#cb34-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ylab</span>(<span class="st">"Library size (millions)"</span>) <span class="sc">+</span> </span>
+<span id="cb34-5"><a href="#cb34-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">axis.text.x =</span> <span class="fu">element_text</span>(<span class="at">angle =</span> <span class="dv">45</span>, <span class="at">hjust =</span> <span class="dv">1</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>In today’s data, we don’t have a huge difference, but this can vary greatly in many experiments. When analysing counts, the number of counts will clearly be affected by the total library size (i.e.&nbsp;the total number of reads counted as aligning to genes). In some libraries, a small number of highly expressed genes can markedly inflate the library size. Before passing this data to any statistical models, we need to calculate a scaling factor that compensates for this, with the default approach being known as <em>The trimmed mean of M-values normalization method</em> (<code>TMM</code>) <span class="citation" data-cites="Robinson2010-qp">(<a href="#ref-Robinson2010-qp" role="doc-biblioref">Robinson and Oshlack 2010</a>)</span>. This approach trims the highest and lowest fraction of genes, then calculates the mean of average expression (i.e.&nbsp;<code>M</code>) values which can compensate for libraries where a single gene, or groups of genes, dominate the counts. This might be the case for whole blood samples, where the haemoglobin genes dwarf the remaining genes and the library sizes for non-haemoglobin genes can be quite heavily impacted.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb35"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb35-1"><a href="#cb35-1" aria-hidden="true" tabindex="-1"></a>dge <span class="ot">&lt;-</span> <span class="fu">calcNormFactors</span>(dge)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>Notice that now the column <code>norm.factors</code>is no longer all <code>1</code>. This is used by all downstream functions in <code>edgeR</code> to scale the library size when fitting negative binomial models. Given they are all within a couple of decimal points of the value 1, this dataset is not heavily impacted by these dominating genes.</p>
+</section>
+<section id="removing-undetectable-genes" class="level4">
+<h4 class="anchored" data-anchor-id="removing-undetectable-genes">Removing Undetectable Genes</h4>
+<p>Genes with low count numbers give us minimal statistical power to detect an changes in expression level, so a common approach is to filter out these genes, along with those were no counts were observed at all. This reduces the issues which we will face due to multiple hypothesis testing, effectively increasing the statistical power of a study. We often refer to this as removing undetectable genes, although we will discard some genes with very low counts.</p>
+<p>A common method would be to remove any genes which are below a specific CPM threshold in the majority of samples. In this dataset, we might like to remove genes which have <span class="math inline">\(&lt;1\)</span> CPM in 4 or more samples. For a dataset with an average library size of 20m reads, this roughly equates to 20 counts, but using CPM allows for significant variability in library sizes.</p>
+<p>Any number of strategies can be applied for this stage.</p>
+<p>We can plot the densities of each of our samples using log-transformed CPM values, and the clear peak in the range of very low expression is clearly visible.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb36"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb36-1"><a href="#cb36-1" aria-hidden="true" tabindex="-1"></a><span class="fu">plotDensities</span>(<span class="fu">cpm</span>(dge, <span class="at">log =</span> <span class="cn">TRUE</span>), <span class="at">main =</span> <span class="st">"All Genes"</span>, <span class="at">legend =</span> <span class="st">"topright"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>Let’s filter our dataset, and remove genes with low signal.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb37"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb37-1"><a href="#cb37-1" aria-hidden="true" tabindex="-1"></a>genes2keep <span class="ot">&lt;-</span> <span class="fu">rowSums</span>(<span class="fu">cpm</span>(dge) <span class="sc">&gt;</span> <span class="dv">1</span>) <span class="sc">&gt;</span> <span class="dv">3</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>Here we’ve created a logical vector defining which genes to keep. To get a quick summary of this enter</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb38"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb38-1"><a href="#cb38-1" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(genes2keep)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>Now let’s look at the densities after filtering. Notice how all of the genes with low signal (at the LHS of the original plot) are no longer included and only the secondary peak, corresponding to higher signal (or detected) genes is retained.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb39"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb39-1"><a href="#cb39-1" aria-hidden="true" tabindex="-1"></a><span class="fu">plotDensities</span>(</span>
+<span id="cb39-2"><a href="#cb39-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">cpm</span>(dge, <span class="at">log =</span> <span class="cn">TRUE</span>)[genes2keep, ], </span>
+<span id="cb39-3"><a href="#cb39-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">main =</span> <span class="st">"Detected Genes Only"</span>, <span class="at">legend =</span> <span class="st">"topright"</span></span>
+<span id="cb39-4"><a href="#cb39-4" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="callout callout-style-default callout-important callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Important
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Before filtering there appeared to be two very clear peaks. The one on the left was the genes with low expression, whilst the peak on the right represented the genes which were ‘detectable’. After filtering our genes, the density plot now just shows the genes which were originally i the second peak.</p>
+</div>
+</div>
+<p>Now we’re happy that we have the genes we can extract meaningful results from, let’s remove them from our dataset. Notice that we’re now over-writing our object called <code>dge</code> so any earlier plots and summaries will be impacted by this</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb40"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb40-1"><a href="#cb40-1" aria-hidden="true" tabindex="-1"></a>dge <span class="ot">&lt;-</span> dge[genes2keep, ]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+<section id="data-exploration" class="level4">
+<h4 class="anchored" data-anchor-id="data-exploration">Data Exploration</h4>
+<p>One of the things we look for in a dataset, is that the samples from each treatment,group together when we apply dimensional reduction techniques such as Principal Component Analysis (PCA) or Multi Dimensional Scaling (MDS). The package <code>edgeR</code> comes with a convenient function to allow this.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb41"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb41-1"><a href="#cb41-1" aria-hidden="true" tabindex="-1"></a>cols <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">"red3"</span>, <span class="st">"blue3"</span>)</span>
+<span id="cb41-2"><a href="#cb41-2" aria-hidden="true" tabindex="-1"></a><span class="fu">plotMDS</span>(dge, <span class="at">labels =</span> dge<span class="sc">$</span>samples<span class="sc">$</span>sample, <span class="at">col =</span> cols[dge<span class="sc">$</span>samples<span class="sc">$</span>group])</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>Here we can see a clear pattern of separation between the groups.</p>
+<p>(If we don’t see this, it may mean we have some difficult decisions to make. Maybe we need to check our samples for mislabelling? Maybe there is some other experimental factor which we’re unaware of.)</p>
+<p>Many people prefer a PCA plot, which is not implemented by default in <code>edgeR</code> or <code>limma</code>, however, the following code uses logCPM values to produce the figure, and you’ll notice it’s very similar to the MDS plot. It’s also more flexible as we’re using <code>ggplot2</code>, but takes a bit more work to get there.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb42"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb42-1"><a href="#cb42-1" aria-hidden="true" tabindex="-1"></a>dge <span class="sc">%&gt;%</span> </span>
+<span id="cb42-2"><a href="#cb42-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">cpm</span>(<span class="at">log =</span> <span class="cn">TRUE</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb42-3"><a href="#cb42-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">t</span>() <span class="sc">%&gt;%</span> </span>
+<span id="cb42-4"><a href="#cb42-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">prcomp</span>() <span class="sc">%&gt;%</span> </span>
+<span id="cb42-5"><a href="#cb42-5" aria-hidden="true" tabindex="-1"></a>  broom<span class="sc">::</span><span class="fu">tidy</span>() <span class="sc">%&gt;%</span> </span>
+<span id="cb42-6"><a href="#cb42-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pivot_wider</span>(<span class="at">names_from =</span> <span class="st">"PC"</span>, <span class="at">values_from =</span> <span class="st">"value"</span>, <span class="at">names_prefix =</span> <span class="st">"PC"</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb42-7"><a href="#cb42-7" aria-hidden="true" tabindex="-1"></a>  dplyr<span class="sc">::</span><span class="fu">rename</span>(<span class="at">sample =</span> row) <span class="sc">%&gt;%</span> </span>
+<span id="cb42-8"><a href="#cb42-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">left_join</span>(dge<span class="sc">$</span>samples, <span class="at">by =</span> <span class="st">"sample"</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb42-9"><a href="#cb42-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(PC1, PC2, <span class="at">colour =</span> treatment)) <span class="sc">+</span></span>
+<span id="cb42-10"><a href="#cb42-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>(<span class="at">size =</span> <span class="dv">2</span>) <span class="sc">+</span></span>
+<span id="cb42-11"><a href="#cb42-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_text_repel</span>(<span class="fu">aes</span>(<span class="at">label =</span> sample), <span class="at">show.legend =</span> <span class="cn">FALSE</span>) <span class="sc">+</span></span>
+<span id="cb42-12"><a href="#cb42-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_colour_brewer</span>(<span class="at">palette =</span> <span class="st">"Set1"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+<section id="calculating-moderated-dispersions" class="level4">
+<h4 class="anchored" data-anchor-id="calculating-moderated-dispersions">Calculating moderated dispersions</h4>
+<p>Most RNA-Seq analysis is performed using the <em>Negative Binomial Distribution</em>. This is similar to a <em>Poisson</em> distribution, where we <strong>count</strong> the number of times something appears in a given interval. The difference with a Negative Binomial approach is that we can model data which is more variable. Under the Poisson assumptions, the variance equals the mean, whilst under the <em>NB</em> this is no longer required.</p>
+<p>This extra variability is known as the <em>dispersion</em>, and our estimates of dispersion will be too high for some genes, and too low for others. Taking advantage of the large numbers of genes in an experiment, we can shrink the ones that are too high, and increase the ones that are too small. This is an important step in RNA Seq analysis, as it reduces the number of false positives, and increase the numbers of true positives.</p>
+<p>Before we do this, we need to define our statistical model. Here, our term of interest is in the column <code>treatment</code>, and we’re using <code>R</code>’s formula notation <code>~ treatment</code>. This can be read as <em>depends on</em> treatment, where the dependent variable is not defined, but can be considered to be the gene expression values for all genes.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb43"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb43-1"><a href="#cb43-1" aria-hidden="true" tabindex="-1"></a>design <span class="ot">&lt;-</span> <span class="fu">model.matrix</span>(<span class="sc">~</span> treatment, <span class="at">data =</span> dge<span class="sc">$</span>samples)</span>
+<span id="cb43-2"><a href="#cb43-2" aria-hidden="true" tabindex="-1"></a>design</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="callout callout-style-default callout-important callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Important
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Notice that every samples is set to 1 for the Intercept column. The value returned by this column ends up becoming the average across all untreated samples, whilst the difference between untreated &amp; treated is estimated by the second column, effectively setting this column to estimate logFC. The actual average expression values are the sums of the indicator variables in each column, multiplied by the average expression estimates (i.e.&nbsp;logCPM) and the logFC estimates.</p>
+</div>
+</div>
+<p>Now we have our design matrix, we can estimate the dispersions using <code>edgeR</code>, which then allows us to fit the model specified for differential gene expression.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb44"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb44-1"><a href="#cb44-1" aria-hidden="true" tabindex="-1"></a>dge <span class="ot">&lt;-</span> <span class="fu">estimateDisp</span>(dge, <span class="at">design =</span> design)</span>
+<span id="cb44-2"><a href="#cb44-2" aria-hidden="true" tabindex="-1"></a>dge</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>You’ll notice that the <code>DGEList</code> now has some extra elements added, which define values like <code>AveLogCPM</code> and different types of dispersion, which will be used as input when fitting the Quasi-Likelihood models.</p>
+</section>
+<section id="performing-differential-expression-analysis" class="level4">
+<h4 class="anchored" data-anchor-id="performing-differential-expression-analysis">Performing Differential Expression Analysis</h4>
+<p>The most common analytic approach we use is the Quasi-Likelihood approach to the Generalised Linear Model used to fit Negative Binomially distributed data.</p>
+<p>In the following line of code, we are comparing the first two groups in our data. Clearly we only have two groups in this dataset, but it is quite common to have multiple groups in other analyses. Sometimes, continuous variables (like age, or time since diagnosis) might be fitted in the models as well.</p>
+<p>Let’s fit the underlying model</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb45"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb45-1"><a href="#cb45-1" aria-hidden="true" tabindex="-1"></a>fit <span class="ot">&lt;-</span> <span class="fu">glmQLFit</span>(dge)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>This simply fits the model without the final step of testing for significance. The full table of results can be returned using the Quasi-Likelihood F-Test, then using some <code>tidyverse</code> skills to extract the <code>topTags()</code> (i.e.&nbsp;genes) and return a <code>tibble</code></p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb46"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb46-1"><a href="#cb46-1" aria-hidden="true" tabindex="-1"></a>results <span class="ot">&lt;-</span> <span class="fu">glmQLFTest</span>(fit)</span>
+<span id="cb46-2"><a href="#cb46-2" aria-hidden="true" tabindex="-1"></a>topTable <span class="ot">&lt;-</span> results <span class="sc">%&gt;%</span> </span>
+<span id="cb46-3"><a href="#cb46-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">topTags</span>(<span class="at">n =</span> <span class="cn">Inf</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb46-4"><a href="#cb46-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pluck</span>(<span class="st">"table"</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb46-5"><a href="#cb46-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">as_tibble</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>Find the highest ranked gene in this dataset If it’s been given a negative value for logFC, this means lower expression is likely to be observed in the second of the two conditions. The opposite is true for a positive value for logFC.</p>
+<p>Now we can visualise the pattern of logFC to expression level across the complete dataset. We can use <code>plotMD</code> to generate MD (mean-difference) plots (these are also known as MA plots) showing the library size-adjusted log-fold change between two libraries (the difference) against the average log-expression across those libraries (the mean). We can use the following command to compare sample 1 (<code>Col_0_mock_rep1</code>) to an artificial reference library constructed from the average of all other samples.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb47"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb47-1"><a href="#cb47-1" aria-hidden="true" tabindex="-1"></a><span class="fu">plotMD</span>(dge)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>Summarised plots can sometimes be more informative and we can use our <code>ggplot</code> skills to create an MA-plot for the fitted values.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb48"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb48-1"><a href="#cb48-1" aria-hidden="true" tabindex="-1"></a>topTable <span class="sc">%&gt;%</span> </span>
+<span id="cb48-2"><a href="#cb48-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(logCPM, logFC)) <span class="sc">+</span></span>
+<span id="cb48-3"><a href="#cb48-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>() <span class="sc">+</span></span>
+<span id="cb48-4"><a href="#cb48-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_smooth</span>(<span class="at">se =</span> <span class="cn">FALSE</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>The smoothed curve shown in blue is very useful for identifying any systemic bias and if this line doesn’t resemble the line <span class="math inline">\(y = 0\)</span>, we might need to revisit our normalisation strategy. Genes above the zero line are tending towards increased expression, whilst those below zero are tending towards decreased expression. Interestingly, there appear to be more genes showing increased expression so it’s good to notice that our smoothed curve through the data sticks closely to <span class="math inline">\(y = 0\)</span> suggesting that there’s no systemic bias, and these genes are truly increased in expression.</p>
+<p>In order to identify those with statistical support for differential expression, so we can add annotations to this plot to show differentially expressed genes by colour, labelling the top 10 genes as they appear in our top-table.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb49"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb49-1"><a href="#cb49-1" aria-hidden="true" tabindex="-1"></a>topTable <span class="sc">%&gt;%</span> </span>
+<span id="cb49-2"><a href="#cb49-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">DE =</span> FDR <span class="sc">&lt;</span> <span class="fl">0.05</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb49-3"><a href="#cb49-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(logCPM, logFC, <span class="at">colour =</span> DE)) <span class="sc">+</span></span>
+<span id="cb49-4"><a href="#cb49-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>() <span class="sc">+</span></span>
+<span id="cb49-5"><a href="#cb49-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_smooth</span>(<span class="at">se =</span> <span class="cn">FALSE</span>, <span class="at">colour =</span> <span class="st">"blue"</span>) <span class="sc">+</span></span>
+<span id="cb49-6"><a href="#cb49-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_text_repel</span>(</span>
+<span id="cb49-7"><a href="#cb49-7" aria-hidden="true" tabindex="-1"></a>    <span class="fu">aes</span>(<span class="at">label =</span> gene_name),</span>
+<span id="cb49-8"><a href="#cb49-8" aria-hidden="true" tabindex="-1"></a>    <span class="at">data =</span> . <span class="sc">%&gt;%</span> dplyr<span class="sc">::</span><span class="fu">slice</span>(<span class="dv">1</span><span class="sc">:</span><span class="dv">10</span>), <span class="at">show.legend =</span> <span class="cn">FALSE</span></span>
+<span id="cb49-9"><a href="#cb49-9" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">+</span></span>
+<span id="cb49-10"><a href="#cb49-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_colour_manual</span>(<span class="at">values =</span> <span class="fu">c</span>(<span class="st">"black"</span>, <span class="st">"red"</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>A common figure people use for differential gene expression is a volcano plot where we show logFC on the x-axis and a measure of significance on the y-axis. Taking log<sub>10</sub>p gives quite large negative values for low p-values, so if we plot the -log<sub>10</sub>p, the more significant points (i.e.&nbsp;lower p-values) will be shown at the top.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb50"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb50-1"><a href="#cb50-1" aria-hidden="true" tabindex="-1"></a>topTable <span class="sc">%&gt;%</span> </span>
+<span id="cb50-2"><a href="#cb50-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
+<span id="cb50-3"><a href="#cb50-3" aria-hidden="true" tabindex="-1"></a>    <span class="at">DE =</span> FDR <span class="sc">&lt;</span> <span class="fl">0.05</span>, <span class="at">log10p =</span> <span class="fu">log10</span>(PValue)</span>
+<span id="cb50-4"><a href="#cb50-4" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">%&gt;%</span> </span>
+<span id="cb50-5"><a href="#cb50-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(logFC, <span class="sc">-</span>log10p, <span class="at">colour =</span> DE)) <span class="sc">+</span></span>
+<span id="cb50-6"><a href="#cb50-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>() <span class="sc">+</span></span>
+<span id="cb50-7"><a href="#cb50-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_text_repel</span>(</span>
+<span id="cb50-8"><a href="#cb50-8" aria-hidden="true" tabindex="-1"></a>    <span class="fu">aes</span>(<span class="at">label =</span> gene_name),</span>
+<span id="cb50-9"><a href="#cb50-9" aria-hidden="true" tabindex="-1"></a>    <span class="at">data =</span> . <span class="sc">%&gt;%</span> dplyr<span class="sc">::</span><span class="fu">slice</span>(<span class="dv">1</span><span class="sc">:</span><span class="dv">10</span>), <span class="at">show.legend =</span> <span class="cn">FALSE</span></span>
+<span id="cb50-10"><a href="#cb50-10" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">+</span></span>
+<span id="cb50-11"><a href="#cb50-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_colour_manual</span>(<span class="at">values =</span> <span class="fu">c</span>(<span class="st">"black"</span>, <span class="st">"red"</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>Now let’s check the raw counts for our top-ranked gene</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb51"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb51-1"><a href="#cb51-1" aria-hidden="true" tabindex="-1"></a>counts_matrix[<span class="st">"AT3G27630"</span>,]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>Clearly this gene is undetectable in the mock treatment samples, but shows active transcription in the Zeocin treated samples.</p>
+<div class="callout callout-style-default callout-tip callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Tip
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Inspect a few more of the highly ranked genes, so make sure you can understand these results.</p>
+</div>
+</div>
+<p>We can also check the top-ranked genes using logCPM values and boxplots.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb52"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb52-1"><a href="#cb52-1" aria-hidden="true" tabindex="-1"></a>ids <span class="ot">&lt;-</span> topTable<span class="sc">$</span>gene_id[<span class="dv">1</span><span class="sc">:</span><span class="dv">6</span>]</span>
+<span id="cb52-2"><a href="#cb52-2" aria-hidden="true" tabindex="-1"></a><span class="fu">cpm</span>(dge, <span class="at">log =</span> <span class="cn">TRUE</span>)[ids,] <span class="sc">%&gt;%</span> </span>
+<span id="cb52-3"><a href="#cb52-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">as_tibble</span>(<span class="at">rownames =</span> <span class="st">"gene_id"</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb52-4"><a href="#cb52-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pivot_longer</span>(<span class="fu">starts_with</span>(<span class="st">"Col"</span>), <span class="at">names_to =</span> <span class="st">"sample"</span>, <span class="at">values_to =</span> <span class="st">"logCPM"</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb52-5"><a href="#cb52-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">left_join</span>(dge<span class="sc">$</span>samples, <span class="at">by =</span> <span class="st">"sample"</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb52-6"><a href="#cb52-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">left_join</span>(dge<span class="sc">$</span>genes, <span class="at">by =</span> <span class="st">"gene_id"</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb52-7"><a href="#cb52-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">gene_name =</span> <span class="fu">fct_inorder</span>(gene_name)) <span class="sc">%&gt;%</span> </span>
+<span id="cb52-8"><a href="#cb52-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(treatment, logCPM, <span class="at">fill =</span> treatment)) <span class="sc">+</span></span>
+<span id="cb52-9"><a href="#cb52-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_boxplot</span>() <span class="sc">+</span></span>
+<span id="cb52-10"><a href="#cb52-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">facet_wrap</span>(<span class="sc">~</span>gene_name) <span class="sc">+</span></span>
+<span id="cb52-11"><a href="#cb52-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_fill_brewer</span>(<span class="at">palette =</span> <span class="st">"Set1"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>Let’s get a list of significant genes, by using an FDR of 0.01 to really pull out the most confident results.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb53"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb53-1"><a href="#cb53-1" aria-hidden="true" tabindex="-1"></a>sigIDs <span class="ot">&lt;-</span> <span class="fu">filter</span>(topTable, FDR <span class="sc">&lt;</span> <span class="fl">0.01</span>)<span class="sc">$</span>gene_id</span>
+<span id="cb53-2"><a href="#cb53-2" aria-hidden="true" tabindex="-1"></a>sigGeneNames <span class="ot">&lt;-</span> <span class="fu">filter</span>(topTable, FDR <span class="sc">&lt;</span> <span class="fl">0.01</span>)<span class="sc">$</span>gene_name</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>And we can check the number of significant genes</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb54"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb54-1"><a href="#cb54-1" aria-hidden="true" tabindex="-1"></a><span class="fu">length</span>(sigIDs)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>We might even like to show these genes using a heatmap so we can see which genes have similar patterns. Here we’ll scale each gene by subtracting the mean expression so genes from samples with higher expression will plot as positive values, whilst those from samples with lower expression will become negative values, whilst retaining the range of differences between groups.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb55"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb55-1"><a href="#cb55-1" aria-hidden="true" tabindex="-1"></a>topCPM <span class="ot">&lt;-</span> <span class="fu">cpm</span>(dge, <span class="at">log =</span> <span class="cn">TRUE</span>)[sigGenes,] <span class="sc">%&gt;%</span> </span>
+<span id="cb55-2"><a href="#cb55-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">subtract</span>(<span class="fu">rowMeans</span>(.)) <span class="sc">%&gt;%</span> </span>
+<span id="cb55-3"><a href="#cb55-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">set_rownames</span>(sigGeneNames) <span class="sc">%&gt;%</span> </span>
+<span id="cb55-4"><a href="#cb55-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">t</span>()</span>
+<span id="cb55-5"><a href="#cb55-5" aria-hidden="true" tabindex="-1"></a><span class="fu">pheatmap</span>(topCPM, <span class="at">fontsize_col =</span> <span class="dv">8</span>, <span class="at">fontsize_row =</span> <span class="dv">10</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>Some clusters of genes showing similar behaviour are clearly visible.</p>
+</section>
+</section>
+<section id="enrichment-analysis" class="level2">
+<h2 class="anchored" data-anchor-id="enrichment-analysis">Enrichment Analysis</h2>
+<p>After we get a list of DE genes between groups (e.g.&nbsp;treatment group vs control group in our dataset), we can do all different kinds downstream analyses based on this DE gene list. One common downstream analysis is the functional enrichment/over-representation analysis. Some people prefer tools like the web-based <a href="https://davidbioinformatics.nih.gov">DAVID</a> (Database for Annotation, Visualization and Integrated Discovery). However, we’ll continue in <code>R</code> using the tools available there.</p>
+<p>The first data we’ll need is the gene-sets or functional descriptions that each gene belongs to. One has been prepared for us as <code>ensembl62_tair10_goterms.tsv.gz</code> which maps genes to GO terms where possible. GO terms are a formal way to describe biological attributes, as defined by the <a href="https://geneontology.org/docs/ontology-documentation/">Gene Ontology (GO) database</a>. There are three domains within the GO database:</p>
+<ol type="1">
+<li>Biological Process</li>
+<li>Molecular Function</li>
+<li>Cellular Component</li>
+</ol>
+<p>An example term, showing how each term is connected to parent terms can be seen <a href="https://www.ebi.ac.uk/QuickGO/GTerm?id=GO:0006412">here</a></p>
+<p>These are all defined independently of any organism, and then genes from each organism are mapped to these terms. Sometimes this occurs as a result of experimental results, but for Arabidposis genes are generally mapped to GO terms by inference using homology across species.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb56"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb56-1"><a href="#cb56-1" aria-hidden="true" tabindex="-1"></a>go_terms <span class="ot">&lt;-</span> <span class="fu">read_tsv</span>(<span class="st">"~/references/ensembl62_tair10_goterms.tsv.gz"</span>)</span>
+<span id="cb56-2"><a href="#cb56-2" aria-hidden="true" tabindex="-1"></a>go_terms </span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>We can gain a little information about the structure that we have using the tidyverse. First we can check how many GO terms we have included in this dataset</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb57"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb57-1"><a href="#cb57-1" aria-hidden="true" tabindex="-1"></a>go_terms <span class="sc">%&gt;%</span> </span>
+<span id="cb57-2"><a href="#cb57-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">distinct</span>(domain, <span class="fu">pick</span>(<span class="fu">starts_with</span>(<span class="st">"term"</span>))) <span class="sc">%&gt;%</span> </span>
+<span id="cb57-3"><a href="#cb57-3" aria-hidden="true" tabindex="-1"></a>  dplyr<span class="sc">::</span><span class="fu">count</span>(domain)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>Next we could check how many genes are mapped to a GO term, noting that many genes will not have any functional annotation.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb58"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb58-1"><a href="#cb58-1" aria-hidden="true" tabindex="-1"></a>go_terms <span class="sc">%&gt;%</span> </span>
+<span id="cb58-2"><a href="#cb58-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">distinct</span>(gene_id) <span class="sc">%&gt;%</span> </span>
+<span id="cb58-3"><a href="#cb58-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">nrow</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>Or we could subset this to our detected genes</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb59"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb59-1"><a href="#cb59-1" aria-hidden="true" tabindex="-1"></a>go_terms <span class="sc">%&gt;%</span> </span>
+<span id="cb59-2"><a href="#cb59-2" aria-hidden="true" tabindex="-1"></a>  dplyr<span class="sc">::</span><span class="fu">filter</span>(gene_id <span class="sc">%in%</span> <span class="fu">rownames</span>(dge)) <span class="sc">%&gt;%</span> </span>
+<span id="cb59-3"><a href="#cb59-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">distinct</span>(gene_id) <span class="sc">%&gt;%</span> </span>
+<span id="cb59-4"><a href="#cb59-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">nrow</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>To perform enrichment analysis, the fundamental model is the hypergeometric distribution as defined by Fisher’s Exact test. However, as we noticed in our MA plot, low-expressed genes may be more likely to be considered as DE which means our results will be biased towards gene-sets with shorter, or low-expressed genes. This is a result of the way RNA-seq maps fragments to counts, and this bias is not observed in microarray data. The package <code>goseq</code> <span class="citation" data-cites="Young2010-gs">(<a href="#ref-Young2010-gs" role="doc-biblioref">Young et al. 2010</a>)</span> implements a version of the hypergeometric model which allows for genes to have a different weight based on their probability of being DE. By using a cutoff value of FDR &lt; 0.01, we’re defining a set of DE genes and asking if any functional terms are found within these DE genes at a rate that looks higher than might be expected y chance.</p>
+<p>First we can define a named, logical vector containing DE genes, then we calculate the Probability Weight Function (PWF) using gene-length as the potential bias term, to identify if gene length influences the probability of a gene being considered as DE.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb60"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb60-1"><a href="#cb60-1" aria-hidden="true" tabindex="-1"></a>de_genes <span class="ot">&lt;-</span> <span class="fu">setNames</span>(topTable<span class="sc">$</span>FDR <span class="sc">&lt;</span> <span class="fl">0.01</span>, topTable<span class="sc">$</span>gene_id)</span>
+<span id="cb60-2"><a href="#cb60-2" aria-hidden="true" tabindex="-1"></a>pwf <span class="ot">&lt;-</span> <span class="fu">nullp</span>(de_genes, <span class="at">bias.data =</span> <span class="fu">log10</span>(topTable<span class="sc">$</span>width))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>To perform enrichment analysis with <code>goseq</code>, we need to structure our enrichment terms so that we have a list of GO terms, separated by each gene_id.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb61"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb61-1"><a href="#cb61-1" aria-hidden="true" tabindex="-1"></a>go_by_id <span class="ot">&lt;-</span> go_terms <span class="sc">%&gt;%</span> </span>
+<span id="cb61-2"><a href="#cb61-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">distinct</span>(gene_id, term_accession) <span class="sc">%&gt;%</span> </span>
+<span id="cb61-3"><a href="#cb61-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">split</span>(.<span class="sc">$</span>gene_id) <span class="sc">%&gt;%</span> </span>
+<span id="cb61-4"><a href="#cb61-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">lapply</span>(pluck, <span class="st">"term_accession"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>Now we can pass this to the function <code>goseq()</code> to perform our enrichment analysis</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb62"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb62-1"><a href="#cb62-1" aria-hidden="true" tabindex="-1"></a><span class="fu">goseq</span>(pwf, <span class="at">gene2cat =</span> go_by_id) <span class="sc">%&gt;%</span> </span>
+<span id="cb62-2"><a href="#cb62-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">head</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>The column we should be checking is the <code>over_represented_pvalue</code> column, so let’s modify our results and save the object.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb63"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb63-1"><a href="#cb63-1" aria-hidden="true" tabindex="-1"></a>goseq_results <span class="ot">&lt;-</span> <span class="fu">goseq</span>(pwf, <span class="at">gene2cat =</span> go_by_id) <span class="sc">%&gt;%</span> </span>
+<span id="cb63-2"><a href="#cb63-2" aria-hidden="true" tabindex="-1"></a>  dplyr<span class="sc">::</span><span class="fu">select</span>(</span>
+<span id="cb63-3"><a href="#cb63-3" aria-hidden="true" tabindex="-1"></a>    ontology, term, category,  <span class="fu">ends_with</span>(<span class="st">"Cat"</span>), <span class="at">PValue =</span> over_represented_pvalue</span>
+<span id="cb63-4"><a href="#cb63-4" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">%&gt;%</span> </span>
+<span id="cb63-5"><a href="#cb63-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">FDR =</span> <span class="fu">p.adjust</span>(PValue, <span class="st">"fdr"</span>)) <span class="sc">%&gt;%</span> </span>
+<span id="cb63-6"><a href="#cb63-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">as_tibble</span>()</span>
+<span id="cb63-7"><a href="#cb63-7" aria-hidden="true" tabindex="-1"></a>goseq_results <span class="sc">%&gt;%</span> dplyr<span class="sc">::</span><span class="fu">filter</span>(FDR <span class="sc">&lt;</span> <span class="fl">0.01</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>Now we have some insight into which biological process are associated with the genes that respond to Zeocin treatment.</p>
+<div class="callout callout-style-default callout-important callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Important
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Repeat this process using an FDR &lt; 0.05 to declare a gene as <em>differentially expressed</em>. Did the results change in any meaningful way?</p>
+</div>
+</div>
+<!-- If possible, gsea (using `fgsea` could be included, but the length of the session may not permit) -->
+</section>
+</section>
+<section id="references" class="level1 unnumbered">
+
+
+</section>
+
+<div id="quarto-appendix" class="default"><section class="quarto-appendix-contents" role="doc-bibliography" id="quarto-bibliography"><h2 class="anchored quarto-appendix-heading">References</h2><div id="refs" class="references csl-bib-body hanging-indent" data-entry-spacing="0" role="list">
+<div id="ref-Dobin2013-us" class="csl-entry" role="listitem">
+Dobin, Alexander, Carrie A Davis, Felix Schlesinger, Jorg Drenkow, Chris Zaleski, Sonali Jha, Philippe Batut, Mark Chaisson, and Thomas R Gingeras. 2013. <span>“<span>STAR</span>: Ultrafast Universal <span>RNA</span>-Seq Aligner.”</span> <em>Bioinformatics</em> 29 (1): 15–21.
+</div>
+<div id="ref-Herbst2023-pj" class="csl-entry" role="listitem">
+Herbst, Josephine, Solveig Henriette Nagy, Ilse Vercauteren, Lieven De Veylder, and Reinhard Kunze. 2023. <span>“The Long Non-Coding RNA LINDA Restrains Cellular Collapse Following DNA Damage in Arabidopsis Thaliana.”</span> <em>The Plant Journal</em> 116 (5): 1370–84. https://doi.org/<a href="https://doi.org/10.1111/tpj.16431">https://doi.org/10.1111/tpj.16431</a>.
+</div>
+<div id="ref-Law2018-mk" class="csl-entry" role="listitem">
+Law, Charity W, Monther Alhamdoosh, Shian Su, Xueyi Dong, Luyi Tian, Gordon K Smyth, and Matthew E Ritchie. 2018. <span>“<span>RNA</span>-Seq Analysis Is Easy as 1-2-3 with Limma, Glimma and <span class="nocase">edgeR</span>.”</span> <em>F1000Res.</em> 5 (1408): 1408.
+</div>
+<div id="ref-Liao2014-gy" class="csl-entry" role="listitem">
+Liao, Yang, Gordon K Smyth, and Wei Shi. 2014. <span>“<span class="nocase">featureCounts</span>: An Efficient General Purpose Program for Assigning Sequence Reads to Genomic Features.”</span> <em>Bioinformatics</em> 30 (7): 923–30.
+</div>
+<div id="ref-Lun2016-vb" class="csl-entry" role="listitem">
+Lun, Aaron T L, Yunshun Chen, and Gordon K Smyth. 2016. <span>“It’s <span>DE</span>-Licious: A Recipe for Differential Expression Analyses of <span>RNA</span>-Seq Experiments Using Quasi-Likelihood Methods in <span class="nocase">edgeR</span>.”</span> <em>Methods Mol. Biol.</em> 1418: 391–416.
+</div>
+<div id="ref-Ritchie2015-lm" class="csl-entry" role="listitem">
+Ritchie, Matthew E, Belinda Phipson, Di Wu, Yifang Hu, Charity W Law, Wei Shi, and Gordon K Smyth. 2015. <span>“<span class="nocase">limma</span> Powers Differential Expression Analyses for <span>RNA</span>-Sequencing and Microarray Studies.”</span> <em>Nucleic Acids Research</em> 43 (7): e47. <a href="https://doi.org/10.1093/nar/gkv007">https://doi.org/10.1093/nar/gkv007</a>.
+</div>
+<div id="ref-Robinson2010-qp" class="csl-entry" role="listitem">
+Robinson, Mark D, and Alicia Oshlack. 2010. <span>“A Scaling Normalization Method for Differential Expression Analysis of <span>RNA</span>-Seq Data.”</span> <em>Genome Biol.</em> 11 (3): R25.
+</div>
+<div id="ref-Ward2020-qf" class="csl-entry" role="listitem">
+Ward, C M, T H To, and S M Pederson. 2020. <span>“<span class="nocase">ngsReports</span>: A Bioconductor Package for Managing <span>FastQC</span> Reports and Other <span>NGS</span> Related Log Files.”</span> <em>Bioinformatics</em>.
+</div>
+<div id="ref-Young2010-gs" class="csl-entry" role="listitem">
+Young, Matthew D, Matthew J Wakefield, Gordon K Smyth, and Alicia Oshlack. 2010. <span>“Gene Ontology Analysis for RNA-Seq: Accounting for Selection Bias.”</span> <em>Genome Biology</em> 11: R14.
+</div>
+</div></section></div></main>
+<!-- /main column -->
+<script id="quarto-html-after-body" type="application/javascript">
+  window.document.addEventListener("DOMContentLoaded", function (event) {
+    const icon = "";
+    const anchorJS = new window.AnchorJS();
+    anchorJS.options = {
+      placement: 'right',
+      icon: icon
+    };
+    anchorJS.add('.anchored');
+    const isCodeAnnotation = (el) => {
+      for (const clz of el.classList) {
+        if (clz.startsWith('code-annotation-')) {                     
+          return true;
+        }
+      }
+      return false;
+    }
+    const onCopySuccess = function(e) {
+      // button target
+      const button = e.trigger;
+      // don't keep focus
+      button.blur();
+      // flash "checked"
+      button.classList.add('code-copy-button-checked');
+      var currentTitle = button.getAttribute("title");
+      button.setAttribute("title", "Copied!");
+      let tooltip;
+      if (window.bootstrap) {
+        button.setAttribute("data-bs-toggle", "tooltip");
+        button.setAttribute("data-bs-placement", "left");
+        button.setAttribute("data-bs-title", "Copied!");
+        tooltip = new bootstrap.Tooltip(button, 
+          { trigger: "manual", 
+            customClass: "code-copy-button-tooltip",
+            offset: [0, -8]});
+        tooltip.show();    
+      }
+      setTimeout(function() {
+        if (tooltip) {
+          tooltip.hide();
+          button.removeAttribute("data-bs-title");
+          button.removeAttribute("data-bs-toggle");
+          button.removeAttribute("data-bs-placement");
+        }
+        button.setAttribute("title", currentTitle);
+        button.classList.remove('code-copy-button-checked');
+      }, 1000);
+      // clear code selection
+      e.clearSelection();
+    }
+    const getTextToCopy = function(trigger) {
+        const codeEl = trigger.previousElementSibling.cloneNode(true);
+        for (const childEl of codeEl.children) {
+          if (isCodeAnnotation(childEl)) {
+            childEl.remove();
+          }
+        }
+        return codeEl.innerText;
+    }
+    const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+      text: getTextToCopy
+    });
+    clipboard.on('success', onCopySuccess);
+    if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+      const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+        text: getTextToCopy,
+        container: window.document.getElementById('quarto-embedded-source-code-modal')
+      });
+      clipboardModal.on('success', onCopySuccess);
+    }
+      var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var mailtoRegex = new RegExp(/^mailto:/);
+        var filterRegex = new RegExp('/' + window.location.host + '/');
+      var isInternal = (href) => {
+          return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+      }
+      // Inspect non-navigation links and adorn them if external
+     var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+      for (var i=0; i<links.length; i++) {
+        const link = links[i];
+        if (!isInternal(link.href)) {
+          // undo the damage that might have been done by quarto-nav.js in the case of
+          // links that we want to consider external
+          if (link.dataset.originalHref !== undefined) {
+            link.href = link.dataset.originalHref;
+          }
+        }
+      }
+    function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+      const config = {
+        allowHTML: true,
+        maxWidth: 500,
+        delay: 100,
+        arrow: false,
+        appendTo: function(el) {
+            return el.parentElement;
+        },
+        interactive: true,
+        interactiveBorder: 10,
+        theme: 'quarto',
+        placement: 'bottom-start',
+      };
+      if (contentFn) {
+        config.content = contentFn;
+      }
+      if (onTriggerFn) {
+        config.onTrigger = onTriggerFn;
+      }
+      if (onUntriggerFn) {
+        config.onUntrigger = onUntriggerFn;
+      }
+      window.tippy(el, config); 
+    }
+    const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+    for (var i=0; i<noterefs.length; i++) {
+      const ref = noterefs[i];
+      tippyHover(ref, function() {
+        // use id or data attribute instead here
+        let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+        try { href = new URL(href).hash; } catch {}
+        const id = href.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note) {
+          return note.innerHTML;
+        } else {
+          return "";
+        }
+      });
+    }
+    const xrefs = window.document.querySelectorAll('a.quarto-xref');
+    const processXRef = (id, note) => {
+      // Strip column container classes
+      const stripColumnClz = (el) => {
+        el.classList.remove("page-full", "page-columns");
+        if (el.children) {
+          for (const child of el.children) {
+            stripColumnClz(child);
+          }
+        }
+      }
+      stripColumnClz(note)
+      if (id === null || id.startsWith('sec-')) {
+        // Special case sections, only their first couple elements
+        const container = document.createElement("div");
+        if (note.children && note.children.length > 2) {
+          container.appendChild(note.children[0].cloneNode(true));
+          for (let i = 1; i < note.children.length; i++) {
+            const child = note.children[i];
+            if (child.tagName === "P" && child.innerText === "") {
+              continue;
+            } else {
+              container.appendChild(child.cloneNode(true));
+              break;
+            }
+          }
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(container);
+          }
+          return container.innerHTML
+        } else {
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(note);
+          }
+          return note.innerHTML;
+        }
+      } else {
+        // Remove any anchor links if they are present
+        const anchorLink = note.querySelector('a.anchorjs-link');
+        if (anchorLink) {
+          anchorLink.remove();
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        if (note.classList.contains("callout")) {
+          return note.outerHTML;
+        } else {
+          return note.innerHTML;
+        }
+      }
+    }
+    for (var i=0; i<xrefs.length; i++) {
+      const xref = xrefs[i];
+      tippyHover(xref, undefined, function(instance) {
+        instance.disable();
+        let url = xref.getAttribute('href');
+        let hash = undefined; 
+        if (url.startsWith('#')) {
+          hash = url;
+        } else {
+          try { hash = new URL(url).hash; } catch {}
+        }
+        if (hash) {
+          const id = hash.replace(/^#\/?/, "");
+          const note = window.document.getElementById(id);
+          if (note !== null) {
+            try {
+              const html = processXRef(id, note.cloneNode(true));
+              instance.setContent(html);
+            } finally {
+              instance.enable();
+              instance.show();
+            }
+          } else {
+            // See if we can fetch this
+            fetch(url.split('#')[0])
+            .then(res => res.text())
+            .then(html => {
+              const parser = new DOMParser();
+              const htmlDoc = parser.parseFromString(html, "text/html");
+              const note = htmlDoc.getElementById(id);
+              if (note !== null) {
+                const html = processXRef(id, note);
+                instance.setContent(html);
+              } 
+            }).finally(() => {
+              instance.enable();
+              instance.show();
+            });
+          }
+        } else {
+          // See if we can fetch a full url (with no hash to target)
+          // This is a special case and we should probably do some content thinning / targeting
+          fetch(url)
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.querySelector('main.content');
+            if (note !== null) {
+              // This should only happen for chapter cross references
+              // (since there is no id in the URL)
+              // remove the first header
+              if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+                note.children[0].remove();
+              }
+              const html = processXRef(null, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      }, function(instance) {
+      });
+    }
+        let selectedAnnoteEl;
+        const selectorForAnnotation = ( cell, annotation) => {
+          let cellAttr = 'data-code-cell="' + cell + '"';
+          let lineAttr = 'data-code-annotation="' +  annotation + '"';
+          const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+          return selector;
+        }
+        const selectCodeLines = (annoteEl) => {
+          const doc = window.document;
+          const targetCell = annoteEl.getAttribute("data-target-cell");
+          const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+          const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+          const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+          const lineIds = lines.map((line) => {
+            return targetCell + "-" + line;
+          })
+          let top = null;
+          let height = null;
+          let parent = null;
+          if (lineIds.length > 0) {
+              //compute the position of the single el (top and bottom and make a div)
+              const el = window.document.getElementById(lineIds[0]);
+              top = el.offsetTop;
+              height = el.offsetHeight;
+              parent = el.parentElement.parentElement;
+            if (lineIds.length > 1) {
+              const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+              const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+              height = bottom - top;
+            }
+            if (top !== null && height !== null && parent !== null) {
+              // cook up a div (if necessary) and position it 
+              let div = window.document.getElementById("code-annotation-line-highlight");
+              if (div === null) {
+                div = window.document.createElement("div");
+                div.setAttribute("id", "code-annotation-line-highlight");
+                div.style.position = 'absolute';
+                parent.appendChild(div);
+              }
+              div.style.top = top - 2 + "px";
+              div.style.height = height + 4 + "px";
+              div.style.left = 0;
+              let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+              if (gutterDiv === null) {
+                gutterDiv = window.document.createElement("div");
+                gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+                gutterDiv.style.position = 'absolute';
+                const codeCell = window.document.getElementById(targetCell);
+                const gutter = codeCell.querySelector('.code-annotation-gutter');
+                gutter.appendChild(gutterDiv);
+              }
+              gutterDiv.style.top = top - 2 + "px";
+              gutterDiv.style.height = height + 4 + "px";
+            }
+            selectedAnnoteEl = annoteEl;
+          }
+        };
+        const unselectCodeLines = () => {
+          const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+          elementsIds.forEach((elId) => {
+            const div = window.document.getElementById(elId);
+            if (div) {
+              div.remove();
+            }
+          });
+          selectedAnnoteEl = undefined;
+        };
+          // Handle positioning of the toggle
+      window.addEventListener(
+        "resize",
+        throttle(() => {
+          elRect = undefined;
+          if (selectedAnnoteEl) {
+            selectCodeLines(selectedAnnoteEl);
+          }
+        }, 10)
+      );
+      function throttle(fn, ms) {
+      let throttle = false;
+      let timer;
+        return (...args) => {
+          if(!throttle) { // first call gets through
+              fn.apply(this, args);
+              throttle = true;
+          } else { // all the others get throttled
+              if(timer) clearTimeout(timer); // cancel #2
+              timer = setTimeout(() => {
+                fn.apply(this, args);
+                timer = throttle = false;
+              }, ms);
+          }
+        };
+      }
+        // Attach click handler to the DT
+        const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+        for (const annoteDlNode of annoteDls) {
+          annoteDlNode.addEventListener('click', (event) => {
+            const clickedEl = event.target;
+            if (clickedEl !== selectedAnnoteEl) {
+              unselectCodeLines();
+              const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+              if (activeEl) {
+                activeEl.classList.remove('code-annotation-active');
+              }
+              selectCodeLines(clickedEl);
+              clickedEl.classList.add('code-annotation-active');
+            } else {
+              // Unselect the line
+              unselectCodeLines();
+              clickedEl.classList.remove('code-annotation-active');
+            }
+          });
+        }
+    const findCites = (el) => {
+      const parentEl = el.parentElement;
+      if (parentEl) {
+        const cites = parentEl.dataset.cites;
+        if (cites) {
+          return {
+            el,
+            cites: cites.split(' ')
+          };
+        } else {
+          return findCites(el.parentElement)
+        }
+      } else {
+        return undefined;
+      }
+    };
+    var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+    for (var i=0; i<bibliorefs.length; i++) {
+      const ref = bibliorefs[i];
+      const citeInfo = findCites(ref);
+      if (citeInfo) {
+        tippyHover(citeInfo.el, function() {
+          var popup = window.document.createElement('div');
+          citeInfo.cites.forEach(function(cite) {
+            var citeDiv = window.document.createElement('div');
+            citeDiv.classList.add('hanging-indent');
+            citeDiv.classList.add('csl-entry');
+            var biblioDiv = window.document.getElementById('ref-' + cite);
+            if (biblioDiv) {
+              citeDiv.innerHTML = biblioDiv.innerHTML;
+            }
+            popup.appendChild(citeDiv);
+          });
+          return popup.innerHTML;
+        });
+      }
+    }
+  });
+  </script>
+</div> <!-- /content -->
+
+
+
+
+</body></html>

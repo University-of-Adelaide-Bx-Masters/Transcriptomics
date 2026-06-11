@@ -1,0 +1,580 @@
+---
+title: "Transcriptomics Practical"
+subtitle: 'Practical 2: Using the Tidyverse'
+author: "Steven Delean & Stevie Pederson"
+institute: "Adelaide University & Black Ochre Data Labs"
+bibliography: 'assets/references.bib'
+format: 
+  html: 
+    toc: true
+    toc-depth: 3
+---
+
+```{r, echo = FALSE}
+knitr::opts_chunk$set(
+  echo = TRUE, eval = TRUE, results = "hide",
+  message = FALSE, warnings=  FALSE
+)
+```
+
+# Introduction
+
+## Last Session
+
+In the first practical we introduced several key concepts about working in RStudio and using R as an interactive tool for exploring your data.
+The core concepts included:
+
+1. Creating objects in R $\implies$ The Global Environments
+2. Recording code using an R Script $\implies$ Using RStudio
+3. Importing spreadsheet-style data
+    + What is a data frame?
+    + What is a vector
+4. Using functions $\implies$ naming arguments
+
+## Today's Content
+
+Now that we know the basics we can truly start exploring data frames and that will be the purpose of today's material.
+The package `readr` is actually a core package from an ecosystem known as the `tidyverse`.
+
+![](assets/tidy_workflow.png)
+
+The `tidyverse` has become the dominant ecosystem for working with data frames and include all of the packages in the above figures.
+So far, we've met `readr` as the first step in data analysis, and we also briefly discussed `tibble` objects, which are the core type of `data.frame` used by the `tidyverse`, and these were designed carefully with "tidy-programming" in mind.
+
+Throughout today's session, we'll mainly learn to use the packages `tidyr` and `dplyr` as these not only form essential tools for transcriptomics, but also are widely used across all forms of data science.
+
+## Loading Today's Data
+
+We'll continue using the same `csv` as the last session, so let's load this how we did last week, but with one key difference.
+Instead of writing `library(readr)` at the top of our script, we'll use `library(tidyverse)` which loads all of the packages in the above figure with a single line.
+We'll mention which package we're working with at the time as that can be very helpful information to know when unexpected problems arise.
+
+
+```{r}
+#| echo: true
+#| eval: false
+library(tidyverse)
+psen2VsWT <- read_csv("data/psen2VsWT.csv")
+```
+
+```{r}
+#| echo: false
+#| eval: true
+#| message: true
+library(tidyverse)
+psen2VsWT <- read_csv(here::here("practicals", "data", "psen2VsWT.csv"))
+```
+
+All of this text is actually just the tidyverse being helpful and letting us know what has been done.
+It can look a but overwhelming or annoying, but it's really informative for when things go wrong.
+You'll notice that is starts by telling is which packages have been loaded, then comes a strange message:
+
+```
+✖ dplyr::filter() masks stats::filter()
+```
+
+This is letting us know that the package `dplyr` has loaded a function called `filter()` and that a function was already loaded with that name from the package `stats`, which is formally referred to using `stats::filter()` telling us which package the former version was from.
+Each package brings with it a set of visible functions, and these functions collectively form what is referred to as the `namespace`, so using `stats::filter()` is the shorthand way of saying the function `filter()` from the namespace of functions from the the `stats` package.
+That'll be handy to know at the end of the session especially.
+
+
+After that is the messages from `readr` that we also saw last time, but didn't really pay attention to.
+
+# The Tidyverse
+
+## The `magrittr`
+
+:::: {.columns}
+::: {.column width='75%'}
+
+The `magrittr` is perhaps one of the most useful packages in the `tidyverse` and has profoundly changed the way we work in R.
+If you're familiar with the pipe (`|`) in `bash`, it implements the R equivalent `%>%` known as "The Magrittr".
+This in turn is a play on the painting [The Treachery of Images, by René Magritte](https://en.wikipedia.org/wiki/The_Treachery_of_Images).
+
+The symbol `%>%` takes the output of one function passes it to the input of the next function, exactly like the `|` symbol in `bash`.
+
+Let's see it in action to really grasp this concept.
+
+
+
+:::
+::: {.column width='25%'}
+
+![](https://magrittr.tidyverse.org/logo.png)
+:::
+::::
+
+```{r}
+## Calling `head()` on the `euro` vector will print the first 6 values
+head(euro)
+## We could rewrite this using the magrittr
+euro %>% head()
+```
+
+In this second version, the `magrittr` has passed the object `euro` to become the first argument of the function `head()`.
+We can only pass objects to become the first argument of a function using this starategy, but that's usually what we want to do anyway.
+It means we can't name this argument, but that's usually OK for the the first argument too.
+
+This opens up the possibility of chaining together multiple functions with a toy example being
+
+```{r}
+euro %>% head() %>% sqrt()
+```
+
+::: {.callout-important}
+
+Using this approach has completely changed the way we work in R as we can avoid creating multiple intermediate files which was the early way we did things.
+We'd have to call a function & save the output, then pass that to the next function and so on.
+It led to very messy Global Environments with multiple versions of objects that had all been modified slightly, such as `data` followed by `data_subset`, then `data_subset_sorted` and so on.
+
+The development of `magrittr` has resulted in base R implementing it's own version, known colloquially as the "base pipe".
+This uses the symbol `|>`, so it's a little more reminiscent of the `bash` pipe with an arrow stuck on it.
+The two versions behave identically about 99% of the time, but there are subtle differences which we won't discuss.
+The `magrittr` implementation usually plays the most nicely with the `tidyverse` so we'll use that, but it's really personal preference once you're writing your own code.
+
+:::
+
+The entire tidyverse ecosystem is heavily based on this type of approach to data, so we'll 'pipe' objects consistently in the subsequent sections.
+
+
+
+## The package `dplyr`
+
+:::: {.columns}
+::: {.column width='75%'}
+
+The most heavily used (and arguably the most useful)  package in the tidyverse is `dplyr` (with a fancy new logo on the right).
+Many of the functions and approaches we're familiar with from Excel are implemented here, with the most common being sorting columns are applying a filter based on the values in a column.
+
+For the following examples, it's important to note that we're never over-writing our original data object.
+This is simply demonstrating ways to explore the data, which forms such a vital part of all data science.
+
+:::
+::: {.column width='25%'}
+
+![](https://dplyr.tidyverse.org//logo.png)
+:::
+::::
+
+### Sorting and Filtering
+
+One of the most common operations we perform on data is to sort by the values in a column.
+The `dplyr` function designed for this is `arrange` and we simply provide a data.frame followed by one or more column name.
+In the example below, we'll sort the genes based on the expression level (`logCPM`).
+
+```{r}
+## Sort our data by average expression (logCPM)
+psen2VsWT %>% arrange(logCPM)
+```
+
+Here we've used the `magrittr` straight away, and as noted, we haven't changed the object `psen2VsWT` at all, we've just sorted by the column `logCPM` as it prints to the Console.
+You might have noticed that the values in that column are now in ascending order.
+This is the default behaviour for sorting, but we can swicth that around by wrapping the column name in `desc()`
+
+```{r}
+## Now sort in descending order of expression
+psen2VsWT %>% arrange(desc(logCPM))
+```
+
+We can also sort any character columns, and these will appear in alphanumeric order.
+Let's sort the chromosome column, followed by the start co-ordinates, so we have these in genomic order.
+
+```{r}
+## Sort by chromosome, then starting position
+psen2VsWT %>% arrange(chromosome, start)
+```
+
+**How would you sort these in order of descending gene length?**
+
+Now that we know how to display our data frame after sorting, we might like to filter based on certain values, and the `dplyr` function we can use for this is `filter()`
+In order to do this, we're actually applying what's known as a logical test.
+Many of these are quite intuitive.
+As our first challenge, we might like to find the "Differentially Expressed" (DE) genes which have an FDR-adjusted p-value below $\alpha = 0.01$
+
+```{r}
+## Find the significant genes to an FDR of 0.01
+psen2VsWT %>% filter(FDR < 0.01)
+```
+
+This has given us `r sum(psen2VsWT$FDR < 0.01)` genes, which is a lot!
+Maybe we can just look at the most up-regulated in our experiment, which are those with a logFC > 0.
+
+```{r}
+## Show the results in descending order of change, but keeping 
+## to only those with an FDR < 0.01
+psen2VsWT %>% filter(FDR < 0.01) %>% arrange(desc(logFC))
+```
+
+So now we can easily find our most up-regulated genes, which have strong statistical support for being differentially expressed in our experiment!
+
+**Find the shortest DE genes using this approach**
+
+Notice these are mostly snRNA or snoRNAs, which makes a lot of sense when we're looking for short genes.
+
+#### Combining Functions
+
+In the previous line and your task, we've actually executed three commands on a single line of code.
+
+1. `print()` the object to the Console
+    + Calling an object by name actually calls the function `print()`
+2. Filter the object based on a significant statistical test
+3. Arrange in order of some other variable of interest
+
+As we move forward, the number of operations we'll perform will continue extending.
+To make these processes easier to read, we often call a new process on a new line.
+
+```{r}
+## Now organise the code so each function has it's own line
+psen2VsWT %>% 
+  filter(FDR < 0.01) %>% 
+  arrange(desc(logFC))
+```
+
+This makes it incredibly easy to comment a line in or out, or stop part way through (by removing a `%>%`) as we figure out what we're trying to do.
+
+::: {.callout-important title = "Logical Tests"}
+
+The logical test we applied above was pretty intuitive and most of us immediately understood we were filtering based on a value being less than 0.01.
+We can apply multiple different types of test that also enable filtering by `character` columns or using multiple values.
+The table below describes some key logical tests we can easily perform in R.
+
+| Symbol | Interpretation |
+|:------ |:-------------- |
+| `<`; `<=` | Strictly less than; less than or equal to |
+| `>`; `>=` | Strictly greater than; greater than or equal to |
+| `==`      | Is exactly equal to |
+| `!=`      | Is **NOT** equal to |
+| `%in%`    | Is in a set of values |
+| `is.na()` | Is missing |
+
+:::
+
+Now let's try filtering by exactly matching a character string
+
+```{r}
+## Find the protein coding genes with an FDR < 0.01
+## Then sort by length
+psen2VsWT %>% 
+  filter(FDR < 0.01, gene_biotype == "protein_coding") %>% 
+  arrange(length)
+```
+
+So now we can find our shortest protein coding genes!
+Let's look for the DE genes which aren't protein coding.
+
+```{r}
+## Find the non-protein coding DE genes using `!=` to specify 
+## Is NOT equal to
+psen2VsWT %>% 
+  filter(FDR < 0.01, gene_biotype != "protein_coding") 
+```
+
+**Mitochondrial genes are on the chromosome `chrM`. Find all of the DE genes on the mitochondrial chromosome**
+
+Mapping between European (Ensembl) and American (EntrezGene) data bases can be tricky and in our data there are some genes which haven't been mapped to an EntrezGene ID (`entrezid`), instead showing as `NA` in this column.
+Given this means the data is missing the only logical test we can use for this type of data is `is.na()`
+
+```{r}
+## Find the genes which were not mapped to the EntrezGene database
+psen2VsWT %>% 
+  filter(is.na(entrezid))
+```
+
+The final logical test we should understand is `%in%` which we read as "is in".
+For this test, we pass a vector of possible values, providing multiple options for an exact match.
+
+```{r}
+## Find all of the lincRNA and pseudogenes, then arrange
+## in descending order of expression
+psen2VsWT %>% 
+  filter(gene_biotype %in% c("lincRNA", "pseudogene")) %>% 
+  arrange(desc(logCPM))
+```
+
+### Adding and Modifying Columns
+
+Not only can we sort and filter our data during exploration, but we can add columns or modify them using the function `mutate()`.
+A simple option might be to add a logical column `DE` which denotes that a gene has passed statistical significance.
+
+```{r}
+psen2VsWT %>% 
+  mutate(DE = FDR < 0.01)
+```
+
+We haven't actually modified our underlying data object here but this can be very useful for creating quick summaries.
+
+```{r}
+psen2VsWT %>% 
+  mutate(DE = FDR < 0.01) %>% 
+  count(DE)
+```
+
+The `count()` function really allows us to drill into our results quickly
+
+```{r}
+psen2VsWT %>% 
+  mutate(DE = FDR < 0.01) %>% 
+  count(DE, gene_biotype, sort = TRUE) %>% 
+  filter(DE)
+```
+
+Notice that we simply called the column `DE` inside `filter()`.
+It's already a logical value so we didn't need to perform any further logical tests.
+This is actually what every logical test returns, as you may remember from the start of a our very first session.
+
+```{r}
+x <- 1:5
+x > 1
+```
+
+We can create columns based on other columns very easily
+
+```{r}
+psen2VsWT %>% 
+  mutate(length_kb = length / 1000)
+```
+
+::: {.callout-tip}
+Once we move to making figures and plots, this approach will become an essential step.
+We can leave our original object untouched, but modify or summarise "on the fly".
+This keeps our Global Environment cleaner and tidier, which also helps minimise the opportunity for mistakes.
+:::
+
+### Slicing Columns
+
+As we've learned, `tibble` objects don't allow rownames, so we're not able to call by rownames.
+As an alternative to using the square brackets (`[]`) `dplyr` provides the function `slice()` which allows us to slice rows out of our data.
+
+```{r}
+## Just pull out the top 5 genes
+psen2VsWT %>% 
+  slice(1:5)
+```
+
+We don't need these to be consecutive numbers, but they usually will be as we'll have sorted and filtered on the way there.
+
+```{r}
+## Find the 5 genes with the largets up-regulation
+psen2VsWT %>% 
+  arrange(desc(logFC)) %>% 
+  slice(1:5)
+```
+
+By leveraging the additional argument `.by` we easily slice out the most significantly DE gene on each chromosome
+
+```{r}
+## Slice out the most DE gene on each chromosome
+psen2VsWT %>% 
+  dplyr::filter(FDR < 0.01) %>% 
+  slice(1, .by = chromosome)
+```
+
+**How would we arrange this to be in chromosomal order?**
+
+::: {.callout-note}
+Although we can still use the quare brackets, placing them in a long chain of expression like above can be clumsy and provides challenges for inexperienced programmers.
+`slice()` provides a simple alternative the works beautifully in these long chains of commands
+:::
+
+
+### Selecting Columns
+
+As well as providing a function to slice out rows, we can use the function `select()` to choose a subset of columns.
+
+```{r}
+psen2VsWT %>% 
+  select(gene_id, gene_name, gene_biotype)
+```
+
+A set of helper functions, make this process incredibly simple and powerful.
+
+| Helper | What it Does |
+|:------ |:------------ |
+| `starts_with()` | Select columns that start with a text string |
+| `ends_with()` | Select columns that end with a text string |
+| `contains()` | Select columns that contain a sequence of characters |
+| `matches()` | Select columns that match a regular expression |
+| `everything()` | Select everything |
+| `all_of()` | Takes a character vector and selects all columns in the vector |
+| `any_of()` | Takes a character vector and selects any columns in the vector |
+
+
+```{r}
+psen2VsWT %>% 
+  select(starts_with("gene"))
+```
+
+We can easily remove columns by simply placing a subtraction sign before the selection
+
+```{r}
+psen2VsWT %>% 
+  select(-starts_with("gene"))
+```
+
+The `everything()` helper is surprisingly useful as we can use this to rearrange the column order
+
+```{r}
+psen2VsWT %>% 
+  select(all_of(c("chromosome", "start", "end")), everything())
+```
+
+### Creating Summaries
+
+We've already had a sneak peak at the function `count()`, but the function `summarise()` is another heavy hitter of the `dplyr` package.
+We can create summary values for any column we choose.
+In the following, we're using mutate to create the column DE like earlier, but when we call `sum()` on a logical vector, all `TRUE` value  take the value `1`, whilst all `FALSE` values take the value `0`.
+This strategy effectively counts the DE genes, but adding the `TRUE` values.
+
+```{r}
+psen2VsWT %>% 
+  mutate(DE = FDR < 0.01) %>% 
+  summarise(
+    n = n(),
+    DE = sum(DE),
+    mean_logCPM = mean(logCPM),
+    mean_gc = mean(gc_content)
+  )
+```
+
+Whilst this gave a summary for the entire dataset, we can again call the `.by` argument to create summaries by gene biotype.
+Then we can add a `mutate` to find if any biotype seems to be more likely to be considered as DE
+
+```{r}
+psen2VsWT %>% 
+  mutate(DE = FDR < 0.01) %>% 
+  summarise(
+    n = n(),
+    n_sig = sum(DE),
+    mean_logCPM = mean(logCPM),
+    mean_gc = mean(gc_content),
+    .by = gene_biotype
+  ) %>% 
+  mutate(prop_DE = n_sig / n)
+```
+
+::: [.callout-note]
+The package `dplyr` is immensely powerful and forms the backbone of much modern data science.
+There is a wide variety of functions that we haven't introduced, but the ones above are the most vital and useful amongst those on offer.
+
+As you've seen, the use of these general R packages also extends into transcriptomics and the entire filed of bioinformatics.
+Most bioinformaticians who work in R spend a good amount of each day working with data using the `tidyverse` in this way.
+
+:::
+
+## The package `tidyr`
+
+The final package we'll familiarise ourselves with today is the package `tidyr`.
+We'll only cover two functions: `pivot_wider()` and `pivot_longer()`
+These are the most heavily used and applicable to our needs.
+
+### Pivot Wider
+
+As you may expect, the `pivot_*` functions are similar to the Excel-based operations.
+These also become very useful when working with summary tables
+
+```{r}
+psen2VsWT %>% 
+  mutate(DE = FDR < 0.01) %>% 
+  count(DE, gene_biotype)
+```
+
+We might like to have separate columns for `TRUE` and `FALSE`, which is where `pivot_wider()` comes in handy
+
+```{r}
+psen2VsWT %>% 
+  mutate(DE = FDR < 0.01) %>% 
+  count(DE, gene_biotype, sort = TRUE) %>% 
+  pivot_wider(names_from = DE, values_from = n)
+```
+
+As you can see, not all values were able to be filled as there were no misc_RNA, unprocessed pseudogenes etc that were consideed DE, and these values were absent from our original summary.
+By providing the argument `values_fill = 0` we can place zeroes where there were missing values
+
+```{r}
+psen2VsWT %>% 
+  mutate(DE = FDR < 0.01) %>% 
+  count(DE, gene_biotype, sort = TRUE) %>% 
+  pivot_wider(names_from = DE, values_from = n, values_fill = 0)
+```
+
+Having column names `TRUE` and `FALSE` may not be particularly informative, so the `dplyr` function `rename()` may be useful here
+
+```{r}
+psen2VsWT %>% 
+  mutate(DE = FDR < 0.01) %>% 
+  count(DE, gene_biotype, sort = TRUE) %>% 
+  pivot_wider(names_from = DE, values_from = n, values_fill = 0) %>% 
+  rename(DE = `TRUE`, notDE = `FALSE`)
+```
+
+::: {.callout-important}
+
+The values `TRUE` and `FALSE` are actually special values in R and to use these as column names, you'll notice they were encased in backticks (\`).
+This is how R allows you to use column names that might be otherwise a bit tricky.
+(R also doesn't like spaces in column names, so these are treated the same way)
+
+:::
+
+Now we could use `mutate()` to create a totals column
+
+```{r}
+psen2VsWT %>% 
+  mutate(DE = FDR < 0.01) %>% 
+  count(DE, gene_biotype, sort = TRUE) %>% 
+  pivot_wider(names_from = DE, values_from = n, values_fill = 0) %>% 
+  rename(DE = `TRUE`, notDE = `FALSE`) %>% 
+  mutate(Total = DE + notDE)
+```
+
+### Pivot Longer
+
+Instead of pivoting our data so it appears wider across the page, `pivot_longer()` instead can join values from multiple columns into a single column, but adding the original column names as a parallel column.
+We can use the helper functions we saw earlier to specify which columns pivot down the page
+
+```{r}
+psen2VsWT %>% 
+  pivot_longer(
+    cols = all_of(c("gc_content", "length")), names_to = "measure", 
+    values_to = "value"
+  )
+```
+
+Given that we've taken the columns `gc_content` and `length` and put them in long format, you might notice that now we have double the rows.
+So far that hasn't been particularly meaningful, but once we bring `summarise()` into play using the `.by` argument, we can produce informative summary statistics very simply
+
+```{r}
+psen2VsWT %>% 
+  pivot_longer(
+    cols = all_of(c("gc_content", "length")), names_to = "measure", 
+    values_to = "value"
+  ) %>% 
+  summarise(
+    min = min(value),
+    mean = mean(value),
+    median = median(value),
+    max = max(value),
+    .by = measure
+  )
+```
+
+# Conclusion
+
+So far in our practical series, we've seen the `tidyverse` packages `readr`, `tidyr`, `tibble`, `dplyr` and `magrittr` in action, and how they all form a seamless ecosystem of tools and capabilities.
+These are the day to day packages used by bioinformaticians and data scientists around the world.
+
+In the next session, we'll introduce `ggplot2`, `stringr` and `forcats` so we can move into visualising our data and creating figures, instead of just looking at data frames.
+
+::: {.callout-important}
+The package `dplyr` was written to mimic many of the capabilities of the language SQL, which is a database language.
+`SQL` has functions called `select` and `filter` and many others, which is why `dplyr` used these function names.
+
+Unfortunately, many other packages have functions called `select()`, `filter()`, `slice()`, `count()` etc.
+Sometimes we have these packages loaded at the same time and it's difficult for R to determine which version of the function is needed.
+**This is why namespaces were developed**, so we can associate a function with the package it is exported by (or loaded by).
+
+If at some point in your future R programming adventures you see one of these functions behaving unexpectedly or giving an error, call it explicitly from the namespace using `dplyr::select()` or `dplyr::filter()`.
+Given that these two functions regularly seem to suffer from this issue, many R users always call these two in this manner just to save themselves some headaches.
+:::
+
+
+

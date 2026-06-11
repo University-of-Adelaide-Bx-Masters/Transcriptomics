@@ -1,0 +1,56 @@
+<div id="logo-tki" style="position: fixed; z-index: 1000;">
+  <img src="https://www.thekids.org.au/Static/Theme/images/TheKids-RGB_Logo_Colour-Pattern.svg" style="height: 70px;">
+</div>
+<div id="logo-bodl" style="position: fixed; z-index: 1000;">
+  <img src="assets/bodl_logo_white_background.jpg" style="height: 70px;">
+</div>
+<div  id="logo-au" style="z-index: 1000;">
+  <img src="assets/au_logo.png" style="height: 70px;">
+</div>
+
+
+<script>
+function positionLogos() {
+  const tkiLogo = document.getElementById('logo-tki');
+  const auLogo = document.getElementById('logo-au');
+  const bodlLogo = document.getElementById('logo-bodl');
+
+  // Check if this is RevealJS
+  const isRevealJS = document.body.classList.contains('reveal') ||
+                     document.querySelector('.reveal') !== null ||
+                     typeof Reveal !== 'undefined';
+
+  if (isRevealJS) {
+    // RevealJS - both logos at bottom
+    tkiLogo.style.bottom = '5px';
+    tkiLogo.style.right = '430px';
+    tkiLogo.style.top = 'auto';
+    tkiLogo.style.display = 'block';
+
+    bodlLogo.style.bottom = '5px';
+    bodlLogo.style.right = '275px';
+    bodlLogo.style.top = 'auto';
+    bodlLogo.style.display = 'block';
+
+    auLogo.style.bottom = '5px';
+    auLogo.style.right = '40px';
+    auLogo.style.top = 'auto';
+    auLogo.style.display = 'block';
+    auLogo.style.position = 'fixed';
+  } else {
+    // Flat HTML - only right logo at top
+    tkiLogo.style.display = 'none';
+    bodlLogo.style.display = 'none';
+
+    auLogo.style.top = '10px';
+    auLogo.style.left = '55%';
+    auLogo.style.bottom = 'auto';
+    auLogo.style.position = 'absolute';
+    auLogo.style.display = 'block';
+  }
+}
+
+// Run positioning
+document.addEventListener('DOMContentLoaded', positionLogos);
+setTimeout(positionLogos, 100);
+</script>

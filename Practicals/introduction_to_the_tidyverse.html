@@ -1,0 +1,1103 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.7.32">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+<meta name="author" content="Steven Delean &amp; Stevie Pederson">
+
+<title>Transcriptomics Practical</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+html { -webkit-text-size-adjust: 100%; }
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+</style>
+
+
+<script src="introduction_to_the_tidyverse_files/libs/clipboard/clipboard.min.js"></script>
+<script src="introduction_to_the_tidyverse_files/libs/quarto-html/quarto.js" type="module"></script>
+<script src="introduction_to_the_tidyverse_files/libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="introduction_to_the_tidyverse_files/libs/quarto-html/popper.min.js"></script>
+<script src="introduction_to_the_tidyverse_files/libs/quarto-html/tippy.umd.min.js"></script>
+<script src="introduction_to_the_tidyverse_files/libs/quarto-html/anchor.min.js"></script>
+<link href="introduction_to_the_tidyverse_files/libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="introduction_to_the_tidyverse_files/libs/quarto-html/quarto-syntax-highlighting-37eea08aefeeee20ff55810ff984fec1.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="introduction_to_the_tidyverse_files/libs/bootstrap/bootstrap.min.js"></script>
+<link href="introduction_to_the_tidyverse_files/libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="introduction_to_the_tidyverse_files/libs/bootstrap/bootstrap-1e1b6d7d3018d0281420745e134191b0.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+
+  <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
+
+<script type="text/javascript">
+const typesetMath = (el) => {
+  if (window.MathJax) {
+    // MathJax Typeset
+    window.MathJax.typeset([el]);
+  } else if (window.katex) {
+    // KaTeX Render
+    var mathElements = el.getElementsByClassName("math");
+    var macros = [];
+    for (var i = 0; i < mathElements.length; i++) {
+      var texText = mathElements[i].firstChild;
+      if (mathElements[i].tagName == "SPAN") {
+        window.katex.render(texText.data, mathElements[i], {
+          displayMode: mathElements[i].classList.contains('display'),
+          throwOnError: false,
+          macros: macros,
+          fleqn: false
+        });
+      }
+    }
+  }
+}
+window.Quarto = {
+  typesetMath
+};
+</script>
+
+</head>
+
+<body class="quarto-light">
+
+<div id="quarto-content" class="page-columns page-rows-contents page-layout-article">
+<div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+  <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">Table of contents</h2>
+   
+  <ul>
+  <li><a href="#introduction" id="toc-introduction" class="nav-link active" data-scroll-target="#introduction">Introduction</a>
+  <ul class="collapse">
+  <li><a href="#last-session" id="toc-last-session" class="nav-link" data-scroll-target="#last-session">Last Session</a></li>
+  <li><a href="#todays-content" id="toc-todays-content" class="nav-link" data-scroll-target="#todays-content">Today’s Content</a></li>
+  <li><a href="#loading-todays-data" id="toc-loading-todays-data" class="nav-link" data-scroll-target="#loading-todays-data">Loading Today’s Data</a></li>
+  </ul></li>
+  <li><a href="#the-tidyverse" id="toc-the-tidyverse" class="nav-link" data-scroll-target="#the-tidyverse">The Tidyverse</a>
+  <ul class="collapse">
+  <li><a href="#the-magrittr" id="toc-the-magrittr" class="nav-link" data-scroll-target="#the-magrittr">The <code>magrittr</code></a></li>
+  <li><a href="#the-package-dplyr" id="toc-the-package-dplyr" class="nav-link" data-scroll-target="#the-package-dplyr">The package <code>dplyr</code></a>
+  <ul class="collapse">
+  <li><a href="#sorting-and-filtering" id="toc-sorting-and-filtering" class="nav-link" data-scroll-target="#sorting-and-filtering">Sorting and Filtering</a></li>
+  <li><a href="#adding-and-modifying-columns" id="toc-adding-and-modifying-columns" class="nav-link" data-scroll-target="#adding-and-modifying-columns">Adding and Modifying Columns</a></li>
+  <li><a href="#slicing-columns" id="toc-slicing-columns" class="nav-link" data-scroll-target="#slicing-columns">Slicing Columns</a></li>
+  <li><a href="#selecting-columns" id="toc-selecting-columns" class="nav-link" data-scroll-target="#selecting-columns">Selecting Columns</a></li>
+  <li><a href="#creating-summaries" id="toc-creating-summaries" class="nav-link" data-scroll-target="#creating-summaries">Creating Summaries</a></li>
+  </ul></li>
+  <li><a href="#the-package-tidyr" id="toc-the-package-tidyr" class="nav-link" data-scroll-target="#the-package-tidyr">The package <code>tidyr</code></a>
+  <ul class="collapse">
+  <li><a href="#pivot-wider" id="toc-pivot-wider" class="nav-link" data-scroll-target="#pivot-wider">Pivot Wider</a></li>
+  <li><a href="#pivot-longer" id="toc-pivot-longer" class="nav-link" data-scroll-target="#pivot-longer">Pivot Longer</a></li>
+  </ul></li>
+  </ul></li>
+  <li><a href="#conclusion" id="toc-conclusion" class="nav-link" data-scroll-target="#conclusion">Conclusion</a></li>
+  </ul>
+</nav>
+</div>
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<h1 class="title">Transcriptomics Practical</h1>
+<p class="subtitle lead">Practical 2: Using the Tidyverse</p>
+</div>
+
+
+<div class="quarto-title-meta-author">
+  <div class="quarto-title-meta-heading">Author</div>
+  <div class="quarto-title-meta-heading">Affiliation</div>
+  
+    <div class="quarto-title-meta-contents">
+    <p class="author">Steven Delean &amp; Stevie Pederson </p>
+  </div>
+  <div class="quarto-title-meta-contents">
+        <p class="affiliation">
+            Adelaide University &amp; Black Ochre Data Labs
+          </p>
+      </div>
+  </div>
+
+<div class="quarto-title-meta">
+
+      
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<section id="introduction" class="level1">
+<h1>Introduction</h1>
+<section id="last-session" class="level2">
+<h2 class="anchored" data-anchor-id="last-session">Last Session</h2>
+<p>In the first practical we introduced several key concepts about working in RStudio and using R as an interactive tool for exploring your data. The core concepts included:</p>
+<ol type="1">
+<li>Creating objects in R <span class="math inline">\(\implies\)</span> The Global Environments</li>
+<li>Recording code using an R Script <span class="math inline">\(\implies\)</span> Using RStudio</li>
+<li>Importing spreadsheet-style data
+<ul>
+<li>What is a data frame?</li>
+<li>What is a vector</li>
+</ul></li>
+<li>Using functions <span class="math inline">\(\implies\)</span> naming arguments</li>
+</ol>
+</section>
+<section id="todays-content" class="level2">
+<h2 class="anchored" data-anchor-id="todays-content">Today’s Content</h2>
+<p>Now that we know the basics we can truly start exploring data frames and that will be the purpose of today’s material. The package <code>readr</code> is actually a core package from an ecosystem known as the <code>tidyverse</code>.</p>
+<p><img src="assets/tidy_workflow.png" class="img-fluid"></p>
+<p>The <code>tidyverse</code> has become the dominant ecosystem for working with data frames and include all of the packages in the above figures. So far, we’ve met <code>readr</code> as the first step in data analysis, and we also briefly discussed <code>tibble</code> objects, which are the core type of <code>data.frame</code> used by the <code>tidyverse</code>, and these were designed carefully with “tidy-programming” in mind.</p>
+<p>Throughout today’s session, we’ll mainly learn to use the packages <code>tidyr</code> and <code>dplyr</code> as these not only form essential tools for transcriptomics, but also are widely used across all forms of data science.</p>
+</section>
+<section id="loading-todays-data" class="level2">
+<h2 class="anchored" data-anchor-id="loading-todays-data">Loading Today’s Data</h2>
+<p>We’ll continue using the same <code>csv</code> as the last session, so let’s load this how we did last week, but with one key difference. Instead of writing <code>library(readr)</code> at the top of our script, we’ll use <code>library(tidyverse)</code> which loads all of the packages in the above figure with a single line. We’ll mention which package we’re working with at the time as that can be very helpful information to know when unexpected problems arise.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tidyverse)</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>psen2VsWT <span class="ot">&lt;-</span> <span class="fu">read_csv</span>(<span class="st">"data/psen2VsWT.csv"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell">
+<div class="cell-output cell-output-stderr">
+<pre><code>── Attaching core tidyverse packages ──────────────────────── tidyverse 2.0.0 ──
+✔ dplyr     1.1.4     ✔ readr     2.1.5
+✔ forcats   1.0.1     ✔ stringr   1.6.0
+✔ ggplot2   4.0.0     ✔ tibble    3.3.0
+✔ lubridate 1.9.4     ✔ tidyr     1.3.1
+✔ purrr     1.2.0     
+── Conflicts ────────────────────────────────────────── tidyverse_conflicts() ──
+✖ dplyr::filter() masks stats::filter()
+✖ dplyr::lag()    masks stats::lag()
+ℹ Use the conflicted package (&lt;http://conflicted.r-lib.org/&gt;) to force all conflicts to become errors
+Rows: 16021 Columns: 15
+── Column specification ────────────────────────────────────────────────────────
+Delimiter: ","
+chr (6): gene_id, gene_name, chromosome, gene_biotype, description, entrezid
+dbl (9): logFC, logCPM, PValue, FDR, start, end, gc_content, length, LR
+
+ℹ Use `spec()` to retrieve the full column specification for this data.
+ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.</code></pre>
+</div>
+</div>
+<p>All of this text is actually just the tidyverse being helpful and letting us know what has been done. It can look a but overwhelming or annoying, but it’s really informative for when things go wrong. You’ll notice that is starts by telling is which packages have been loaded, then comes a strange message:</p>
+<pre><code>✖ dplyr::filter() masks stats::filter()</code></pre>
+<p>This is letting us know that the package <code>dplyr</code> has loaded a function called <code>filter()</code> and that a function was already loaded with that name from the package <code>stats</code>, which is formally referred to using <code>stats::filter()</code> telling us which package the former version was from. Each package brings with it a set of visible functions, and these functions collectively form what is referred to as the <code>namespace</code>, so using <code>stats::filter()</code> is the shorthand way of saying the function <code>filter()</code> from the namespace of functions from the the <code>stats</code> package. That’ll be handy to know at the end of the session especially.</p>
+<p>After that is the messages from <code>readr</code> that we also saw last time, but didn’t really pay attention to.</p>
+</section>
+</section>
+<section id="the-tidyverse" class="level1">
+<h1>The Tidyverse</h1>
+<section id="the-magrittr" class="level2">
+<h2 class="anchored" data-anchor-id="the-magrittr">The <code>magrittr</code></h2>
+<div class="columns">
+<div class="column" style="width:75%;">
+<p>The <code>magrittr</code> is perhaps one of the most useful packages in the <code>tidyverse</code> and has profoundly changed the way we work in R. If you’re familiar with the pipe (<code>|</code>) in <code>bash</code>, it implements the R equivalent <code>%&gt;%</code> known as “The Magrittr”. This in turn is a play on the painting <a href="https://en.wikipedia.org/wiki/The_Treachery_of_Images">The Treachery of Images, by René Magritte</a>.</p>
+<p>The symbol <code>%&gt;%</code> takes the output of one function passes it to the input of the next function, exactly like the <code>|</code> symbol in <code>bash</code>.</p>
+<p>Let’s see it in action to really grasp this concept.</p>
+</div><div class="column" style="width:25%;">
+<p><img src="https://magrittr.tidyverse.org/logo.png" class="img-fluid"></p>
+</div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="do">## Calling `head()` on the `euro` vector will print the first 6 values</span></span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(euro)</span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a><span class="do">## We could rewrite this using the magrittr</span></span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>euro <span class="sc">%&gt;%</span> <span class="fu">head</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>In this second version, the <code>magrittr</code> has passed the object <code>euro</code> to become the first argument of the function <code>head()</code>. We can only pass objects to become the first argument of a function using this starategy, but that’s usually what we want to do anyway. It means we can’t name this argument, but that’s usually OK for the the first argument too.</p>
+<p>This opens up the possibility of chaining together multiple functions with a toy example being</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>euro <span class="sc">%&gt;%</span> <span class="fu">head</span>() <span class="sc">%&gt;%</span> <span class="fu">sqrt</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="callout callout-style-default callout-important callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Important
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Using this approach has completely changed the way we work in R as we can avoid creating multiple intermediate files which was the early way we did things. We’d have to call a function &amp; save the output, then pass that to the next function and so on. It led to very messy Global Environments with multiple versions of objects that had all been modified slightly, such as <code>data</code> followed by <code>data_subset</code>, then <code>data_subset_sorted</code> and so on.</p>
+<p>The development of <code>magrittr</code> has resulted in base R implementing it’s own version, known colloquially as the “base pipe”. This uses the symbol <code>|&gt;</code>, so it’s a little more reminiscent of the <code>bash</code> pipe with an arrow stuck on it. The two versions behave identically about 99% of the time, but there are subtle differences which we won’t discuss. The <code>magrittr</code> implementation usually plays the most nicely with the <code>tidyverse</code> so we’ll use that, but it’s really personal preference once you’re writing your own code.</p>
+</div>
+</div>
+<p>The entire tidyverse ecosystem is heavily based on this type of approach to data, so we’ll ‘pipe’ objects consistently in the subsequent sections.</p>
+</section>
+<section id="the-package-dplyr" class="level2">
+<h2 class="anchored" data-anchor-id="the-package-dplyr">The package <code>dplyr</code></h2>
+<div class="columns">
+<div class="column" style="width:75%;">
+<p>The most heavily used (and arguably the most useful) package in the tidyverse is <code>dplyr</code> (with a fancy new logo on the right). Many of the functions and approaches we’re familiar with from Excel are implemented here, with the most common being sorting columns are applying a filter based on the values in a column.</p>
+<p>For the following examples, it’s important to note that we’re never over-writing our original data object. This is simply demonstrating ways to explore the data, which forms such a vital part of all data science.</p>
+</div><div class="column" style="width:25%;">
+<p><img src="https://dplyr.tidyverse.org//logo.png" class="img-fluid"></p>
+</div>
+</div>
+<section id="sorting-and-filtering" class="level3">
+<h3 class="anchored" data-anchor-id="sorting-and-filtering">Sorting and Filtering</h3>
+<p>One of the most common operations we perform on data is to sort by the values in a column. The <code>dplyr</code> function designed for this is <code>arrange</code> and we simply provide a data.frame followed by one or more column name. In the example below, we’ll sort the genes based on the expression level (<code>logCPM</code>).</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="do">## Sort our data by average expression (logCPM)</span></span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>psen2VsWT <span class="sc">%&gt;%</span> <span class="fu">arrange</span>(logCPM)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>Here we’ve used the <code>magrittr</code> straight away, and as noted, we haven’t changed the object <code>psen2VsWT</code> at all, we’ve just sorted by the column <code>logCPM</code> as it prints to the Console. You might have noticed that the values in that column are now in ascending order. This is the default behaviour for sorting, but we can swicth that around by wrapping the column name in <code>desc()</code></p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="do">## Now sort in descending order of expression</span></span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>psen2VsWT <span class="sc">%&gt;%</span> <span class="fu">arrange</span>(<span class="fu">desc</span>(logCPM))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>We can also sort any character columns, and these will appear in alphanumeric order. Let’s sort the chromosome column, followed by the start co-ordinates, so we have these in genomic order.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="do">## Sort by chromosome, then starting position</span></span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>psen2VsWT <span class="sc">%&gt;%</span> <span class="fu">arrange</span>(chromosome, start)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p><strong>How would you sort these in order of descending gene length?</strong></p>
+<p>Now that we know how to display our data frame after sorting, we might like to filter based on certain values, and the <code>dplyr</code> function we can use for this is <code>filter()</code> In order to do this, we’re actually applying what’s known as a logical test. Many of these are quite intuitive. As our first challenge, we might like to find the “Differentially Expressed” (DE) genes which have an FDR-adjusted p-value below <span class="math inline">\(\alpha = 0.01\)</span></p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="do">## Find the significant genes to an FDR of 0.01</span></span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>psen2VsWT <span class="sc">%&gt;%</span> <span class="fu">filter</span>(FDR <span class="sc">&lt;</span> <span class="fl">0.01</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>This has given us 2470 genes, which is a lot! Maybe we can just look at the most up-regulated in our experiment, which are those with a logFC &gt; 0.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb10"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="do">## Show the results in descending order of change, but keeping </span></span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a><span class="do">## to only those with an FDR &lt; 0.01</span></span>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a>psen2VsWT <span class="sc">%&gt;%</span> <span class="fu">filter</span>(FDR <span class="sc">&lt;</span> <span class="fl">0.01</span>) <span class="sc">%&gt;%</span> <span class="fu">arrange</span>(<span class="fu">desc</span>(logFC))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>So now we can easily find our most up-regulated genes, which have strong statistical support for being differentially expressed in our experiment!</p>
+<p><strong>Find the shortest DE genes using this approach</strong></p>
+<p>Notice these are mostly snRNA or snoRNAs, which makes a lot of sense when we’re looking for short genes.</p>
+<section id="combining-functions" class="level4">
+<h4 class="anchored" data-anchor-id="combining-functions">Combining Functions</h4>
+<p>In the previous line and your task, we’ve actually executed three commands on a single line of code.</p>
+<ol type="1">
+<li><code>print()</code> the object to the Console
+<ul>
+<li>Calling an object by name actually calls the function <code>print()</code></li>
+</ul></li>
+<li>Filter the object based on a significant statistical test</li>
+<li>Arrange in order of some other variable of interest</li>
+</ol>
+<p>As we move forward, the number of operations we’ll perform will continue extending. To make these processes easier to read, we often call a new process on a new line.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb11"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="do">## Now organise the code so each function has it's own line</span></span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>psen2VsWT <span class="sc">%&gt;%</span> </span>
+<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(FDR <span class="sc">&lt;</span> <span class="fl">0.01</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">arrange</span>(<span class="fu">desc</span>(logFC))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>This makes it incredibly easy to comment a line in or out, or stop part way through (by removing a <code>%&gt;%</code>) as we figure out what we’re trying to do.</p>
+<div class="callout callout-style-default callout-important callout-titled" title="Logical Tests">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Logical Tests
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>The logical test we applied above was pretty intuitive and most of us immediately understood we were filtering based on a value being less than 0.01. We can apply multiple different types of test that also enable filtering by <code>character</code> columns or using multiple values. The table below describes some key logical tests we can easily perform in R.</p>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th style="text-align: left;">Symbol</th>
+<th style="text-align: left;">Interpretation</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;"><code>&lt;</code>; <code>&lt;=</code></td>
+<td style="text-align: left;">Strictly less than; less than or equal to</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"><code>&gt;</code>; <code>&gt;=</code></td>
+<td style="text-align: left;">Strictly greater than; greater than or equal to</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;"><code>==</code></td>
+<td style="text-align: left;">Is exactly equal to</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"><code>!=</code></td>
+<td style="text-align: left;">Is <strong>NOT</strong> equal to</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;"><code>%in%</code></td>
+<td style="text-align: left;">Is in a set of values</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"><code>is.na()</code></td>
+<td style="text-align: left;">Is missing</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<p>Now let’s try filtering by exactly matching a character string</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb12"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="do">## Find the protein coding genes with an FDR &lt; 0.01</span></span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a><span class="do">## Then sort by length</span></span>
+<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a>psen2VsWT <span class="sc">%&gt;%</span> </span>
+<span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(FDR <span class="sc">&lt;</span> <span class="fl">0.01</span>, gene_biotype <span class="sc">==</span> <span class="st">"protein_coding"</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb12-5"><a href="#cb12-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">arrange</span>(length)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>So now we can find our shortest protein coding genes! Let’s look for the DE genes which aren’t protein coding.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb13"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="do">## Find the non-protein coding DE genes using `!=` to specify </span></span>
+<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a><span class="do">## Is NOT equal to</span></span>
+<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a>psen2VsWT <span class="sc">%&gt;%</span> </span>
+<span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(FDR <span class="sc">&lt;</span> <span class="fl">0.01</span>, gene_biotype <span class="sc">!=</span> <span class="st">"protein_coding"</span>) </span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p><strong>Mitochondrial genes are on the chromosome <code>chrM</code>. Find all of the DE genes on the mitochondrial chromosome</strong></p>
+<p>Mapping between European (Ensembl) and American (EntrezGene) data bases can be tricky and in our data there are some genes which haven’t been mapped to an EntrezGene ID (<code>entrezid</code>), instead showing as <code>NA</code> in this column. Given this means the data is missing the only logical test we can use for this type of data is <code>is.na()</code></p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb14"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="do">## Find the genes which were not mapped to the EntrezGene database</span></span>
+<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a>psen2VsWT <span class="sc">%&gt;%</span> </span>
+<span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(<span class="fu">is.na</span>(entrezid))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>The final logical test we should understand is <code>%in%</code> which we read as “is in”. For this test, we pass a vector of possible values, providing multiple options for an exact match.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb15"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="do">## Find all of the lincRNA and pseudogenes, then arrange</span></span>
+<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a><span class="do">## in descending order of expression</span></span>
+<span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a>psen2VsWT <span class="sc">%&gt;%</span> </span>
+<span id="cb15-4"><a href="#cb15-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(gene_biotype <span class="sc">%in%</span> <span class="fu">c</span>(<span class="st">"lincRNA"</span>, <span class="st">"pseudogene"</span>)) <span class="sc">%&gt;%</span> </span>
+<span id="cb15-5"><a href="#cb15-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">arrange</span>(<span class="fu">desc</span>(logCPM))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+</section>
+<section id="adding-and-modifying-columns" class="level3">
+<h3 class="anchored" data-anchor-id="adding-and-modifying-columns">Adding and Modifying Columns</h3>
+<p>Not only can we sort and filter our data during exploration, but we can add columns or modify them using the function <code>mutate()</code>. A simple option might be to add a logical column <code>DE</code> which denotes that a gene has passed statistical significance.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb16"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a>psen2VsWT <span class="sc">%&gt;%</span> </span>
+<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">DE =</span> FDR <span class="sc">&lt;</span> <span class="fl">0.01</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>We haven’t actually modified our underlying data object here but this can be very useful for creating quick summaries.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb17"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a>psen2VsWT <span class="sc">%&gt;%</span> </span>
+<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">DE =</span> FDR <span class="sc">&lt;</span> <span class="fl">0.01</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">count</span>(DE)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>The <code>count()</code> function really allows us to drill into our results quickly</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb18"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a>psen2VsWT <span class="sc">%&gt;%</span> </span>
+<span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">DE =</span> FDR <span class="sc">&lt;</span> <span class="fl">0.01</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb18-3"><a href="#cb18-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">count</span>(DE, gene_biotype, <span class="at">sort =</span> <span class="cn">TRUE</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb18-4"><a href="#cb18-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(DE)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>Notice that we simply called the column <code>DE</code> inside <code>filter()</code>. It’s already a logical value so we didn’t need to perform any further logical tests. This is actually what every logical test returns, as you may remember from the start of a our very first session.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb19"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a>x <span class="ot">&lt;-</span> <span class="dv">1</span><span class="sc">:</span><span class="dv">5</span></span>
+<span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a>x <span class="sc">&gt;</span> <span class="dv">1</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>We can create columns based on other columns very easily</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb20"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a>psen2VsWT <span class="sc">%&gt;%</span> </span>
+<span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">length_kb =</span> length <span class="sc">/</span> <span class="dv">1000</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="callout callout-style-default callout-tip callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Tip
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Once we move to making figures and plots, this approach will become an essential step. We can leave our original object untouched, but modify or summarise “on the fly”. This keeps our Global Environment cleaner and tidier, which also helps minimise the opportunity for mistakes.</p>
+</div>
+</div>
+</section>
+<section id="slicing-columns" class="level3">
+<h3 class="anchored" data-anchor-id="slicing-columns">Slicing Columns</h3>
+<p>As we’ve learned, <code>tibble</code> objects don’t allow rownames, so we’re not able to call by rownames. As an alternative to using the square brackets (<code>[]</code>) <code>dplyr</code> provides the function <code>slice()</code> which allows us to slice rows out of our data.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb21"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a><span class="do">## Just pull out the top 5 genes</span></span>
+<span id="cb21-2"><a href="#cb21-2" aria-hidden="true" tabindex="-1"></a>psen2VsWT <span class="sc">%&gt;%</span> </span>
+<span id="cb21-3"><a href="#cb21-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">slice</span>(<span class="dv">1</span><span class="sc">:</span><span class="dv">5</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>We don’t need these to be consecutive numbers, but they usually will be as we’ll have sorted and filtered on the way there.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb22"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a><span class="do">## Find the 5 genes with the largets up-regulation</span></span>
+<span id="cb22-2"><a href="#cb22-2" aria-hidden="true" tabindex="-1"></a>psen2VsWT <span class="sc">%&gt;%</span> </span>
+<span id="cb22-3"><a href="#cb22-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">arrange</span>(<span class="fu">desc</span>(logFC)) <span class="sc">%&gt;%</span> </span>
+<span id="cb22-4"><a href="#cb22-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">slice</span>(<span class="dv">1</span><span class="sc">:</span><span class="dv">5</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>By leveraging the additional argument <code>.by</code> we easily slice out the most significantly DE gene on each chromosome</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb23"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a><span class="do">## Slice out the most DE gene on each chromosome</span></span>
+<span id="cb23-2"><a href="#cb23-2" aria-hidden="true" tabindex="-1"></a>psen2VsWT <span class="sc">%&gt;%</span> </span>
+<span id="cb23-3"><a href="#cb23-3" aria-hidden="true" tabindex="-1"></a>  dplyr<span class="sc">::</span><span class="fu">filter</span>(FDR <span class="sc">&lt;</span> <span class="fl">0.01</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb23-4"><a href="#cb23-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">slice</span>(<span class="dv">1</span>, <span class="at">.by =</span> chromosome)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p><strong>How would we arrange this to be in chromosomal order?</strong></p>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Note
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Although we can still use the quare brackets, placing them in a long chain of expression like above can be clumsy and provides challenges for inexperienced programmers. <code>slice()</code> provides a simple alternative the works beautifully in these long chains of commands</p>
+</div>
+</div>
+</section>
+<section id="selecting-columns" class="level3">
+<h3 class="anchored" data-anchor-id="selecting-columns">Selecting Columns</h3>
+<p>As well as providing a function to slice out rows, we can use the function <code>select()</code> to choose a subset of columns.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb24"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a>psen2VsWT <span class="sc">%&gt;%</span> </span>
+<span id="cb24-2"><a href="#cb24-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(gene_id, gene_name, gene_biotype)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>A set of helper functions, make this process incredibly simple and powerful.</p>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 35%">
+<col style="width: 65%">
+</colgroup>
+<thead>
+<tr class="header">
+<th style="text-align: left;">Helper</th>
+<th style="text-align: left;">What it Does</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;"><code>starts_with()</code></td>
+<td style="text-align: left;">Select columns that start with a text string</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"><code>ends_with()</code></td>
+<td style="text-align: left;">Select columns that end with a text string</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;"><code>contains()</code></td>
+<td style="text-align: left;">Select columns that contain a sequence of characters</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"><code>matches()</code></td>
+<td style="text-align: left;">Select columns that match a regular expression</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;"><code>everything()</code></td>
+<td style="text-align: left;">Select everything</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"><code>all_of()</code></td>
+<td style="text-align: left;">Takes a character vector and selects all columns in the vector</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;"><code>any_of()</code></td>
+<td style="text-align: left;">Takes a character vector and selects any columns in the vector</td>
+</tr>
+</tbody>
+</table>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb25"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a>psen2VsWT <span class="sc">%&gt;%</span> </span>
+<span id="cb25-2"><a href="#cb25-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(<span class="fu">starts_with</span>(<span class="st">"gene"</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>We can easily remove columns by simply placing a subtraction sign before the selection</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb26"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a>psen2VsWT <span class="sc">%&gt;%</span> </span>
+<span id="cb26-2"><a href="#cb26-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(<span class="sc">-</span><span class="fu">starts_with</span>(<span class="st">"gene"</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>The <code>everything()</code> helper is surprisingly useful as we can use this to rearrange the column order</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb27"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true" tabindex="-1"></a>psen2VsWT <span class="sc">%&gt;%</span> </span>
+<span id="cb27-2"><a href="#cb27-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(<span class="fu">all_of</span>(<span class="fu">c</span>(<span class="st">"chromosome"</span>, <span class="st">"start"</span>, <span class="st">"end"</span>)), <span class="fu">everything</span>())</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+<section id="creating-summaries" class="level3">
+<h3 class="anchored" data-anchor-id="creating-summaries">Creating Summaries</h3>
+<p>We’ve already had a sneak peak at the function <code>count()</code>, but the function <code>summarise()</code> is another heavy hitter of the <code>dplyr</code> package. We can create summary values for any column we choose. In the following, we’re using mutate to create the column DE like earlier, but when we call <code>sum()</code> on a logical vector, all <code>TRUE</code> value take the value <code>1</code>, whilst all <code>FALSE</code> values take the value <code>0</code>. This strategy effectively counts the DE genes, but adding the <code>TRUE</code> values.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb28"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb28-1"><a href="#cb28-1" aria-hidden="true" tabindex="-1"></a>psen2VsWT <span class="sc">%&gt;%</span> </span>
+<span id="cb28-2"><a href="#cb28-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">DE =</span> FDR <span class="sc">&lt;</span> <span class="fl">0.01</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb28-3"><a href="#cb28-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(</span>
+<span id="cb28-4"><a href="#cb28-4" aria-hidden="true" tabindex="-1"></a>    <span class="at">n =</span> <span class="fu">n</span>(),</span>
+<span id="cb28-5"><a href="#cb28-5" aria-hidden="true" tabindex="-1"></a>    <span class="at">DE =</span> <span class="fu">sum</span>(DE),</span>
+<span id="cb28-6"><a href="#cb28-6" aria-hidden="true" tabindex="-1"></a>    <span class="at">mean_logCPM =</span> <span class="fu">mean</span>(logCPM),</span>
+<span id="cb28-7"><a href="#cb28-7" aria-hidden="true" tabindex="-1"></a>    <span class="at">mean_gc =</span> <span class="fu">mean</span>(gc_content)</span>
+<span id="cb28-8"><a href="#cb28-8" aria-hidden="true" tabindex="-1"></a>  )</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>Whilst this gave a summary for the entire dataset, we can again call the <code>.by</code> argument to create summaries by gene biotype. Then we can add a <code>mutate</code> to find if any biotype seems to be more likely to be considered as DE</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb29"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb29-1"><a href="#cb29-1" aria-hidden="true" tabindex="-1"></a>psen2VsWT <span class="sc">%&gt;%</span> </span>
+<span id="cb29-2"><a href="#cb29-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">DE =</span> FDR <span class="sc">&lt;</span> <span class="fl">0.01</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb29-3"><a href="#cb29-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(</span>
+<span id="cb29-4"><a href="#cb29-4" aria-hidden="true" tabindex="-1"></a>    <span class="at">n =</span> <span class="fu">n</span>(),</span>
+<span id="cb29-5"><a href="#cb29-5" aria-hidden="true" tabindex="-1"></a>    <span class="at">n_sig =</span> <span class="fu">sum</span>(DE),</span>
+<span id="cb29-6"><a href="#cb29-6" aria-hidden="true" tabindex="-1"></a>    <span class="at">mean_logCPM =</span> <span class="fu">mean</span>(logCPM),</span>
+<span id="cb29-7"><a href="#cb29-7" aria-hidden="true" tabindex="-1"></a>    <span class="at">mean_gc =</span> <span class="fu">mean</span>(gc_content),</span>
+<span id="cb29-8"><a href="#cb29-8" aria-hidden="true" tabindex="-1"></a>    <span class="at">.by =</span> gene_biotype</span>
+<span id="cb29-9"><a href="#cb29-9" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">%&gt;%</span> </span>
+<span id="cb29-10"><a href="#cb29-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">prop_DE =</span> n_sig <span class="sc">/</span> n)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="[.callout-note]">
+<p>The package <code>dplyr</code> is immensely powerful and forms the backbone of much modern data science. There is a wide variety of functions that we haven’t introduced, but the ones above are the most vital and useful amongst those on offer.</p>
+<p>As you’ve seen, the use of these general R packages also extends into transcriptomics and the entire filed of bioinformatics. Most bioinformaticians who work in R spend a good amount of each day working with data using the <code>tidyverse</code> in this way.</p>
+</div>
+</section>
+</section>
+<section id="the-package-tidyr" class="level2">
+<h2 class="anchored" data-anchor-id="the-package-tidyr">The package <code>tidyr</code></h2>
+<p>The final package we’ll familiarise ourselves with today is the package <code>tidyr</code>. We’ll only cover two functions: <code>pivot_wider()</code> and <code>pivot_longer()</code> These are the most heavily used and applicable to our needs.</p>
+<section id="pivot-wider" class="level3">
+<h3 class="anchored" data-anchor-id="pivot-wider">Pivot Wider</h3>
+<p>As you may expect, the <code>pivot_*</code> functions are similar to the Excel-based operations. These also become very useful when working with summary tables</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb30"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb30-1"><a href="#cb30-1" aria-hidden="true" tabindex="-1"></a>psen2VsWT <span class="sc">%&gt;%</span> </span>
+<span id="cb30-2"><a href="#cb30-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">DE =</span> FDR <span class="sc">&lt;</span> <span class="fl">0.01</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb30-3"><a href="#cb30-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">count</span>(DE, gene_biotype)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>We might like to have separate columns for <code>TRUE</code> and <code>FALSE</code>, which is where <code>pivot_wider()</code> comes in handy</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb31"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb31-1"><a href="#cb31-1" aria-hidden="true" tabindex="-1"></a>psen2VsWT <span class="sc">%&gt;%</span> </span>
+<span id="cb31-2"><a href="#cb31-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">DE =</span> FDR <span class="sc">&lt;</span> <span class="fl">0.01</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb31-3"><a href="#cb31-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">count</span>(DE, gene_biotype, <span class="at">sort =</span> <span class="cn">TRUE</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb31-4"><a href="#cb31-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pivot_wider</span>(<span class="at">names_from =</span> DE, <span class="at">values_from =</span> n)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>As you can see, not all values were able to be filled as there were no misc_RNA, unprocessed pseudogenes etc that were consideed DE, and these values were absent from our original summary. By providing the argument <code>values_fill = 0</code> we can place zeroes where there were missing values</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb32"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb32-1"><a href="#cb32-1" aria-hidden="true" tabindex="-1"></a>psen2VsWT <span class="sc">%&gt;%</span> </span>
+<span id="cb32-2"><a href="#cb32-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">DE =</span> FDR <span class="sc">&lt;</span> <span class="fl">0.01</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb32-3"><a href="#cb32-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">count</span>(DE, gene_biotype, <span class="at">sort =</span> <span class="cn">TRUE</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb32-4"><a href="#cb32-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pivot_wider</span>(<span class="at">names_from =</span> DE, <span class="at">values_from =</span> n, <span class="at">values_fill =</span> <span class="dv">0</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>Having column names <code>TRUE</code> and <code>FALSE</code> may not be particularly informative, so the <code>dplyr</code> function <code>rename()</code> may be useful here</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb33"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb33-1"><a href="#cb33-1" aria-hidden="true" tabindex="-1"></a>psen2VsWT <span class="sc">%&gt;%</span> </span>
+<span id="cb33-2"><a href="#cb33-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">DE =</span> FDR <span class="sc">&lt;</span> <span class="fl">0.01</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb33-3"><a href="#cb33-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">count</span>(DE, gene_biotype, <span class="at">sort =</span> <span class="cn">TRUE</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb33-4"><a href="#cb33-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pivot_wider</span>(<span class="at">names_from =</span> DE, <span class="at">values_from =</span> n, <span class="at">values_fill =</span> <span class="dv">0</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb33-5"><a href="#cb33-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">rename</span>(<span class="at">DE =</span> <span class="st">`</span><span class="at">TRUE</span><span class="st">`</span>, <span class="at">notDE =</span> <span class="st">`</span><span class="at">FALSE</span><span class="st">`</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="callout callout-style-default callout-important callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Important
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>The values <code>TRUE</code> and <code>FALSE</code> are actually special values in R and to use these as column names, you’ll notice they were encased in backticks (`). This is how R allows you to use column names that might be otherwise a bit tricky. (R also doesn’t like spaces in column names, so these are treated the same way)</p>
+</div>
+</div>
+<p>Now we could use <code>mutate()</code> to create a totals column</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb34"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb34-1"><a href="#cb34-1" aria-hidden="true" tabindex="-1"></a>psen2VsWT <span class="sc">%&gt;%</span> </span>
+<span id="cb34-2"><a href="#cb34-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">DE =</span> FDR <span class="sc">&lt;</span> <span class="fl">0.01</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb34-3"><a href="#cb34-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">count</span>(DE, gene_biotype, <span class="at">sort =</span> <span class="cn">TRUE</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb34-4"><a href="#cb34-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pivot_wider</span>(<span class="at">names_from =</span> DE, <span class="at">values_from =</span> n, <span class="at">values_fill =</span> <span class="dv">0</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb34-5"><a href="#cb34-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">rename</span>(<span class="at">DE =</span> <span class="st">`</span><span class="at">TRUE</span><span class="st">`</span>, <span class="at">notDE =</span> <span class="st">`</span><span class="at">FALSE</span><span class="st">`</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb34-6"><a href="#cb34-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">Total =</span> DE <span class="sc">+</span> notDE)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+<section id="pivot-longer" class="level3">
+<h3 class="anchored" data-anchor-id="pivot-longer">Pivot Longer</h3>
+<p>Instead of pivoting our data so it appears wider across the page, <code>pivot_longer()</code> instead can join values from multiple columns into a single column, but adding the original column names as a parallel column. We can use the helper functions we saw earlier to specify which columns pivot down the page</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb35"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb35-1"><a href="#cb35-1" aria-hidden="true" tabindex="-1"></a>psen2VsWT <span class="sc">%&gt;%</span> </span>
+<span id="cb35-2"><a href="#cb35-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pivot_longer</span>(</span>
+<span id="cb35-3"><a href="#cb35-3" aria-hidden="true" tabindex="-1"></a>    <span class="at">cols =</span> <span class="fu">all_of</span>(<span class="fu">c</span>(<span class="st">"gc_content"</span>, <span class="st">"length"</span>)), <span class="at">names_to =</span> <span class="st">"measure"</span>, </span>
+<span id="cb35-4"><a href="#cb35-4" aria-hidden="true" tabindex="-1"></a>    <span class="at">values_to =</span> <span class="st">"value"</span></span>
+<span id="cb35-5"><a href="#cb35-5" aria-hidden="true" tabindex="-1"></a>  )</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>Given that we’ve taken the columns <code>gc_content</code> and <code>length</code> and put them in long format, you might notice that now we have double the rows. So far that hasn’t been particularly meaningful, but once we bring <code>summarise()</code> into play using the <code>.by</code> argument, we can produce informative summary statistics very simply</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb36"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb36-1"><a href="#cb36-1" aria-hidden="true" tabindex="-1"></a>psen2VsWT <span class="sc">%&gt;%</span> </span>
+<span id="cb36-2"><a href="#cb36-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">pivot_longer</span>(</span>
+<span id="cb36-3"><a href="#cb36-3" aria-hidden="true" tabindex="-1"></a>    <span class="at">cols =</span> <span class="fu">all_of</span>(<span class="fu">c</span>(<span class="st">"gc_content"</span>, <span class="st">"length"</span>)), <span class="at">names_to =</span> <span class="st">"measure"</span>, </span>
+<span id="cb36-4"><a href="#cb36-4" aria-hidden="true" tabindex="-1"></a>    <span class="at">values_to =</span> <span class="st">"value"</span></span>
+<span id="cb36-5"><a href="#cb36-5" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">%&gt;%</span> </span>
+<span id="cb36-6"><a href="#cb36-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(</span>
+<span id="cb36-7"><a href="#cb36-7" aria-hidden="true" tabindex="-1"></a>    <span class="at">min =</span> <span class="fu">min</span>(value),</span>
+<span id="cb36-8"><a href="#cb36-8" aria-hidden="true" tabindex="-1"></a>    <span class="at">mean =</span> <span class="fu">mean</span>(value),</span>
+<span id="cb36-9"><a href="#cb36-9" aria-hidden="true" tabindex="-1"></a>    <span class="at">median =</span> <span class="fu">median</span>(value),</span>
+<span id="cb36-10"><a href="#cb36-10" aria-hidden="true" tabindex="-1"></a>    <span class="at">max =</span> <span class="fu">max</span>(value),</span>
+<span id="cb36-11"><a href="#cb36-11" aria-hidden="true" tabindex="-1"></a>    <span class="at">.by =</span> measure</span>
+<span id="cb36-12"><a href="#cb36-12" aria-hidden="true" tabindex="-1"></a>  )</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+</section>
+</section>
+<section id="conclusion" class="level1">
+<h1>Conclusion</h1>
+<p>So far in our practical series, we’ve seen the <code>tidyverse</code> packages <code>readr</code>, <code>tidyr</code>, <code>tibble</code>, <code>dplyr</code> and <code>magrittr</code> in action, and how they all form a seamless ecosystem of tools and capabilities. These are the day to day packages used by bioinformaticians and data scientists around the world.</p>
+<p>In the next session, we’ll introduce <code>ggplot2</code>, <code>stringr</code> and <code>forcats</code> so we can move into visualising our data and creating figures, instead of just looking at data frames.</p>
+<div class="callout callout-style-default callout-important callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Important
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>The package <code>dplyr</code> was written to mimic many of the capabilities of the language SQL, which is a database language. <code>SQL</code> has functions called <code>select</code> and <code>filter</code> and many others, which is why <code>dplyr</code> used these function names.</p>
+<p>Unfortunately, many other packages have functions called <code>select()</code>, <code>filter()</code>, <code>slice()</code>, <code>count()</code> etc. Sometimes we have these packages loaded at the same time and it’s difficult for R to determine which version of the function is needed. <strong>This is why namespaces were developed</strong>, so we can associate a function with the package it is exported by (or loaded by).</p>
+<p>If at some point in your future R programming adventures you see one of these functions behaving unexpectedly or giving an error, call it explicitly from the namespace using <code>dplyr::select()</code> or <code>dplyr::filter()</code>. Given that these two functions regularly seem to suffer from this issue, many R users always call these two in this manner just to save themselves some headaches.</p>
+</div>
+</div>
+</section>
+
+</main>
+<!-- /main column -->
+<script id="quarto-html-after-body" type="application/javascript">
+  window.document.addEventListener("DOMContentLoaded", function (event) {
+    const icon = "";
+    const anchorJS = new window.AnchorJS();
+    anchorJS.options = {
+      placement: 'right',
+      icon: icon
+    };
+    anchorJS.add('.anchored');
+    const isCodeAnnotation = (el) => {
+      for (const clz of el.classList) {
+        if (clz.startsWith('code-annotation-')) {                     
+          return true;
+        }
+      }
+      return false;
+    }
+    const onCopySuccess = function(e) {
+      // button target
+      const button = e.trigger;
+      // don't keep focus
+      button.blur();
+      // flash "checked"
+      button.classList.add('code-copy-button-checked');
+      var currentTitle = button.getAttribute("title");
+      button.setAttribute("title", "Copied!");
+      let tooltip;
+      if (window.bootstrap) {
+        button.setAttribute("data-bs-toggle", "tooltip");
+        button.setAttribute("data-bs-placement", "left");
+        button.setAttribute("data-bs-title", "Copied!");
+        tooltip = new bootstrap.Tooltip(button, 
+          { trigger: "manual", 
+            customClass: "code-copy-button-tooltip",
+            offset: [0, -8]});
+        tooltip.show();    
+      }
+      setTimeout(function() {
+        if (tooltip) {
+          tooltip.hide();
+          button.removeAttribute("data-bs-title");
+          button.removeAttribute("data-bs-toggle");
+          button.removeAttribute("data-bs-placement");
+        }
+        button.setAttribute("title", currentTitle);
+        button.classList.remove('code-copy-button-checked');
+      }, 1000);
+      // clear code selection
+      e.clearSelection();
+    }
+    const getTextToCopy = function(trigger) {
+        const codeEl = trigger.previousElementSibling.cloneNode(true);
+        for (const childEl of codeEl.children) {
+          if (isCodeAnnotation(childEl)) {
+            childEl.remove();
+          }
+        }
+        return codeEl.innerText;
+    }
+    const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+      text: getTextToCopy
+    });
+    clipboard.on('success', onCopySuccess);
+    if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+      const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+        text: getTextToCopy,
+        container: window.document.getElementById('quarto-embedded-source-code-modal')
+      });
+      clipboardModal.on('success', onCopySuccess);
+    }
+      var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var mailtoRegex = new RegExp(/^mailto:/);
+        var filterRegex = new RegExp('/' + window.location.host + '/');
+      var isInternal = (href) => {
+          return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+      }
+      // Inspect non-navigation links and adorn them if external
+     var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+      for (var i=0; i<links.length; i++) {
+        const link = links[i];
+        if (!isInternal(link.href)) {
+          // undo the damage that might have been done by quarto-nav.js in the case of
+          // links that we want to consider external
+          if (link.dataset.originalHref !== undefined) {
+            link.href = link.dataset.originalHref;
+          }
+        }
+      }
+    function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+      const config = {
+        allowHTML: true,
+        maxWidth: 500,
+        delay: 100,
+        arrow: false,
+        appendTo: function(el) {
+            return el.parentElement;
+        },
+        interactive: true,
+        interactiveBorder: 10,
+        theme: 'quarto',
+        placement: 'bottom-start',
+      };
+      if (contentFn) {
+        config.content = contentFn;
+      }
+      if (onTriggerFn) {
+        config.onTrigger = onTriggerFn;
+      }
+      if (onUntriggerFn) {
+        config.onUntrigger = onUntriggerFn;
+      }
+      window.tippy(el, config); 
+    }
+    const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+    for (var i=0; i<noterefs.length; i++) {
+      const ref = noterefs[i];
+      tippyHover(ref, function() {
+        // use id or data attribute instead here
+        let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+        try { href = new URL(href).hash; } catch {}
+        const id = href.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note) {
+          return note.innerHTML;
+        } else {
+          return "";
+        }
+      });
+    }
+    const xrefs = window.document.querySelectorAll('a.quarto-xref');
+    const processXRef = (id, note) => {
+      // Strip column container classes
+      const stripColumnClz = (el) => {
+        el.classList.remove("page-full", "page-columns");
+        if (el.children) {
+          for (const child of el.children) {
+            stripColumnClz(child);
+          }
+        }
+      }
+      stripColumnClz(note)
+      if (id === null || id.startsWith('sec-')) {
+        // Special case sections, only their first couple elements
+        const container = document.createElement("div");
+        if (note.children && note.children.length > 2) {
+          container.appendChild(note.children[0].cloneNode(true));
+          for (let i = 1; i < note.children.length; i++) {
+            const child = note.children[i];
+            if (child.tagName === "P" && child.innerText === "") {
+              continue;
+            } else {
+              container.appendChild(child.cloneNode(true));
+              break;
+            }
+          }
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(container);
+          }
+          return container.innerHTML
+        } else {
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(note);
+          }
+          return note.innerHTML;
+        }
+      } else {
+        // Remove any anchor links if they are present
+        const anchorLink = note.querySelector('a.anchorjs-link');
+        if (anchorLink) {
+          anchorLink.remove();
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        if (note.classList.contains("callout")) {
+          return note.outerHTML;
+        } else {
+          return note.innerHTML;
+        }
+      }
+    }
+    for (var i=0; i<xrefs.length; i++) {
+      const xref = xrefs[i];
+      tippyHover(xref, undefined, function(instance) {
+        instance.disable();
+        let url = xref.getAttribute('href');
+        let hash = undefined; 
+        if (url.startsWith('#')) {
+          hash = url;
+        } else {
+          try { hash = new URL(url).hash; } catch {}
+        }
+        if (hash) {
+          const id = hash.replace(/^#\/?/, "");
+          const note = window.document.getElementById(id);
+          if (note !== null) {
+            try {
+              const html = processXRef(id, note.cloneNode(true));
+              instance.setContent(html);
+            } finally {
+              instance.enable();
+              instance.show();
+            }
+          } else {
+            // See if we can fetch this
+            fetch(url.split('#')[0])
+            .then(res => res.text())
+            .then(html => {
+              const parser = new DOMParser();
+              const htmlDoc = parser.parseFromString(html, "text/html");
+              const note = htmlDoc.getElementById(id);
+              if (note !== null) {
+                const html = processXRef(id, note);
+                instance.setContent(html);
+              } 
+            }).finally(() => {
+              instance.enable();
+              instance.show();
+            });
+          }
+        } else {
+          // See if we can fetch a full url (with no hash to target)
+          // This is a special case and we should probably do some content thinning / targeting
+          fetch(url)
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.querySelector('main.content');
+            if (note !== null) {
+              // This should only happen for chapter cross references
+              // (since there is no id in the URL)
+              // remove the first header
+              if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+                note.children[0].remove();
+              }
+              const html = processXRef(null, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      }, function(instance) {
+      });
+    }
+        let selectedAnnoteEl;
+        const selectorForAnnotation = ( cell, annotation) => {
+          let cellAttr = 'data-code-cell="' + cell + '"';
+          let lineAttr = 'data-code-annotation="' +  annotation + '"';
+          const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+          return selector;
+        }
+        const selectCodeLines = (annoteEl) => {
+          const doc = window.document;
+          const targetCell = annoteEl.getAttribute("data-target-cell");
+          const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+          const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+          const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+          const lineIds = lines.map((line) => {
+            return targetCell + "-" + line;
+          })
+          let top = null;
+          let height = null;
+          let parent = null;
+          if (lineIds.length > 0) {
+              //compute the position of the single el (top and bottom and make a div)
+              const el = window.document.getElementById(lineIds[0]);
+              top = el.offsetTop;
+              height = el.offsetHeight;
+              parent = el.parentElement.parentElement;
+            if (lineIds.length > 1) {
+              const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+              const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+              height = bottom - top;
+            }
+            if (top !== null && height !== null && parent !== null) {
+              // cook up a div (if necessary) and position it 
+              let div = window.document.getElementById("code-annotation-line-highlight");
+              if (div === null) {
+                div = window.document.createElement("div");
+                div.setAttribute("id", "code-annotation-line-highlight");
+                div.style.position = 'absolute';
+                parent.appendChild(div);
+              }
+              div.style.top = top - 2 + "px";
+              div.style.height = height + 4 + "px";
+              div.style.left = 0;
+              let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+              if (gutterDiv === null) {
+                gutterDiv = window.document.createElement("div");
+                gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+                gutterDiv.style.position = 'absolute';
+                const codeCell = window.document.getElementById(targetCell);
+                const gutter = codeCell.querySelector('.code-annotation-gutter');
+                gutter.appendChild(gutterDiv);
+              }
+              gutterDiv.style.top = top - 2 + "px";
+              gutterDiv.style.height = height + 4 + "px";
+            }
+            selectedAnnoteEl = annoteEl;
+          }
+        };
+        const unselectCodeLines = () => {
+          const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+          elementsIds.forEach((elId) => {
+            const div = window.document.getElementById(elId);
+            if (div) {
+              div.remove();
+            }
+          });
+          selectedAnnoteEl = undefined;
+        };
+          // Handle positioning of the toggle
+      window.addEventListener(
+        "resize",
+        throttle(() => {
+          elRect = undefined;
+          if (selectedAnnoteEl) {
+            selectCodeLines(selectedAnnoteEl);
+          }
+        }, 10)
+      );
+      function throttle(fn, ms) {
+      let throttle = false;
+      let timer;
+        return (...args) => {
+          if(!throttle) { // first call gets through
+              fn.apply(this, args);
+              throttle = true;
+          } else { // all the others get throttled
+              if(timer) clearTimeout(timer); // cancel #2
+              timer = setTimeout(() => {
+                fn.apply(this, args);
+                timer = throttle = false;
+              }, ms);
+          }
+        };
+      }
+        // Attach click handler to the DT
+        const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+        for (const annoteDlNode of annoteDls) {
+          annoteDlNode.addEventListener('click', (event) => {
+            const clickedEl = event.target;
+            if (clickedEl !== selectedAnnoteEl) {
+              unselectCodeLines();
+              const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+              if (activeEl) {
+                activeEl.classList.remove('code-annotation-active');
+              }
+              selectCodeLines(clickedEl);
+              clickedEl.classList.add('code-annotation-active');
+            } else {
+              // Unselect the line
+              unselectCodeLines();
+              clickedEl.classList.remove('code-annotation-active');
+            }
+          });
+        }
+    const findCites = (el) => {
+      const parentEl = el.parentElement;
+      if (parentEl) {
+        const cites = parentEl.dataset.cites;
+        if (cites) {
+          return {
+            el,
+            cites: cites.split(' ')
+          };
+        } else {
+          return findCites(el.parentElement)
+        }
+      } else {
+        return undefined;
+      }
+    };
+    var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+    for (var i=0; i<bibliorefs.length; i++) {
+      const ref = bibliorefs[i];
+      const citeInfo = findCites(ref);
+      if (citeInfo) {
+        tippyHover(citeInfo.el, function() {
+          var popup = window.document.createElement('div');
+          citeInfo.cites.forEach(function(cite) {
+            var citeDiv = window.document.createElement('div');
+            citeDiv.classList.add('hanging-indent');
+            citeDiv.classList.add('csl-entry');
+            var biblioDiv = window.document.getElementById('ref-' + cite);
+            if (biblioDiv) {
+              citeDiv.innerHTML = biblioDiv.innerHTML;
+            }
+            popup.appendChild(citeDiv);
+          });
+          return popup.innerHTML;
+        });
+      }
+    }
+  });
+  </script>
+</div> <!-- /content -->
+
+
+
+
+</body></html>

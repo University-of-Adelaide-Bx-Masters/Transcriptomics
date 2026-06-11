@@ -1,0 +1,1238 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.7.32">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+<meta name="author" content="Stevie Pederson &amp; Zhipeng Qu">
+
+<title>Transcriptomics Practical</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+html { -webkit-text-size-adjust: 100%; }
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+/* CSS for citations */
+div.csl-bib-body { }
+div.csl-entry {
+  clear: both;
+  margin-bottom: 0em;
+}
+.hanging-indent div.csl-entry {
+  margin-left:2em;
+  text-indent:-2em;
+}
+div.csl-left-margin {
+  min-width:2em;
+  float:left;
+}
+div.csl-right-inline {
+  margin-left:2em;
+  padding-left:1em;
+}
+div.csl-indent {
+  margin-left: 2em;
+}</style>
+
+
+<script src="transcriptome_assembly_files/libs/clipboard/clipboard.min.js"></script>
+<script src="transcriptome_assembly_files/libs/quarto-html/quarto.js" type="module"></script>
+<script src="transcriptome_assembly_files/libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="transcriptome_assembly_files/libs/quarto-html/popper.min.js"></script>
+<script src="transcriptome_assembly_files/libs/quarto-html/tippy.umd.min.js"></script>
+<script src="transcriptome_assembly_files/libs/quarto-html/anchor.min.js"></script>
+<link href="transcriptome_assembly_files/libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="transcriptome_assembly_files/libs/quarto-html/quarto-syntax-highlighting-37eea08aefeeee20ff55810ff984fec1.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="transcriptome_assembly_files/libs/bootstrap/bootstrap.min.js"></script>
+<link href="transcriptome_assembly_files/libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="transcriptome_assembly_files/libs/bootstrap/bootstrap-1e1b6d7d3018d0281420745e134191b0.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+
+
+</head>
+
+<body class="quarto-light">
+
+<div id="quarto-content" class="page-columns page-rows-contents page-layout-article">
+<div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+  <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">Table of contents</h2>
+   
+  <ul>
+  <li><a href="#introduction" id="toc-introduction" class="nav-link active" data-scroll-target="#introduction">Introduction</a>
+  <ul class="collapse">
+  <li><a href="#stringtie" id="toc-stringtie" class="nav-link" data-scroll-target="#stringtie">StringTie</a></li>
+  <li><a href="#trinity" id="toc-trinity" class="nav-link" data-scroll-target="#trinity">Trinity</a></li>
+  <li><a href="#dataset" id="toc-dataset" class="nav-link" data-scroll-target="#dataset">Dataset</a>
+  <ul class="collapse">
+  <li><a href="#the-arabidposis-genome" id="toc-the-arabidposis-genome" class="nav-link" data-scroll-target="#the-arabidposis-genome">The Arabidposis Genome</a></li>
+  <li><a href="#the-rna-seq-dataset" id="toc-the-rna-seq-dataset" class="nav-link" data-scroll-target="#the-rna-seq-dataset">The RNA-Seq dataset</a></li>
+  </ul></li>
+  <li><a href="#tools-and-pipeline" id="toc-tools-and-pipeline" class="nav-link" data-scroll-target="#tools-and-pipeline">Tools and pipeline</a></li>
+  <li><a href="#running-time-estimate-based-on-teaching-vm" id="toc-running-time-estimate-based-on-teaching-vm" class="nav-link" data-scroll-target="#running-time-estimate-based-on-teaching-vm">Running time estimate (based on teaching VM)</a></li>
+  <li><a href="#what-you-will-learn-in-this-practical" id="toc-what-you-will-learn-in-this-practical" class="nav-link" data-scroll-target="#what-you-will-learn-in-this-practical">What you will learn in this Practical</a></li>
+  </ul></li>
+  <li><a href="#practical" id="toc-practical" class="nav-link" data-scroll-target="#practical">Practical</a>
+  <ul class="collapse">
+  <li><a href="#setup-and-preparation" id="toc-setup-and-preparation" class="nav-link" data-scroll-target="#setup-and-preparation">Setup and Preparation</a>
+  <ul class="collapse">
+  <li><a href="#prepare-the-folder-structure" id="toc-prepare-the-folder-structure" class="nav-link" data-scroll-target="#prepare-the-folder-structure">Prepare The Folder Structure</a></li>
+  <li><a href="#raw-data-and-reference-data" id="toc-raw-data-and-reference-data" class="nav-link" data-scroll-target="#raw-data-and-reference-data">Raw Data and Reference Data</a></li>
+  </ul></li>
+  <li><a href="#qc" id="toc-qc" class="nav-link" data-scroll-target="#qc">QC</a>
+  <ul class="collapse">
+  <li><a href="#qc-for-raw-reads" id="toc-qc-for-raw-reads" class="nav-link" data-scroll-target="#qc-for-raw-reads">QC for raw reads</a></li>
+  <li><a href="#adapter-trimming-and-low-quality-sequence-filtering" id="toc-adapter-trimming-and-low-quality-sequence-filtering" class="nav-link" data-scroll-target="#adapter-trimming-and-low-quality-sequence-filtering">Adapter Trimming and Low-Quality Sequence Filtering</a></li>
+  <li><a href="#run-the-pre-processing-script" id="toc-run-the-pre-processing-script" class="nav-link" data-scroll-target="#run-the-pre-processing-script">Run the Pre-Processing Script</a></li>
+  </ul></li>
+  <li><a href="#genome-guided-transcriptome-assembly" id="toc-genome-guided-transcriptome-assembly" class="nav-link" data-scroll-target="#genome-guided-transcriptome-assembly">Genome-Guided Transcriptome Assembly</a>
+  <ul class="collapse">
+  <li><a href="#genome-alignment-using-star" id="toc-genome-alignment-using-star" class="nav-link" data-scroll-target="#genome-alignment-using-star">Genome Alignment Using STAR</a></li>
+  <li><a href="#assembly-using-stringtie" id="toc-assembly-using-stringtie" class="nav-link" data-scroll-target="#assembly-using-stringtie">Assembly Using StringTie</a></li>
+  <li><a href="#assessing-the-assembly-quality" id="toc-assessing-the-assembly-quality" class="nav-link" data-scroll-target="#assessing-the-assembly-quality">Assessing The Assembly Quality</a></li>
+  </ul></li>
+  <li><a href="#de-novo-transcriptome-assembly" id="toc-de-novo-transcriptome-assembly" class="nav-link" data-scroll-target="#de-novo-transcriptome-assembly"><em>De novo</em> Transcriptome Assembly</a>
+  <ul class="collapse">
+  <li><a href="#de-novo-assembly-using-trinity" id="toc-de-novo-assembly-using-trinity" class="nav-link" data-scroll-target="#de-novo-assembly-using-trinity">De novo assembly using Trinity</a></li>
+  <li><a href="#trinity-assembly-statistics" id="toc-trinity-assembly-statistics" class="nav-link" data-scroll-target="#trinity-assembly-statistics">Trinity Assembly Statistics</a></li>
+  <li><a href="#assessing-the-assembly-quality-1" id="toc-assessing-the-assembly-quality-1" class="nav-link" data-scroll-target="#assessing-the-assembly-quality-1">Assessing the Assembly Quality</a></li>
+  <li><a href="#align-the-assembled-transcripts-to-the-genome" id="toc-align-the-assembled-transcripts-to-the-genome" class="nav-link" data-scroll-target="#align-the-assembled-transcripts-to-the-genome">Align the Assembled Transcripts to the Genome</a></li>
+  </ul></li>
+  <li><a href="#visualising-your-assembled-transcripts-in-igv" id="toc-visualising-your-assembled-transcripts-in-igv" class="nav-link" data-scroll-target="#visualising-your-assembled-transcripts-in-igv">Visualising your assembled transcripts in IGV</a></li>
+  </ul></li>
+  <li><a href="#references" id="toc-references" class="nav-link" data-scroll-target="#references">References</a></li>
+  </ul>
+</nav>
+</div>
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<h1 class="title">Transcriptomics Practical</h1>
+<p class="subtitle lead">Transcriptome Assembly</p>
+</div>
+
+
+<div class="quarto-title-meta-author">
+  <div class="quarto-title-meta-heading">Author</div>
+  <div class="quarto-title-meta-heading">Affiliation</div>
+  
+    <div class="quarto-title-meta-contents">
+    <p class="author">Stevie Pederson &amp; Zhipeng Qu </p>
+  </div>
+  <div class="quarto-title-meta-contents">
+        <p class="affiliation">
+            Adelaide University &amp; Black Ochre Data Labs
+          </p>
+      </div>
+  </div>
+
+<div class="quarto-title-meta">
+
+      
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<section id="introduction" class="level1">
+<h1>Introduction</h1>
+<p>In this practical, we will use a RNA-Seq dataset from a model plant <em>Arabidopsis thaliana</em> <span class="citation" data-cites="Wang2017-te">(<a href="#ref-Wang2017-te" role="doc-biblioref">Wang et al. 2017</a>)</span> This dataset was initially used for identification of long non-coding RNAs by transcriptome assembly of RNA-Seq.</p>
+<p>Our aim will be to assemble transcripts using genomic alignments followed by StringTie. Following that, we will perform a <em>de novo</em> assembly using Trinity, which is a far more computationally demanding approach. (Please note the expected run time below) If we get time, we can compare the assemblies using some QC metrics.</p>
+<p>We will not be using <code>R</code> for any of today’s material, but the material has been tested using the Terminal inside RStudio so please use the Terminal inside the RStudio IDE.</p>
+<section id="stringtie" class="level3">
+<h3 class="anchored" data-anchor-id="stringtie">StringTie</h3>
+<p>The first step will be to identify novel transcripts using <code>stringtie</code> <span class="citation" data-cites="Pertea2015-zd">(<a href="#ref-Pertea2015-zd" role="doc-biblioref">Pertea et al. 2015</a>)</span>. We’ll first trim and check QC for the underlying data, then we’ll move onto the assembly itself.</p>
+<p>As shown briefly in the lecture notes, the full StringTie process would be to assemble “super-reads” before aligning to the genome, however, we will simply use the reads provided, given how small this dataset is.</p>
+<p><img src="./assets/stringtie.png" class="img-fluid"></p>
+<p>After we have aligned our reads to the reference genome, Stringtie will build the “alternative splice graph”, then proceed on to constructing the “flow network”. Finally, it will identify the most likely transcripts using a network flow algorithm. Note that this algorithm focusses on the most commonly seen splicing patterns, and uses these to guide the assembly.</p>
+</section>
+<section id="trinity" class="level3">
+<h3 class="anchored" data-anchor-id="trinity">Trinity</h3>
+<p>After completing our StringTie assembly, we’ll attempt a full <em>de novo</em> assembly using Trinity <span class="citation" data-cites="Haas2013-ma">(<a href="#ref-Haas2013-ma" role="doc-biblioref">Haas et al. 2013</a>)</span>. This assembles the transcriptome directly from the reads, without aligning to a reference genome. The full Trinity repository with detailed help pages and guides is also accessible <a href="https://github.com/trinityrnaseq/trinityrnaseq/wiki">here</a></p>
+<p>Given that this process will run for 2-3 hours, the explanation regarding the underlying methodology is below, for you to read while the process is underway.</p>
+</section>
+<section id="dataset" class="level2">
+<h2 class="anchored" data-anchor-id="dataset">Dataset</h2>
+<p>Due to the the limitation of computing resources in our VM, we will use a subset of raw reads (reads from chromosome 2 of Arabidopsis) from one of three biological replicates sampled from leaf tissue. Here is the key information about the Arabidopsis genome and this RNA-Seq datatset:</p>
+<section id="the-arabidposis-genome" class="level3">
+<h3 class="anchored" data-anchor-id="the-arabidposis-genome">The Arabidposis Genome</h3>
+<ul>
+<li>Reference genome build: TAIR10 (<a href="https://www.arabidopsis.org/index.jsp" class="uri">https://www.arabidopsis.org/index.jsp</a>)</li>
+<li>Number of chromosomes: 5 chromosomes + Chloroplast + Mitochondria</li>
+<li>Genome size: ~135 Mb</li>
+</ul>
+</section>
+<section id="the-rna-seq-dataset" class="level3">
+<h3 class="anchored" data-anchor-id="the-rna-seq-dataset">The RNA-Seq dataset</h3>
+<ul>
+<li>Number of raw reads (pairs): 550,405</li>
+<li>Sequencing type: PE125 (2x125nt)</li>
+</ul>
+</section>
+</section>
+<section id="tools-and-pipeline" class="level2">
+<h2 class="anchored" data-anchor-id="tools-and-pipeline">Tools and pipeline</h2>
+<p>The pipeline of today’s Prac is shown in the following flowchart:</p>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="./assets/Prac_transcriptome_assembly_pipeline.png" class="img-fluid figure-img"></p>
+<figcaption>Transcriptome assembly flowchart</figcaption>
+</figure>
+</div>
+<p>Tools used in this Prac:</p>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th>Tool/Package</th>
+<th>Version</th>
+<th>URL</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>fastQC</td>
+<td>v0.11.9</td>
+<td><a href="https://www.bioinformatics.babraham.ac.uk/projects/fastqc/" class="uri">https://www.bioinformatics.babraham.ac.uk/projects/fastqc/</a></td>
+</tr>
+<tr class="even">
+<td>cutadapt</td>
+<td>3.5</td>
+<td><a href="https://cutadapt.readthedocs.io/en/stable/" class="uri">https://cutadapt.readthedocs.io/en/stable/</a></td>
+</tr>
+<tr class="odd">
+<td>Trinity</td>
+<td>2.15.1</td>
+<td><a href="https://github.com/trinityrnaseq/trinityrnaseq/wiki" class="uri">https://github.com/trinityrnaseq/trinityrnaseq/wiki</a></td>
+</tr>
+<tr class="even">
+<td>GMAP</td>
+<td>2021-12-17</td>
+<td><a href="http://research-pub.gene.com/gmap/" class="uri">http://research-pub.gene.com/gmap/</a></td>
+</tr>
+<tr class="odd">
+<td>STAR</td>
+<td>2.7.10a</td>
+<td><a href="https://github.com/alexdobin/STAR" class="uri">https://github.com/alexdobin/STAR</a></td>
+</tr>
+<tr class="even">
+<td>StringTie</td>
+<td>v2.2.1</td>
+<td><a href="https://ccb.jhu.edu/software/stringtie/" class="uri">https://ccb.jhu.edu/software/stringtie/</a></td>
+</tr>
+<tr class="odd">
+<td>BUSCO</td>
+<td>5.4.4</td>
+<td><a href="https://busco.ezlab.org/" class="uri">https://busco.ezlab.org/</a></td>
+</tr>
+<tr class="even">
+<td>gffread</td>
+<td>0.12.7</td>
+<td><a href="http://cole-trapnell-lab.github.io/cufflinks/" class="uri">http://cole-trapnell-lab.github.io/cufflinks/</a></td>
+</tr>
+<tr class="odd">
+<td>IGV</td>
+<td>web</td>
+<td><a href="https://software.broadinstitute.org/software/igv/" class="uri">https://software.broadinstitute.org/software/igv/</a></td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="running-time-estimate-based-on-teaching-vm" class="level2">
+<h2 class="anchored" data-anchor-id="running-time-estimate-based-on-teaching-vm">Running time estimate (based on teaching VM)</h2>
+<p>The following table shows the estimated run time in VM for the major steps:</p>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th>Step</th>
+<th>Tool/Package</th>
+<th>Estimated run time</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>QC</td>
+<td>fastQC</td>
+<td>3 mins</td>
+</tr>
+<tr class="even">
+<td>Sequence trimming</td>
+<td>cutadapt</td>
+<td>4 mins</td>
+</tr>
+<tr class="odd">
+<td>De novo assembly</td>
+<td>Trinity</td>
+<td>2.5 hrs</td>
+</tr>
+<tr class="even">
+<td>Genome mapping for transcripts</td>
+<td>GMAP</td>
+<td>3 mins</td>
+</tr>
+<tr class="odd">
+<td>Genome mapping for short reads</td>
+<td>STAR</td>
+<td>10 mins</td>
+</tr>
+<tr class="even">
+<td>Genome-guided assembly</td>
+<td>StringTie</td>
+<td>1 mins</td>
+</tr>
+<tr class="odd">
+<td>BUSCO for Trinity</td>
+<td>BUSCO</td>
+<td>3 mins</td>
+</tr>
+<tr class="even">
+<td>BUSCO for StringTie</td>
+<td>BUSCO</td>
+<td>3 mins</td>
+</tr>
+<tr class="odd">
+<td>Viewing assembly in IGV</td>
+<td>IGV</td>
+<td>N/A</td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="what-you-will-learn-in-this-practical" class="level2">
+<h2 class="anchored" data-anchor-id="what-you-will-learn-in-this-practical">What you will learn in this Practical</h2>
+<ul>
+<li>Learn how to build and create scripts for an analysis</li>
+<li>Practice bash commands you have learned</li>
+<li>Practice QC for NGS data you have learned</li>
+<li>Learn how to do genome-guided transcriptome assembly</li>
+<li>Learn how to do de novo transcriptome assembly</li>
+</ul>
+</section>
+</section>
+<section id="practical" class="level1">
+<h1>Practical</h1>
+<p>There are three parts to the transcriptome assembly in this Prac. Please follow the instructions <strong>in order</strong>, because later commands will rely on the results from previous commands. Feel free to talk to tutors/instructors if you have a problem/question. We’re here to help &amp; love to talk about these types of analysis.</p>
+<section id="setup-and-preparation" class="level2">
+<h2 class="anchored" data-anchor-id="setup-and-preparation">Setup and Preparation</h2>
+<p>In this part, we will create some folders to keep files (including input RNA-Seq raw reads, databases and output files) organised. Note that we’ll use the STAR-indexed reference genome from the DGE practical to align reads</p>
+<section id="prepare-the-folder-structure" class="level3">
+<h3 class="anchored" data-anchor-id="prepare-the-folder-structure">Prepare The Folder Structure</h3>
+<p>For each project, I normally store files at different processing stages in different folders. I put initial input data into a <code>data</code> folder, and output files from different processing stages into separate folders in a <code>results</code> folder. I store all scripts in a separate <code>scripts</code> folder.</p>
+<p>Let’s use a slightly different directory structure to last time.</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="co">## First we'll make the directory for the entire practical session</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="co">## Notice that we're using the absolute path here, given that '~' stands for </span></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="co">## your 'home' directory (/home/rstudio for all of us)</span></span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="fu">mkdir</span> ~/transcriptomics_assembly_practical</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>Now that we’ve made a directory for today, let’s configure the rest of the structure. Instead of numbering directories, we can use a series of sensible names.</p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="co">## Change into to practical directory we have just created</span></span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="bu">cd</span> ~/transcriptomics_assembly_practical</span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="co">## Now it's easier to make a series of lower-level directories</span></span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a><span class="fu">mkdir</span> data</span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a><span class="fu">mkdir</span> output</span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a><span class="fu">mkdir</span> scripts</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>Now let’s make some sub-directories for key steps during our analysis</p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="co">## We can place our FastQ files in subdirectories in data</span></span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="fu">mkdir</span> data/raw</span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a><span class="fu">mkdir</span> data/trimmed</span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a><span class="fu">mkdir</span> data/aligned</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>The FastQC reports can go in our output directory</p>
+<div class="sourceCode" id="cb4"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="co">## Using the -p flag allows the parent directories to be created</span></span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="fu">mkdir</span> <span class="at">-p</span> output/fastqc/raw</span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a><span class="fu">mkdir</span> <span class="at">-p</span> output/fastqc/trimmed</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>Next we’ll make some directories for the assemblies</p>
+<div class="sourceCode" id="cb5"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="fu">mkdir</span> output/stringtie</span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a><span class="fu">mkdir</span> output/assembly</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>Finally, we’ll create a directory to place any log files</p>
+<div class="sourceCode" id="cb6"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="fu">mkdir</span> output/logs</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>The final folder structure for this project will look like this:</p>
+<pre><code>transcriptomics_assembly_practical/
+├── data
+│   ├── aligned
+│   ├── raw
+│   └── trimmed
+├── output
+│   ├── assembly
+│   ├── fastqc
+│   │   ├── raw
+│   │   └── trimmed
+│   ├── logs
+│   └── stringtie
+└── scripts</code></pre>
+<p>We can see this structure by typing the command <code>tree</code> from our current directory</p>
+</section>
+<section id="raw-data-and-reference-data" class="level3">
+<h3 class="anchored" data-anchor-id="raw-data-and-reference-data">Raw Data and Reference Data</h3>
+<!-- CHECK ALL FILE PATHS ONCE THE VM IS CONFIGURED -->
+<p>The initial RNA-Seq raw data is stored in the shared data directory <code>~/data/prac_transcriptome_assembly</code>.</p>
+<p>Copy the raw data to your <code>data/raw</code> folder</p>
+<div class="sourceCode" id="cb8"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="fu">cp</span> ~/data/prac_transcriptome_assembly/<span class="pp">*</span>.fastq.gz ./data/raw/</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>We already have the reference genome indexed using STAR in our directory <code>~/references</code> directory, however, there are additional files included.</p>
+<p>The databases, including Arabidopsis reference genome (Arabidopsis_thaliana.TAIR10.dna.toplevel.fa), annotated genes (Arabidopsis_thaliana.TAIR10.62.gtf), and BUSCO lineages file (viridiplantae_odb12.2025-07-01.tar.gz) need to be copied from <code>~/data/prac_transcriptome_assembly</code> to <code>~/references</code> and the tarball decompressed and extracted (i.e.&nbsp;untarred).</p>
+<div class="sourceCode" id="cb9"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a><span class="co">## Now copy our databset of conserved orthologs</span></span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a><span class="fu">cp</span> ~/data/prac_transcriptome_assembly/viridiplantae_odb12.2025-07-01.tar.gz ~/references/</span>
+<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a><span class="co">## This is the type of file known as a 'tarball', which contains a complete</span></span>
+<span id="cb9-6"><a href="#cb9-6" aria-hidden="true" tabindex="-1"></a><span class="co">## directory structure in a compressed form. We use the command 'tar' to create </span></span>
+<span id="cb9-7"><a href="#cb9-7" aria-hidden="true" tabindex="-1"></a><span class="co">## or extract these structures. The flags '-xzvf' let tar know that the tarball</span></span>
+<span id="cb9-8"><a href="#cb9-8" aria-hidden="true" tabindex="-1"></a><span class="co">## is to be extracted (x), is compressed (z), that we want to see the files being</span></span>
+<span id="cb9-9"><a href="#cb9-9" aria-hidden="true" tabindex="-1"></a><span class="co">## extracted (i.e. verbose: v), and that the file is a tarball (f)</span></span>
+<span id="cb9-10"><a href="#cb9-10" aria-hidden="true" tabindex="-1"></a><span class="fu">tar</span> <span class="at">-zxvf</span> ~/references/viridiplantae_odb12.2025-07-01.tar.gz <span class="at">--directory</span> ~/references/</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>Finally, we’ll move the completed Trinity assembly into the directory <code>output/assembly</code></p>
+<div class="sourceCode" id="cb10"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="fu">cp</span> ~/data/prac_transcriptome_assembly/Col_leaf_chr2_trinity.Trinity.fasta output/assembly/</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>Now, all the setup work is done. Let’s move to part 2. From here, we’ll start to record all of our commands as <code>bash</code> scripts too.</p>
+</section>
+</section>
+<section id="qc" class="level2">
+<h2 class="anchored" data-anchor-id="qc">QC</h2>
+<p>In This part, we will use the skills that we learned from the <code>NGS_practicals</code> to do QC and trim adapters and low-quality sequences from our RNA-Seq raw data. This is also quite similar to the previous Differential Expression practical</p>
+<section id="qc-for-raw-reads" class="level3">
+<h3 class="anchored" data-anchor-id="qc-for-raw-reads">QC for raw reads</h3>
+<p>The first step is to do QC for the raw reads using fastQC. Whilst we could do this in the terminal like we did previously, let’s start building a script</p>
+<div class="sourceCode" id="cb11"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="fu">touch</span> scripts/pre_processing.sh</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>Now open this file in either <code>nano</code> or the RStudio editor and add the shebang in the first line.</p>
+<div class="sourceCode" id="cb12"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="co">#! /bin/bash</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>Now add a blank line or two, then enter the following in the script to define our directories. This defines our key directories to use in subsequent commands.</p>
+<div class="sourceCode" id="cb13"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="va">ROOTDIR</span><span class="op">=</span>~/transcriptomics_assembly_practical</span>
+<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a><span class="va">DATADIR</span><span class="op">=</span><span class="st">"</span><span class="va">${ROOTDIR}</span><span class="st">/data"</span></span>
+<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a><span class="va">FQCDIR</span><span class="op">=</span><span class="st">"</span><span class="va">${ROOTDIR}</span><span class="st">/output/fastqc"</span></span>
+<span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a><span class="va">LOGDIR</span><span class="op">=</span><span class="st">"</span><span class="va">${ROOTDIR}</span><span class="st">/output/logs"</span></span>
+<span id="cb13-5"><a href="#cb13-5" aria-hidden="true" tabindex="-1"></a><span class="va">PREFIX</span><span class="op">=</span><span class="st">"Col_leaf_chr2"</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>Now add a couple more blank lines, then the commands to run FastQC. We won’t run this just yet, but will run the entire script in a minute</p>
+<div class="sourceCode" id="cb14"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="co">## Run FastQC on the raw data</span></span>
+<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a><span class="bu">echo</span> <span class="st">"Running FastQC on raw data"</span></span>
+<span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a><span class="ex">fastqc</span> <span class="at">-t</span> 2 <span class="at">-o</span> <span class="va">${FQCDIR}</span>/raw <span class="va">${DATADIR}</span>/raw/<span class="pp">*</span>.fastq.gz</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</section>
+<section id="adapter-trimming-and-low-quality-sequence-filtering" class="level3">
+<h3 class="anchored" data-anchor-id="adapter-trimming-and-low-quality-sequence-filtering">Adapter Trimming and Low-Quality Sequence Filtering</h3>
+<p>The next step in the script will be to run <code>cutadapt</code>, just like in the DE Genes practical. The adapters for this RNA-Seq dataset are Illumina TruSeq adapters as <code>AGATCGGAAGAGCACACGTCTGAACTCCAGTCA</code> and <code>AGATCGGAAGAGCGTCGTGTAGGGAAAGAGTGT</code>.</p>
+<div class="sourceCode" id="cb15"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="bu">echo</span> <span class="st">"Running cutadapt"</span></span>
+<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a><span class="ex">cutadapt</span> <span class="dt">\</span></span>
+<span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">-a</span> AGATCGGAAGAGCACACGTCTGAACTCCAGTCA <span class="at">-A</span> AGATCGGAAGAGCGTCGTGTAGGGAAAGAGTGT <span class="dt">\</span></span>
+<span id="cb15-4"><a href="#cb15-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">-o</span> <span class="va">${DATADIR}</span>/trimmed/<span class="va">${PREFIX}</span>_R1.fastq.gz <span class="dt">\</span></span>
+<span id="cb15-5"><a href="#cb15-5" aria-hidden="true" tabindex="-1"></a>  <span class="at">-p</span> <span class="va">${DATADIR}</span>/trimmed/<span class="va">${PREFIX}</span>_R2.fastq.gz <span class="dt">\</span></span>
+<span id="cb15-6"><a href="#cb15-6" aria-hidden="true" tabindex="-1"></a>  <span class="at">--minimum-length</span> 25 <span class="dt">\</span></span>
+<span id="cb15-7"><a href="#cb15-7" aria-hidden="true" tabindex="-1"></a>  <span class="at">--quality-cutoff</span> 20 <span class="dt">\</span></span>
+<span id="cb15-8"><a href="#cb15-8" aria-hidden="true" tabindex="-1"></a>  <span class="va">${DATADIR}</span>/raw/<span class="va">${PREFIX}</span>_R1.fastq.gz <span class="va">${DATADIR}</span>/raw/<span class="va">${PREFIX}</span>_R2.fastq.gz <span class="op">&gt;</span> <span class="va">${LOGDIR}</span>/<span class="va">${PREFIX}</span>_cutadapt.log</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>Now we’ve trimmed the reads, we should run FastQC again</p>
+<div class="sourceCode" id="cb16"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a><span class="bu">echo</span> <span class="st">"Running FastQC on trimmed data"</span></span>
+<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a><span class="ex">fastqc</span> <span class="at">-t</span> 2 <span class="at">-o</span> <span class="va">${FQCDIR}</span>/trimmed/ <span class="va">${DATADIR}</span>/trimmed/<span class="pp">*</span>.fastq.gz</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</section>
+<section id="run-the-pre-processing-script" class="level3">
+<h3 class="anchored" data-anchor-id="run-the-pre-processing-script">Run the Pre-Processing Script</h3>
+<p>Now save this script and try running it</p>
+<div class="sourceCode" id="cb17"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a><span class="fu">bash</span> scripts/pre_processing.sh</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>This should run in only a few minutes. Once complete, check the raw FastQC reports, then the trimmed FastQC reports. Given we only have ~500,000 reads in this dataset some of the plots</p>
+<div class="callout callout-style-default callout-important callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Important
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<ol type="1">
+<li>How many reads were discarded when trimming R1 and R2</li>
+<li>What did the command <code>&gt; ${LOGDIR}/${PREFIX}_cutadapt.log</code> do?
+<ul>
+<li>These kind of log files capture the output tools like <code>cutadapt</code> write to the screen and can be valuable for downstream QC, especially if processing multiple files of variable quality.</li>
+</ul></li>
+<li>Inspect the output file from the previous command</li>
+</ol>
+</div>
+</div>
+</section>
+</section>
+<section id="genome-guided-transcriptome-assembly" class="level2">
+<h2 class="anchored" data-anchor-id="genome-guided-transcriptome-assembly">Genome-Guided Transcriptome Assembly</h2>
+<p>In this section, we will do genome guided transcriptome assembly using STAR and StringTie. This approach is only applicable if a reference genome exists, although closely related genomes may be suitable if also available.</p>
+<section id="genome-alignment-using-star" class="level3">
+<h3 class="anchored" data-anchor-id="genome-alignment-using-star">Genome Alignment Using STAR</h3>
+<p>The first step for genome guided transcriptome assembly is to map RNA-Seq reads to a reference genome. We will use STAR to do this job in this practical as we have previously and will use the genome index built during the DGE practical.</p>
+<p>The first step will be to align our reads to the reference genome. Once again, we’ll write a script for this</p>
+<div class="sourceCode" id="cb18"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a><span class="fu">touch</span> scripts/star_alignments.sh</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>Then open the file in <code>nano</code> or the RStudio editor and add the <em>shebang</em> on the first line (<code>#! /bin/bash</code>)</p>
+<p>Now add a couple of blank lines, followed by our key directories</p>
+<div class="sourceCode" id="cb19"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a><span class="va">ROOTDIR</span><span class="op">=</span><span class="st">"</span><span class="va">${HOME}</span><span class="st">/transcriptomics_assembly_practical"</span></span>
+<span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a><span class="va">REFDIR</span><span class="op">=</span><span class="st">"</span><span class="va">${HOME}</span><span class="st">/references/TAIR10/STAR149"</span></span>
+<span id="cb19-3"><a href="#cb19-3" aria-hidden="true" tabindex="-1"></a><span class="va">FQDIR</span><span class="op">=</span><span class="st">"</span><span class="va">${ROOTDIR}</span><span class="st">/data/trimmed"</span></span>
+<span id="cb19-4"><a href="#cb19-4" aria-hidden="true" tabindex="-1"></a><span class="va">BAMDIR</span><span class="op">=</span><span class="st">"</span><span class="va">${ROOTDIR}</span><span class="st">/data/aligned"</span></span>
+<span id="cb19-5"><a href="#cb19-5" aria-hidden="true" tabindex="-1"></a><span class="va">LOGDIR</span><span class="op">=</span><span class="st">"</span><span class="va">${ROOTDIR}</span><span class="st">/output/logs"</span></span>
+<span id="cb19-6"><a href="#cb19-6" aria-hidden="true" tabindex="-1"></a><span class="va">PREFIX</span><span class="op">=</span><span class="st">"Col_leaf_chr2"</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>Add another blank line or two, followed by the commands to align our reads</p>
+<div class="sourceCode" id="cb20"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a><span class="bu">echo</span> <span class="st">"Aligning to the reference"</span></span>
+<span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a><span class="ex">STAR</span> <span class="dt">\</span></span>
+<span id="cb20-3"><a href="#cb20-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">--genomeDir</span> <span class="va">${REFDIR}</span> <span class="dt">\</span></span>
+<span id="cb20-4"><a href="#cb20-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">--readFilesIn</span> <span class="va">${FQDIR}</span>/<span class="va">${PREFIX}</span>_R1.fastq.gz <span class="va">${FQDIR}</span>/<span class="va">${PREFIX}</span>_R2.fastq.gz <span class="dt">\</span></span>
+<span id="cb20-5"><a href="#cb20-5" aria-hidden="true" tabindex="-1"></a>  <span class="at">--readFilesCommand</span> zcat <span class="dt">\</span></span>
+<span id="cb20-6"><a href="#cb20-6" aria-hidden="true" tabindex="-1"></a>  <span class="at">--runThreadN</span> 2 <span class="dt">\</span></span>
+<span id="cb20-7"><a href="#cb20-7" aria-hidden="true" tabindex="-1"></a>  <span class="at">--outSAMstrandField</span> intronMotif <span class="dt">\</span></span>
+<span id="cb20-8"><a href="#cb20-8" aria-hidden="true" tabindex="-1"></a>  <span class="at">--outSAMattributes</span> All <span class="dt">\</span></span>
+<span id="cb20-9"><a href="#cb20-9" aria-hidden="true" tabindex="-1"></a>  <span class="at">--outFilterMismatchNoverLmax</span> 0.03 <span class="dt">\</span></span>
+<span id="cb20-10"><a href="#cb20-10" aria-hidden="true" tabindex="-1"></a>  <span class="at">--alignIntronMax</span> 10000 <span class="dt">\</span></span>
+<span id="cb20-11"><a href="#cb20-11" aria-hidden="true" tabindex="-1"></a>  <span class="at">--outSAMtype</span> BAM SortedByCoordinate <span class="dt">\</span></span>
+<span id="cb20-12"><a href="#cb20-12" aria-hidden="true" tabindex="-1"></a>  <span class="at">--outFileNamePrefix</span> <span class="va">${BAMDIR}</span>/<span class="va">${PREFIX}</span>. </span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>After aligning, we (almost) always need to index the bam file</p>
+<div class="sourceCode" id="cb21"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a><span class="bu">echo</span> <span class="st">"Indexing the bam file"</span></span>
+<span id="cb21-2"><a href="#cb21-2" aria-hidden="true" tabindex="-1"></a><span class="ex">samtools</span> index <span class="at">-@2</span> <span class="va">${BAMDIR}</span>/<span class="va">${PREFIX}</span>.Aligned.sortedByCoord.out.bam</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>And then we can move the log files</p>
+<div class="sourceCode" id="cb22"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a><span class="bu">echo</span> <span class="st">"Moving log files"</span></span>
+<span id="cb22-2"><a href="#cb22-2" aria-hidden="true" tabindex="-1"></a><span class="fu">mv</span> <span class="va">${BAMDIR}</span>/<span class="va">${PREFIX}</span>.Log<span class="pp">*</span> <span class="va">${LOGDIR}</span>/</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>Save this script then run using.</p>
+<div class="sourceCode" id="cb23"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a><span class="fu">bash</span> scripts/star_alignments.sh</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="callout callout-style-default callout-important callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Important
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>The command we used to align the reads had quite a few parameters (or arguments). See if you can understand what the following arguments told <code>STAR</code> to do</p>
+<ol type="1">
+<li><code>--runThreadN 2</code></li>
+<li><code>--readFilesCommand zcat</code></li>
+<li><code>--outSAMtype BAM SortedByCoordinate</code></li>
+</ol>
+</div>
+</div>
+</section>
+<section id="assembly-using-stringtie" class="level3">
+<h3 class="anchored" data-anchor-id="assembly-using-stringtie">Assembly Using StringTie</h3>
+<p>Now we have our alignments, sorted by genomic co-ordinate, we can use StringTie to assemble the alignments into transcripts. First, we’ll call <code>stringtie</code> which will provide a gtf with all gene, transcript and exon co-ordinates. However, this is only part of the story and the next step will be to extract the transcript sequences themselves.</p>
+<p>Once again, let’s write a script for this</p>
+<div class="sourceCode" id="cb24"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a><span class="fu">touch</span> scripts/stringtie_assembly.sh</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>Then open the file in <code>nano</code> or the RStudio editor and add the <em>shebang</em> on the first line (<code>#! /bin/bash</code>). Follow this with a blank line or two, then we can define our directories and variables.</p>
+<div class="sourceCode" id="cb25"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a><span class="va">ROOTDIR</span><span class="op">=</span><span class="st">"</span><span class="va">${HOME}</span><span class="st">/transcriptomics_assembly_practical"</span></span>
+<span id="cb25-2"><a href="#cb25-2" aria-hidden="true" tabindex="-1"></a><span class="va">REFDIR</span><span class="op">=</span><span class="st">"</span><span class="va">${HOME}</span><span class="st">/references"</span></span>
+<span id="cb25-3"><a href="#cb25-3" aria-hidden="true" tabindex="-1"></a><span class="va">BAMDIR</span><span class="op">=</span><span class="st">"</span><span class="va">${ROOTDIR}</span><span class="st">/data/aligned"</span></span>
+<span id="cb25-4"><a href="#cb25-4" aria-hidden="true" tabindex="-1"></a><span class="va">OUTDIR</span><span class="op">=</span><span class="st">"</span><span class="va">${ROOTDIR}</span><span class="st">/output/stringtie"</span></span>
+<span id="cb25-5"><a href="#cb25-5" aria-hidden="true" tabindex="-1"></a><span class="va">PREFIX</span><span class="op">=</span><span class="st">"Col_leaf_chr2"</span></span>
+<span id="cb25-6"><a href="#cb25-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb25-7"><a href="#cb25-7" aria-hidden="true" tabindex="-1"></a><span class="bu">echo</span> <span class="st">"Running StringTie on </span><span class="va">${PREFIX}</span><span class="st">"</span></span>
+<span id="cb25-8"><a href="#cb25-8" aria-hidden="true" tabindex="-1"></a><span class="ex">stringtie</span> <span class="dt">\</span></span>
+<span id="cb25-9"><a href="#cb25-9" aria-hidden="true" tabindex="-1"></a>  <span class="va">${BAMDIR}</span>/<span class="va">${PREFIX}</span>.Aligned.sortedByCoord.out.bam <span class="dt">\</span></span>
+<span id="cb25-10"><a href="#cb25-10" aria-hidden="true" tabindex="-1"></a>  <span class="at">-o</span> <span class="va">${OUTDIR}</span>/<span class="va">${PREFIX}</span>_stringtie.gtf <span class="dt">\</span></span>
+<span id="cb25-11"><a href="#cb25-11" aria-hidden="true" tabindex="-1"></a>  <span class="at">-p</span> 2</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>To finish the script, we’ll call <code>gffread</code> which will extract the transcript sequences from the reference genome</p>
+<div class="sourceCode" id="cb26"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a><span class="ex">gffread</span> <span class="dt">\</span></span>
+<span id="cb26-2"><a href="#cb26-2" aria-hidden="true" tabindex="-1"></a>  <span class="at">-w</span> <span class="va">${OUTDIR}</span>/<span class="va">${PREFIX}</span>_stringtie.fa <span class="dt">\</span></span>
+<span id="cb26-3"><a href="#cb26-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">-g</span> <span class="va">${REFDIR}</span>/Arabidopsis_thaliana.TAIR10.dna.toplevel.fa <span class="dt">\</span></span>
+<span id="cb26-4"><a href="#cb26-4" aria-hidden="true" tabindex="-1"></a>  <span class="va">${OUTDIR}</span>/<span class="va">${PREFIX}</span>_stringtie.gtf</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>Now save the script and run it</p>
+<div class="sourceCode" id="cb27"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true" tabindex="-1"></a><span class="fu">bash</span> scripts/stringtie_assembly.sh</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>Let’s quickly compare our reference gene annotations with the transcripts identified using StringTie</p>
+<div class="sourceCode" id="cb28"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb28-1"><a href="#cb28-1" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span> output/stringtie/Col_leaf_chr2_stringtie.gtf </span>
+<span id="cb28-2"><a href="#cb28-2" aria-hidden="true" tabindex="-1"></a><span class="fu">sed</span> <span class="at">-n</span> 241,260p ~/references/Arabidopsis_thaliana.TAIR10.62.gtf <span class="kw">|</span> <span class="fu">egrep</span> <span class="st">'CDS'</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p><em>Can you see anything in the official annotations which resembles that first transcript identified using StringTie?</em></p>
+</section>
+<section id="assessing-the-assembly-quality" class="level3">
+<h3 class="anchored" data-anchor-id="assessing-the-assembly-quality">Assessing The Assembly Quality</h3>
+<p>After we get the assembled transcripts, we need to find some ways to assess the quality of the assembly, such as the completeness of genes/transcripts. One way that we can check the assembly quality is by using BUSCO (Benchmarking Universal Single-Copy Orthologs, <a href="https://busco.ezlab.org/" class="uri">https://busco.ezlab.org/</a>) <span class="citation" data-cites="Tegenfeldt2025-lt">(<a href="#ref-Tegenfeldt2025-lt" role="doc-biblioref">Tegenfeldt et al. 2025</a>)</span>. BUSCO provides quantitative measures for the assessment of genome assembly, gene set, and transcriptome completeness, based on evolutionary-informed expectation of gene content from <em>near-universal single-copy orthologs</em> selected from different lineages.</p>
+<p>BUSCO was installed under a different conda environment in VM, so to make life a little easier, let’s first run this interactively in the terminal. We sometimes use <code>conda</code> environments to install software with specific dependencies in an isolated environment so they don’t interfere with similar dependencies for other software.</p>
+<p>To enable access to BUSCO, we need to activate the conda environment with the correct dependencies, and where we have <code>busco</code> installed.</p>
+<div class="sourceCode" id="cb29"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb29-1"><a href="#cb29-1" aria-hidden="true" tabindex="-1"></a><span class="bu">source</span> activate busco</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>You should be able to see that your terminal prompt is now showing <code>(busco) axxxxxxx@ip-xx-xxx-x-xx:/shared/axxxxxxx$</code> after the <code>busco</code> environment is activated.</p>
+<p>We’ll need to include this in our script for running busco</p>
+<pre><code>touch scripts/stringtie_busco.sh</code></pre>
+<p>Now paste the following into the script using your preferred editor</p>
+<div class="sourceCode" id="cb31"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb31-1"><a href="#cb31-1" aria-hidden="true" tabindex="-1"></a><span class="co">#! /bin/bash</span></span>
+<span id="cb31-2"><a href="#cb31-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb31-3"><a href="#cb31-3" aria-hidden="true" tabindex="-1"></a><span class="va">ROOTDIR</span><span class="op">=</span><span class="st">"</span><span class="va">${HOME}</span><span class="st">/transcriptomics_assembly_practical"</span></span>
+<span id="cb31-4"><a href="#cb31-4" aria-hidden="true" tabindex="-1"></a><span class="va">REFDIR</span><span class="op">=</span><span class="st">"</span><span class="va">${HOME}</span><span class="st">/references"</span></span>
+<span id="cb31-5"><a href="#cb31-5" aria-hidden="true" tabindex="-1"></a><span class="va">OUTDIR</span><span class="op">=</span><span class="st">"</span><span class="va">${ROOTDIR}</span><span class="st">/output"</span></span>
+<span id="cb31-6"><a href="#cb31-6" aria-hidden="true" tabindex="-1"></a><span class="va">PREFIX</span><span class="op">=</span><span class="st">"Col_leaf_chr2"</span></span>
+<span id="cb31-7"><a href="#cb31-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb31-8"><a href="#cb31-8" aria-hidden="true" tabindex="-1"></a><span class="bu">echo</span> <span class="st">"Activating busco conda env"</span></span>
+<span id="cb31-9"><a href="#cb31-9" aria-hidden="true" tabindex="-1"></a><span class="bu">source</span> activate busco</span>
+<span id="cb31-10"><a href="#cb31-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb31-11"><a href="#cb31-11" aria-hidden="true" tabindex="-1"></a><span class="ex">busco</span> <span class="dt">\</span></span>
+<span id="cb31-12"><a href="#cb31-12" aria-hidden="true" tabindex="-1"></a>  <span class="at">-i</span> <span class="va">${OUTDIR}</span>/stringtie/<span class="va">${PREFIX}</span>_stringtie.fa <span class="dt">\</span></span>
+<span id="cb31-13"><a href="#cb31-13" aria-hidden="true" tabindex="-1"></a>  <span class="at">-l</span> <span class="va">${REFDIR}</span>/viridiplantae_odb12 <span class="dt">\</span></span>
+<span id="cb31-14"><a href="#cb31-14" aria-hidden="true" tabindex="-1"></a>  <span class="at">--out_path</span> <span class="va">${OUTDIR}</span>/busco <span class="dt">\</span></span>
+<span id="cb31-15"><a href="#cb31-15" aria-hidden="true" tabindex="-1"></a>  <span class="at">-o</span> <span class="va">${PREFIX}</span>_stringtie <span class="dt">\</span></span>
+<span id="cb31-16"><a href="#cb31-16" aria-hidden="true" tabindex="-1"></a>  <span class="at">-m</span> transcriptome <span class="dt">\</span></span>
+<span id="cb31-17"><a href="#cb31-17" aria-hidden="true" tabindex="-1"></a>  <span class="at">--cpu</span> 2</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>Run the script using <code>bash scripts/stringtie_busco.sh</code></p>
+<p>BUSCO will output a collection of files including the information for predicted ORFs (Open Reading Frames) from assembled transcripts and output files from a <code>blast</code> search against orthologs. Of these output files, the most important one is the text file called <code>short_summary_BUSCO_StringTie_viridiplantae.txt</code>. This should be in the directory <code>output/busco/Col_leaf_chr2_stringtie/</code>, which <code>busco</code> created when running with our parameters.</p>
+<p>In it you will find one summary line that looks like this <code>C:18.0%[S:14.7%,D:3.3%],F:7.8%,M:74.2%,n:822</code>. This line summarises the completeness of assembled transcripts, and explanations of these numbers can be found in the same text file after the one line summary. (The numbers may very slightly in your output)</p>
+<pre><code>    ***** Results: *****
+  
+    C:18.0%[S:14.7%,D:3.3%],F:7.8%,M:74.2%,n:822       
+    148     Complete BUSCOs (C)                        
+    121     Complete and single-copy BUSCOs (S)        
+    27      Complete and duplicated BUSCOs (D)         
+    64      Fragmented BUSCOs (F)                      
+    610     Missing BUSCOs (M)                         
+    822     Total BUSCO groups searched  </code></pre>
+<div class="callout callout-style-default callout-important callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Important
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Given our small initial number of reads, do you think StringTie did an OK job?</p>
+</div>
+</div>
+</section>
+</section>
+<section id="de-novo-transcriptome-assembly" class="level2">
+<h2 class="anchored" data-anchor-id="de-novo-transcriptome-assembly"><em>De novo</em> Transcriptome Assembly</h2>
+<div class="callout callout-style-default callout-important callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Important
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>Please note that the assembly will take ~2.5 hours. The VMs are capable of running this but it may take a second attempt for some students, depending on how you’re managing your VM capacity. Once you set the assembly running, please read the following material. We’ll analyse the results next week.</p>
+</div>
+</div>
+<p>We have previously trimmed the adapter and low-quality sequences from the reads, and we can use these reads to perform <em>de novo</em> transcriptome assembly using Trinity. In this step, we’ve effectively removed some identifiable low-quality sequences and those which are not derived from the source RNA.</p>
+<p>Trinity is installed under a different conda environment named <code>trinityenv</code>, so we will need to activate the environment before we run trinity:</p>
+<div class="sourceCode" id="cb33"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb33-1"><a href="#cb33-1" aria-hidden="true" tabindex="-1"></a><span class="bu">source</span> activate trinityenv</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<section id="de-novo-assembly-using-trinity" class="level3">
+<h3 class="anchored" data-anchor-id="de-novo-assembly-using-trinity">De novo assembly using Trinity</h3>
+<p>We will use the trimmed reads as input for this step, and will perform a complete <em>de novo</em> assembly. Create the script <code>trinity_assembly.sh</code></p>
+<div class="sourceCode" id="cb34"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb34-1"><a href="#cb34-1" aria-hidden="true" tabindex="-1"></a><span class="fu">touch</span> scripts/trinity_assembly.sh</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>Open the script using your preferred editor, then paste the following.</p>
+<div class="sourceCode" id="cb35"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb35-1"><a href="#cb35-1" aria-hidden="true" tabindex="-1"></a><span class="co">#! /bin/bash</span></span>
+<span id="cb35-2"><a href="#cb35-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb35-3"><a href="#cb35-3" aria-hidden="true" tabindex="-1"></a><span class="va">ROOTDIR</span><span class="op">=</span>~/transcriptomics_assembly_practical</span>
+<span id="cb35-4"><a href="#cb35-4" aria-hidden="true" tabindex="-1"></a><span class="va">DATADIR</span><span class="op">=</span><span class="va">${ROOTDIR}</span>/data/trimmed</span>
+<span id="cb35-5"><a href="#cb35-5" aria-hidden="true" tabindex="-1"></a><span class="va">OUTDIR</span><span class="op">=</span><span class="va">${ROOTDIR}</span>/output/assembly</span>
+<span id="cb35-6"><a href="#cb35-6" aria-hidden="true" tabindex="-1"></a><span class="va">PREFIX</span><span class="op">=</span><span class="st">"Col_leaf_chr2"</span></span>
+<span id="cb35-7"><a href="#cb35-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb35-8"><a href="#cb35-8" aria-hidden="true" tabindex="-1"></a><span class="bu">echo</span> <span class="st">"Activating the 'trinity' conda environment"</span></span>
+<span id="cb35-9"><a href="#cb35-9" aria-hidden="true" tabindex="-1"></a><span class="bu">source</span> activate trinityenv</span>
+<span id="cb35-10"><a href="#cb35-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb35-11"><a href="#cb35-11" aria-hidden="true" tabindex="-1"></a><span class="bu">echo</span> <span class="st">"Running the complete do novo assembly"</span></span>
+<span id="cb35-12"><a href="#cb35-12" aria-hidden="true" tabindex="-1"></a><span class="ex">Trinity</span> <span class="dt">\</span></span>
+<span id="cb35-13"><a href="#cb35-13" aria-hidden="true" tabindex="-1"></a>  <span class="at">--seqType</span> fq <span class="dt">\</span></span>
+<span id="cb35-14"><a href="#cb35-14" aria-hidden="true" tabindex="-1"></a>  <span class="at">--left</span> <span class="va">${DATADIR}</span>/<span class="va">${PREFIX}</span>_R1.fastq.gz <span class="dt">\</span></span>
+<span id="cb35-15"><a href="#cb35-15" aria-hidden="true" tabindex="-1"></a>  <span class="at">--right</span> <span class="va">${DATADIR}</span>/<span class="va">${PREFIX}</span>_R2.fastq.gz <span class="dt">\</span></span>
+<span id="cb35-16"><a href="#cb35-16" aria-hidden="true" tabindex="-1"></a>  <span class="at">--output</span> <span class="va">${OUTDIR}</span>/<span class="va">${PREFIX}</span>_trinity <span class="dt">\</span></span>
+<span id="cb35-17"><a href="#cb35-17" aria-hidden="true" tabindex="-1"></a>  <span class="at">--CPU</span> 2 <span class="dt">\</span></span>
+<span id="cb35-18"><a href="#cb35-18" aria-hidden="true" tabindex="-1"></a>  <span class="at">--max_memory</span> 8G <span class="dt">\</span></span>
+<span id="cb35-19"><a href="#cb35-19" aria-hidden="true" tabindex="-1"></a>  <span class="at">--bypass_java_version_check</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>Now we can run this script using <code>bash scripts.trinity_assembly.sh</code>. <strong>Please note, that this script will run for 2-3 hours</strong> so let’s take a moment to understand what we’re actually asking <code>Trinity</code> to do.</p>
+<section id="understanding-trinity" class="level4">
+<h4 class="anchored" data-anchor-id="understanding-trinity">Understanding Trinity</h4>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="./assets/trinity_modules.gif" class="img-fluid figure-img"></p>
+<figcaption>The overall process used by Trinity when assembling a <em>de novo</em> transcriptome</figcaption>
+</figure>
+</div>
+<p>The first step Trinity performs (Inchworm) uses <em>k</em>-mers to form a graph which can be considered to be contigs, with a contig being loosely approximating a transcript. The default k-mer size for Trinity is 25nt. This is an inclusive process so an extensive graph is formed during this step.</p>
+<p>After sketching out the initial structure, a <em>de Bruijn</em> graph us then formed as part of the <em>Chrysalis</em> step. This step clusters related contigs, then constructs complete de Bruijn graphs for each cluster. Whilst <em>de Bruijn</em> graphs can be intimidating to try and visualise in their entirety, a simplified figure below shows how k-mers are used to create a structure full of loops.</p>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="./assets/debruijn.jpg" class="img-fluid figure-img"></p>
+<figcaption>An example <em>de Bruijn</em> graph. Reads represent fragments of a transcript, then k-mers within these reads are used to form a graph.</figcaption>
+</figure>
+</div>
+<p><br>Finally, the <em>Butterfly</em> step processes the individual graphs in parallel, identifying the most likely paths through the <em>de Bruijn</em> graph using the initial reads. This ultimately allows for the reporting of full-length transcripts as contained within the original library.</p>
+</section>
+</section>
+<section id="trinity-assembly-statistics" class="level3">
+<h3 class="anchored" data-anchor-id="trinity-assembly-statistics">Trinity Assembly Statistics</h3>
+<p>All results from Trinity will be stored in the folder of <code>output/assembly/Col_leaf_chr2_trinity</code> in the directory <code>~/transcriptomics_assembly_practical/04_results/04_denovo_assembly</code>. It includes a lot of intermediate files and log files created during the Trinity assembly process. The final output file includes all final assembled transcripts and with suffix <code>Trinity.fasta</code>.</p>
+<p>Trinity also provides a useful utility to summarise the basic assembly statistics.</p>
+<div class="sourceCode" id="cb36"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb36-1"><a href="#cb36-1" aria-hidden="true" tabindex="-1"></a><span class="bu">source</span> activate trinityenv</span>
+<span id="cb36-2"><a href="#cb36-2" aria-hidden="true" tabindex="-1"></a><span class="ex">/usr/local/bin/util/TrinityStats.pl</span> output/assembly/Col_leaf_chr2_trinity.Trinity.fasta</span>
+<span id="cb36-3"><a href="#cb36-3" aria-hidden="true" tabindex="-1"></a><span class="ex">conda</span> deactivate</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>And you will get output like this in your <code>bash</code> session:</p>
+<pre><code>################################
+## Counts of transcripts, etc.
+################################
+Total trinity 'genes':  4494
+Total trinity transcripts:      5473
+Percent GC: 42.33
+
+########################################
+Stats based on ALL transcript contigs:
+########################################
+
+        Contig N10: 2975
+        Contig N20: 2375
+        Contig N30: 1933
+        Contig N40: 1643
+        Contig N50: 1411
+
+        Median contig length: 731
+        Average contig: 965.79
+        Total assembled bases: 5285771
+
+
+#####################################################
+## Stats based on ONLY LONGEST ISOFORM per 'GENE':
+#####################################################
+
+        Contig N10: 2975
+        Contig N20: 2299
+        Contig N30: 1872
+        Contig N40: 1580
+        Contig N50: 1334
+
+        Median contig length: 627.5
+        Average contig: 895.65
+        Total assembled bases: 4025052
+</code></pre>
+<p>This report gives us some basic statistics of the assembled transcripts from Trinity, such as the number of genes and transcripts and length of transcripts.</p>
+</section>
+<section id="assessing-the-assembly-quality-1" class="level3">
+<h3 class="anchored" data-anchor-id="assessing-the-assembly-quality-1">Assessing the Assembly Quality</h3>
+<p>As we did before, we can use BUSCO to assess the assembly quality. (Remember to activate the <code>busco</code> environment before you run busco.)</p>
+<div class="sourceCode" id="cb38"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb38-1"><a href="#cb38-1" aria-hidden="true" tabindex="-1"></a><span class="bu">source</span> activate busco</span>
+<span id="cb38-2"><a href="#cb38-2" aria-hidden="true" tabindex="-1"></a><span class="ex">busco</span> <span class="dt">\</span></span>
+<span id="cb38-3"><a href="#cb38-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">-i</span> output/assembly/Col_leaf_chr2_trinity.Trinity.fasta <span class="dt">\</span></span>
+<span id="cb38-4"><a href="#cb38-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">-l</span> ~/references/viridiplantae_odb12 <span class="dt">\</span></span>
+<span id="cb38-5"><a href="#cb38-5" aria-hidden="true" tabindex="-1"></a>  <span class="at">--out_path</span> output/busco <span class="dt">\</span></span>
+<span id="cb38-6"><a href="#cb38-6" aria-hidden="true" tabindex="-1"></a>  <span class="at">-o</span> Col_leaf_chr2_trinity <span class="dt">\</span></span>
+<span id="cb38-7"><a href="#cb38-7" aria-hidden="true" tabindex="-1"></a>  <span class="at">-m</span> transcriptome <span class="dt">\</span></span>
+<span id="cb38-8"><a href="#cb38-8" aria-hidden="true" tabindex="-1"></a>  <span class="at">--cpu</span> 2</span>
+<span id="cb38-9"><a href="#cb38-9" aria-hidden="true" tabindex="-1"></a><span class="ex">conda</span> deactivate</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="callout callout-style-default callout-important callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Important
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<ul>
+<li>What is the short summary of the BUSCO report for the Trinity assembly?</li>
+<li>How many complete orthologs did it find?</li>
+<li>How many duplicated and single copy orthologs did it find?</li>
+<li>Which assembly is better, the genome guided assembly or the <code>Trinity</code> assembly?</li>
+</ul>
+</div>
+</div>
+</section>
+<section id="align-the-assembled-transcripts-to-the-genome" class="level3">
+<h3 class="anchored" data-anchor-id="align-the-assembled-transcripts-to-the-genome">Align the Assembled Transcripts to the Genome</h3>
+<p><em>Arabidopsis</em> has a reference genome, therefore we can map the assembled transcripts to the reference genome to get a genomic coordinates file (GTF or GFF format). We will use an aligner called <code>GMAP</code> (<a href="http://research-pub.gene.com/gmap/" class="uri">http://research-pub.gene.com/gmap/</a>) to do the genome mapping which means we’ll first need to build a index for GMAP to use. (Indexes are specific to each aligner)</p>
+<p>Some tools can be a bit fussy about which directory they are run from, so for this command, we’ll change into the <code>references</code> directory, then go back up to the practical home.</p>
+<div class="sourceCode" id="cb39"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb39-1"><a href="#cb39-1" aria-hidden="true" tabindex="-1"></a><span class="bu">cd</span> ~/references</span>
+<span id="cb39-2"><a href="#cb39-2" aria-hidden="true" tabindex="-1"></a><span class="ex">gmap_build</span> <span class="at">-D</span> ./TAIR10 <span class="at">-d</span> GMAP Arabidopsis_thaliana.TAIR10.dna.toplevel.fa</span>
+<span id="cb39-3"><a href="#cb39-3" aria-hidden="true" tabindex="-1"></a><span class="bu">cd</span> ~/transcriptomics_assembly_practical</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>After building the genome index, we can map the assembled transcripts to the reference genome using following commands:</p>
+<div class="sourceCode" id="cb40"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb40-1"><a href="#cb40-1" aria-hidden="true" tabindex="-1"></a><span class="ex">gmap</span> <span class="dt">\</span></span>
+<span id="cb40-2"><a href="#cb40-2" aria-hidden="true" tabindex="-1"></a>  <span class="at">-D</span> ~/references/TAIR10/GMAP <span class="dt">\</span></span>
+<span id="cb40-3"><a href="#cb40-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">-d</span> GMAP <span class="dt">\</span></span>
+<span id="cb40-4"><a href="#cb40-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">-t</span> 2 <span class="at">-f</span> 3 <span class="at">-n</span> 1 <span class="dt">\</span></span>
+<span id="cb40-5"><a href="#cb40-5" aria-hidden="true" tabindex="-1"></a>  output/assembly/Col_leaf_chr2_trinity.Trinity.fasta <span class="op">&gt;</span> output/assembly/Col_leaf_chr2_trinity.gff3</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>This will generate a GFF3 format file, including genomic coordinates for our <em>de novo</em> assembled transcripts, which we can import into IGV for visualisation.</p>
+</section>
+</section>
+<section id="visualising-your-assembled-transcripts-in-igv" class="level2">
+<h2 class="anchored" data-anchor-id="visualising-your-assembled-transcripts-in-igv">Visualising your assembled transcripts in IGV</h2>
+<p>After we finish the <em>de novo</em> transcriptome assembly and genome guided transcriptome assembly, we can visualise our results in IGV to check the assembly quality and look for interesting genes/transcripts.</p>
+<p>First, we will put all the important final files into one folder. The files we’ll choose are:</p>
+<ol type="1">
+<li>the original genome (.fa + .fa.fai)</li>
+<li>the annotated gtf</li>
+<li>our alignments (.bam + .bam.bai)</li>
+<li>both the stringtie and trinity gtf/gff3 files</li>
+</ol>
+<div class="sourceCode" id="cb41"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb41-1"><a href="#cb41-1" aria-hidden="true" tabindex="-1"></a><span class="fu">mkdir</span> temp</span>
+<span id="cb41-2"><a href="#cb41-2" aria-hidden="true" tabindex="-1"></a><span class="fu">cp</span> ~/references/Arabidopsis_thaliana.TAIR10<span class="pp">*</span> temp/</span>
+<span id="cb41-3"><a href="#cb41-3" aria-hidden="true" tabindex="-1"></a><span class="fu">cp</span> data/aligned/Col_leaf_chr2.Aligned.sortedByCoord.out.<span class="pp">*</span> temp/</span>
+<span id="cb41-4"><a href="#cb41-4" aria-hidden="true" tabindex="-1"></a><span class="fu">cp</span> output/stringtie/Col_leaf_chr2_stringtie.gtf temp/</span>
+<span id="cb41-5"><a href="#cb41-5" aria-hidden="true" tabindex="-1"></a><span class="fu">cp</span> output/assembly/Col_leaf_chr2_trinity.gff3 temp/</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>To view the results, we’ll use the IGV browser using this <a href="https://igv.org/app/">link</a>. The files will need to be uploaded to this app, which means that first, we need to download them to our local laptops. To do this, select the <code>temp</code> directory using the checkbox, the find the Export command in the menu within the Files Pane. Save the file <code>temp.zip</code> anywhere on your computer (<code>~/Downloads</code> for Linux users), then extract the zip file. It will be 100-120Mb so will take a minute to download, but it shouldn’t be too long.</p>
+<p>Now go to the IGV website and:</p>
+<ol type="1">
+<li>Upload both Arabidopsis_thaliana.TAIR10.dna.toplevel.fa and Arabidopsis_thaliana.TAIR10.dna.toplevel.fa.fai together using <code>Genome -&gt; Local File</code></li>
+<li>Upload the reference GTF (TAIR10_GFF3_genes.gtf)</li>
+<li>Repeat individually for our StringTie and Trinity annotations</li>
+</ol>
+<p>Browse to somewhere on chr2 and have a look. Try <code>Chr2:9,778,710-9,783,692</code> as a starting point. Which annotations do you think were the best?</p>
+</section>
+</section>
+<section id="references" class="level1 unnumbered">
+
+
+</section>
+
+<div id="quarto-appendix" class="default"><section class="quarto-appendix-contents" role="doc-bibliography" id="quarto-bibliography"><h2 class="anchored quarto-appendix-heading">References</h2><div id="refs" class="references csl-bib-body hanging-indent" data-entry-spacing="0" role="list">
+<div id="ref-Haas2013-ma" class="csl-entry" role="listitem">
+Haas, Brian J, Alexie Papanicolaou, Moran Yassour, Manfred Grabherr, Philip D Blood, Joshua Bowden, Matthew Brian Couger, et al. 2013. <span>“De Novo Transcript Sequence Reconstruction from <span>RNA</span>-Seq Using the Trinity Platform for Reference Generation and Analysis.”</span> <em>Nat. Protoc.</em> 8 (8): 1494–1512.
+</div>
+<div id="ref-Pertea2015-zd" class="csl-entry" role="listitem">
+Pertea, Mihaela, Geo M Pertea, Corina M Antonescu, Tsung-Cheng Chang, Joshua T Mendell, and Steven L Salzberg. 2015. <span>“<span>StringTie</span> Enables Improved Reconstruction of a Transcriptome from <span>RNA</span>-Seq Reads.”</span> <em>Nat. Biotechnol.</em> 33 (3): 290–95.
+</div>
+<div id="ref-Tegenfeldt2025-lt" class="csl-entry" role="listitem">
+Tegenfeldt, Fredrik, Dmitry Kuznetsov, Mosè Manni, Matthew Berkeley, Evgeny M Zdobnov, and Evgenia V Kriventseva. 2025. <span>“<span>OrthoDB</span> and <span>BUSCO</span> Update: Annotation of Orthologs with Wider Sampling of Genomes.”</span> <em>Nucleic Acids Res.</em> 53 (D1): D516–22.
+</div>
+<div id="ref-Wang2017-te" class="csl-entry" role="listitem">
+Wang, Dong, Zhipeng Qu, Lan Yang, Qingzhu Zhang, Zhi-Hong Liu, Trung Do, David L. Adelson, Zhen-Yu Wang, Iain Searle, and Jian-Kang Zhu. 2017. <span>“Transposable Elements (TEs) Contribute to Stress-Related Long Intergenic Noncoding RNAs in Plants.”</span> <em>The Plant Journal</em> 90 (1): 133–46. <a href="https://doi.org/10.1111/tpj.13481">https://doi.org/10.1111/tpj.13481</a>.
+</div>
+</div></section></div></main>
+<!-- /main column -->
+<script id="quarto-html-after-body" type="application/javascript">
+  window.document.addEventListener("DOMContentLoaded", function (event) {
+    const icon = "";
+    const anchorJS = new window.AnchorJS();
+    anchorJS.options = {
+      placement: 'right',
+      icon: icon
+    };
+    anchorJS.add('.anchored');
+    const isCodeAnnotation = (el) => {
+      for (const clz of el.classList) {
+        if (clz.startsWith('code-annotation-')) {                     
+          return true;
+        }
+      }
+      return false;
+    }
+    const onCopySuccess = function(e) {
+      // button target
+      const button = e.trigger;
+      // don't keep focus
+      button.blur();
+      // flash "checked"
+      button.classList.add('code-copy-button-checked');
+      var currentTitle = button.getAttribute("title");
+      button.setAttribute("title", "Copied!");
+      let tooltip;
+      if (window.bootstrap) {
+        button.setAttribute("data-bs-toggle", "tooltip");
+        button.setAttribute("data-bs-placement", "left");
+        button.setAttribute("data-bs-title", "Copied!");
+        tooltip = new bootstrap.Tooltip(button, 
+          { trigger: "manual", 
+            customClass: "code-copy-button-tooltip",
+            offset: [0, -8]});
+        tooltip.show();    
+      }
+      setTimeout(function() {
+        if (tooltip) {
+          tooltip.hide();
+          button.removeAttribute("data-bs-title");
+          button.removeAttribute("data-bs-toggle");
+          button.removeAttribute("data-bs-placement");
+        }
+        button.setAttribute("title", currentTitle);
+        button.classList.remove('code-copy-button-checked');
+      }, 1000);
+      // clear code selection
+      e.clearSelection();
+    }
+    const getTextToCopy = function(trigger) {
+        const codeEl = trigger.previousElementSibling.cloneNode(true);
+        for (const childEl of codeEl.children) {
+          if (isCodeAnnotation(childEl)) {
+            childEl.remove();
+          }
+        }
+        return codeEl.innerText;
+    }
+    const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+      text: getTextToCopy
+    });
+    clipboard.on('success', onCopySuccess);
+    if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+      const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+        text: getTextToCopy,
+        container: window.document.getElementById('quarto-embedded-source-code-modal')
+      });
+      clipboardModal.on('success', onCopySuccess);
+    }
+      var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var mailtoRegex = new RegExp(/^mailto:/);
+        var filterRegex = new RegExp('/' + window.location.host + '/');
+      var isInternal = (href) => {
+          return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+      }
+      // Inspect non-navigation links and adorn them if external
+     var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+      for (var i=0; i<links.length; i++) {
+        const link = links[i];
+        if (!isInternal(link.href)) {
+          // undo the damage that might have been done by quarto-nav.js in the case of
+          // links that we want to consider external
+          if (link.dataset.originalHref !== undefined) {
+            link.href = link.dataset.originalHref;
+          }
+        }
+      }
+    function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+      const config = {
+        allowHTML: true,
+        maxWidth: 500,
+        delay: 100,
+        arrow: false,
+        appendTo: function(el) {
+            return el.parentElement;
+        },
+        interactive: true,
+        interactiveBorder: 10,
+        theme: 'quarto',
+        placement: 'bottom-start',
+      };
+      if (contentFn) {
+        config.content = contentFn;
+      }
+      if (onTriggerFn) {
+        config.onTrigger = onTriggerFn;
+      }
+      if (onUntriggerFn) {
+        config.onUntrigger = onUntriggerFn;
+      }
+      window.tippy(el, config); 
+    }
+    const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+    for (var i=0; i<noterefs.length; i++) {
+      const ref = noterefs[i];
+      tippyHover(ref, function() {
+        // use id or data attribute instead here
+        let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+        try { href = new URL(href).hash; } catch {}
+        const id = href.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note) {
+          return note.innerHTML;
+        } else {
+          return "";
+        }
+      });
+    }
+    const xrefs = window.document.querySelectorAll('a.quarto-xref');
+    const processXRef = (id, note) => {
+      // Strip column container classes
+      const stripColumnClz = (el) => {
+        el.classList.remove("page-full", "page-columns");
+        if (el.children) {
+          for (const child of el.children) {
+            stripColumnClz(child);
+          }
+        }
+      }
+      stripColumnClz(note)
+      if (id === null || id.startsWith('sec-')) {
+        // Special case sections, only their first couple elements
+        const container = document.createElement("div");
+        if (note.children && note.children.length > 2) {
+          container.appendChild(note.children[0].cloneNode(true));
+          for (let i = 1; i < note.children.length; i++) {
+            const child = note.children[i];
+            if (child.tagName === "P" && child.innerText === "") {
+              continue;
+            } else {
+              container.appendChild(child.cloneNode(true));
+              break;
+            }
+          }
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(container);
+          }
+          return container.innerHTML
+        } else {
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(note);
+          }
+          return note.innerHTML;
+        }
+      } else {
+        // Remove any anchor links if they are present
+        const anchorLink = note.querySelector('a.anchorjs-link');
+        if (anchorLink) {
+          anchorLink.remove();
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        if (note.classList.contains("callout")) {
+          return note.outerHTML;
+        } else {
+          return note.innerHTML;
+        }
+      }
+    }
+    for (var i=0; i<xrefs.length; i++) {
+      const xref = xrefs[i];
+      tippyHover(xref, undefined, function(instance) {
+        instance.disable();
+        let url = xref.getAttribute('href');
+        let hash = undefined; 
+        if (url.startsWith('#')) {
+          hash = url;
+        } else {
+          try { hash = new URL(url).hash; } catch {}
+        }
+        if (hash) {
+          const id = hash.replace(/^#\/?/, "");
+          const note = window.document.getElementById(id);
+          if (note !== null) {
+            try {
+              const html = processXRef(id, note.cloneNode(true));
+              instance.setContent(html);
+            } finally {
+              instance.enable();
+              instance.show();
+            }
+          } else {
+            // See if we can fetch this
+            fetch(url.split('#')[0])
+            .then(res => res.text())
+            .then(html => {
+              const parser = new DOMParser();
+              const htmlDoc = parser.parseFromString(html, "text/html");
+              const note = htmlDoc.getElementById(id);
+              if (note !== null) {
+                const html = processXRef(id, note);
+                instance.setContent(html);
+              } 
+            }).finally(() => {
+              instance.enable();
+              instance.show();
+            });
+          }
+        } else {
+          // See if we can fetch a full url (with no hash to target)
+          // This is a special case and we should probably do some content thinning / targeting
+          fetch(url)
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.querySelector('main.content');
+            if (note !== null) {
+              // This should only happen for chapter cross references
+              // (since there is no id in the URL)
+              // remove the first header
+              if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+                note.children[0].remove();
+              }
+              const html = processXRef(null, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      }, function(instance) {
+      });
+    }
+        let selectedAnnoteEl;
+        const selectorForAnnotation = ( cell, annotation) => {
+          let cellAttr = 'data-code-cell="' + cell + '"';
+          let lineAttr = 'data-code-annotation="' +  annotation + '"';
+          const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+          return selector;
+        }
+        const selectCodeLines = (annoteEl) => {
+          const doc = window.document;
+          const targetCell = annoteEl.getAttribute("data-target-cell");
+          const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+          const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+          const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+          const lineIds = lines.map((line) => {
+            return targetCell + "-" + line;
+          })
+          let top = null;
+          let height = null;
+          let parent = null;
+          if (lineIds.length > 0) {
+              //compute the position of the single el (top and bottom and make a div)
+              const el = window.document.getElementById(lineIds[0]);
+              top = el.offsetTop;
+              height = el.offsetHeight;
+              parent = el.parentElement.parentElement;
+            if (lineIds.length > 1) {
+              const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+              const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+              height = bottom - top;
+            }
+            if (top !== null && height !== null && parent !== null) {
+              // cook up a div (if necessary) and position it 
+              let div = window.document.getElementById("code-annotation-line-highlight");
+              if (div === null) {
+                div = window.document.createElement("div");
+                div.setAttribute("id", "code-annotation-line-highlight");
+                div.style.position = 'absolute';
+                parent.appendChild(div);
+              }
+              div.style.top = top - 2 + "px";
+              div.style.height = height + 4 + "px";
+              div.style.left = 0;
+              let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+              if (gutterDiv === null) {
+                gutterDiv = window.document.createElement("div");
+                gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+                gutterDiv.style.position = 'absolute';
+                const codeCell = window.document.getElementById(targetCell);
+                const gutter = codeCell.querySelector('.code-annotation-gutter');
+                gutter.appendChild(gutterDiv);
+              }
+              gutterDiv.style.top = top - 2 + "px";
+              gutterDiv.style.height = height + 4 + "px";
+            }
+            selectedAnnoteEl = annoteEl;
+          }
+        };
+        const unselectCodeLines = () => {
+          const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+          elementsIds.forEach((elId) => {
+            const div = window.document.getElementById(elId);
+            if (div) {
+              div.remove();
+            }
+          });
+          selectedAnnoteEl = undefined;
+        };
+          // Handle positioning of the toggle
+      window.addEventListener(
+        "resize",
+        throttle(() => {
+          elRect = undefined;
+          if (selectedAnnoteEl) {
+            selectCodeLines(selectedAnnoteEl);
+          }
+        }, 10)
+      );
+      function throttle(fn, ms) {
+      let throttle = false;
+      let timer;
+        return (...args) => {
+          if(!throttle) { // first call gets through
+              fn.apply(this, args);
+              throttle = true;
+          } else { // all the others get throttled
+              if(timer) clearTimeout(timer); // cancel #2
+              timer = setTimeout(() => {
+                fn.apply(this, args);
+                timer = throttle = false;
+              }, ms);
+          }
+        };
+      }
+        // Attach click handler to the DT
+        const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+        for (const annoteDlNode of annoteDls) {
+          annoteDlNode.addEventListener('click', (event) => {
+            const clickedEl = event.target;
+            if (clickedEl !== selectedAnnoteEl) {
+              unselectCodeLines();
+              const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+              if (activeEl) {
+                activeEl.classList.remove('code-annotation-active');
+              }
+              selectCodeLines(clickedEl);
+              clickedEl.classList.add('code-annotation-active');
+            } else {
+              // Unselect the line
+              unselectCodeLines();
+              clickedEl.classList.remove('code-annotation-active');
+            }
+          });
+        }
+    const findCites = (el) => {
+      const parentEl = el.parentElement;
+      if (parentEl) {
+        const cites = parentEl.dataset.cites;
+        if (cites) {
+          return {
+            el,
+            cites: cites.split(' ')
+          };
+        } else {
+          return findCites(el.parentElement)
+        }
+      } else {
+        return undefined;
+      }
+    };
+    var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+    for (var i=0; i<bibliorefs.length; i++) {
+      const ref = bibliorefs[i];
+      const citeInfo = findCites(ref);
+      if (citeInfo) {
+        tippyHover(citeInfo.el, function() {
+          var popup = window.document.createElement('div');
+          citeInfo.cites.forEach(function(cite) {
+            var citeDiv = window.document.createElement('div');
+            citeDiv.classList.add('hanging-indent');
+            citeDiv.classList.add('csl-entry');
+            var biblioDiv = window.document.getElementById('ref-' + cite);
+            if (biblioDiv) {
+              citeDiv.innerHTML = biblioDiv.innerHTML;
+            }
+            popup.appendChild(citeDiv);
+          });
+          return popup.innerHTML;
+        });
+      }
+    }
+  });
+  </script>
+</div> <!-- /content -->
+
+
+
+
+</body></html>
