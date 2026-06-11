@@ -4,18 +4,18 @@
 
 **Data management and visualisation**
 
-- Practical 1 - [Introduction to R](Practicals/introduction_to_r.html)
-- Practical 2 - [Introduction to the tidyverse](Practicals/introduction_to_the_tidyverse.html)
-- Practical 3 - [Data visualisation & R markdown](Practicals/visualisation_and_rmarkdown.html)
+- Practical 1 - [Introduction to R](https://university-of-adelaide-bx-masters.github.io/Transcriptomics/Practicals/introduction_to_r.html)
+- Practical 2 - [Introduction to the tidyverse](https://university-of-adelaide-bx-masters.github.io/Transcriptomics/Practicals/introduction_to_the_tidyverse.html)
+- Practical 3 - [Data visualisation & R markdown](https://university-of-adelaide-bx-masters.github.io/Transcriptomics/Practicals/visualisation_and_rmarkdown.html)
 
 **Development of transcriptomics**
 
-- Practical 4 and 5 - [Differential gene expression](Practicals/differential_gene_expression.html)
+- Practical 4 and 5 - [Differential gene expression](https://university-of-adelaide-bx-masters.github.io/Transcriptomics/Practicals/differential_gene_expression.html)
 
 **Transcriptomics in the sequencing era**
 
-- Practical 6 - [Single-cell RNASeq](Practicals/scRNA.html)
-- Practical 7 and 8 - [Transcriptome Assembly](Practicals/transcriptome_assembly.html)
+- Practical 6 - [Single-cell RNASeq](https://university-of-adelaide-bx-masters.github.io/Transcriptomics/Practicals/scRNA.html)
+- Practical 7 and 8 - [Transcriptome Assembly](https://university-of-adelaide-bx-masters.github.io/Transcriptomics/Practicals/transcriptome_assembly.html)
 
 ## Useful Links
 
