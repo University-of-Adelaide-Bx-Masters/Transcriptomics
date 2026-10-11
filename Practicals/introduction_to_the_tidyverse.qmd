@@ -45,6 +45,8 @@ Throughout today's session, we'll mainly learn to use the packages `tidyr` and `
 
 ## Loading Today's Data
 
+First, make sure you are working in the `R_Practicals` R Project. You can confirm this by looking at the upper right of the RStudio window, just below your 'a' number, where you should see a small, blue `R` icon and `R_Practicals` next to it. If not, click the small, black arrow next to Project and select `R_Praticals` from the drop-down list. You can then create a new `R` script (as per the instructions in the 'Introduction to R' practical) for today's work.
+
 We'll continue using the same `csv` as the last session, so let's load this how we did last week, but with one key difference.
 Instead of writing `library(readr)` at the top of our script, we'll use `library(tidyverse)` which loads all of the packages in the above figure with a single line.
 We'll mention which package we're working with at the time as that can be very helpful information to know when unexpected problems arise.
@@ -61,9 +63,10 @@ psen2VsWT <- read_csv("data/psen2VsWT.csv")
 #| echo: false
 #| eval: true
 #| message: true
-library(tidyverse)
-psen2VsWT <- read_csv(here::here("practicals", "data", "psen2VsWT.csv"))
+suppressWarnings(library(tidyverse))
+psen2VsWT <- read_csv(here::here("data", "psen2VsWT.csv"))
 ```
+
 
 All of this text is actually just the tidyverse being helpful and letting us know what has been done.
 It can look a but overwhelming or annoying, but it's really informative for when things go wrong.

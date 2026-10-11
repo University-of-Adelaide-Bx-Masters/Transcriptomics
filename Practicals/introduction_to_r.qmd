@@ -24,7 +24,7 @@ knitr::opts_chunk$set(
 The practicals that you will be participating in will make use of cloud compute resources that are provided by The University as a [virtual machine](https://en.wikipedia.org/wiki/System_virtual_machine) (VM).
 The VM is basically a program that runs on a server but acts like a separate computer. You can log in to the VM and interact with the programs installed on it. The VMs provided each have 2 CPU cores, 16 GB of system memory, and 80 GB of hard disk space. They are yours to use for the semester, but you are also responsible for looking after them. The University hosts these VMs on AWS RONIN (Amazon Web Services) and pays by the minute for CPU time and storage. As a result, we have added an auto shutdown feature for VMs that stay idle for too long (idle means no jobs running or no user input).
 
-**Please [go here](../AWS_RONIN_connection) for instructions on connecting to your VM.**
+**Please [go here](https://university-of-adelaide-bx-masters.github.io/Fundamentals_of_Bioinformatics/Course_materials/vm_login_instructions.html) for instructions on connecting to your VM.**
 
 
 
@@ -80,7 +80,7 @@ RStudio offers many extra features that are not directly related to R but make o
 For these practicals, we have given you a Virtual Machine (VM), and we will use this to ensure minimal issues with the entire practical series.
 RStudio is how we will primarily interact with our VMs
 
-**Please [go here](../AWS_RONIN_connection) for instructions on connecting to your VM.**
+**Please [go here](https://university-of-adelaide-bx-masters.github.io/Fundamentals_of_Bioinformatics/Course_materials/vm_login_instructions.html) for instructions on connecting to your VM.**
 
 
 ## R At It's Simplest
@@ -138,7 +138,7 @@ Both R and R Studio can also be installed on your computer, and you may need to 
 
 ### Creating an R Project
 
-First we will set up an `R Project` for today's practical.
+First we will set up an `R Project` for this week's practicals.
 These are a simple way to manage your code for multiple analyses or datasets, and *are always named after the directory they are in*.
 These are not essential, but are very useful and make good practice.
 If you don't follow this step, you will be making your life immeasurably harder and will not be following 'best practice' for R.
@@ -146,34 +146,34 @@ If you don't follow this step, you will be making your life immeasurably harder 
 In the middle of the screen (at the top of a pane called **Files**) you will see the home icon (![home](assets/home.png)).
 Click on this and you'll notice that the Files Pane will have taken you to your "home" folder on the VM.
 
-Now you're in the home folder where we can place all our practical sessions, click on ![NewFolder](assets/NewFolder.png) directly above this and call this folder `introduction_to_r`.
+Now you're in the home folder where we can place all our practical sessions, click on ![NewFolder](assets/NewFolder.png) directly above this and call this folder `R_Practicals`.
 
 ::: {.callout-important}
 
-**Please ensure you spell `introduction_to_r` correctly, including all underscores.
+**Please ensure you spell `R_Practicals` correctly, including the underscore.
 It is important when using scripting languages never to use spaces in the names of files or folders, so please get into the practice of following this rule from now on!**
 
 :::
 
-This is where we'll run everything for today's session.
+This is where we'll run everything for this week's sessions.
 To make an R Project for this folder use the following commands in the menu bar at the top of your R Studio session:
 
 ```
 1. `File` > `New Project` 
 2. When asked if you'd like to `Save Current Workspace`, choose `Don't Save`.
 3. Choose `Existing Directory` >
-    + Browse to `introduction_to_r`
+    + Browse to `R_Practicals`
     + `Choose`
     + `Create Project`
 ```
 
 ![](assets/RProject.png)
 
-You will now find yourself in the `introduction_to_r` folder we have created.
-If you look at the top right of your RStudio session you will also see `introduction_to_r` and an arrow for the drop-down menu with all the R Projects you have listed.
+You will now find yourself in the `R_Practicals` folder we have created.
+If you look at the top right of your RStudio session you will also see `R_Practicals` and an arrow for the drop-down menu with all the R Projects you have listed.
 
 We only have one project at this point, but this is where you can switch between projects as we go through multiple practical sessions.
-For this practical series, we'll start a new project for every session.
+<!-- For this practical series, we'll start a new project for every session. -->
 This will help you keep everything organised so you can find everything later.
 
 ::: {.callout-tip title="Take Care Managing Your Data"}
@@ -181,7 +181,7 @@ Managing your data and code intelligently is a considerable challenge in bioinfo
 Analyses can get complex surprisingly quickly so it's good to get into the habit of being well-organised early.
 :::
 
-The final step is to copy the data we have provided for this practical into your `introduction_to_r` folder.
+The final step is to copy the data we have provided for this practical into your `R_Practicals` folder.
 It's best practice when using `R Projects` to keep all data, scripts, outputs, reports within the R Project folder for maximum portability and reproducibility.
 
 The provided data is in the folder `~/data/intro_r` within your Home folder on the VM (the `~/` part here expands to your system `Home` folder, which on the VM expands to `/shared//aXXXXXXX`).
@@ -193,7 +193,7 @@ We will keep things simple for now and use the Files pane as follows:
 
 ```
 1. Click on the `Files` tab in the bottom right pane of RStudio.
-   - Ensure you are in the `~/introduction_to_r` folder
+   - Ensure you are in the `~/R_Practicals` folder
 2. Click on the new folder icon (looks like a folder with a plus sign) to create a new folder.
    - Name this folder `data`
 3. Click on the `Home` icon (looks like a house) to go to your home folder.
@@ -201,12 +201,12 @@ We will keep things simple for now and use the Files pane as follows:
 5. Click on the box next to the `intro_r` folder to select it.
 6. Click on the `More` button in the top right of the Files pane.
 7. Select `Copy To` from the drop-down menu.
-8. Click `Home`, then double-click 'introduction_to_r`, and then click `data`.
-9. In the `File name` box type `intro_r` and select `Save`
-  - This will copy the `intro_r` folder into your `introduction_to_r/data` folder.
+8. Click `Home`, then double-click 'R_Practicals`, and then click `data`.
+9. In the `File name` box type `psen2VsWT.csv` and select `Save`
+  - This will copy the `psen2VsWT.csv` file into your `R_Practicals/data` folder.
 ```
 
-Great, the data is now in your `introduction_to_r/data/intro_r` folder! 
+Great, the data is now in your `R_Practicals/data` folder! 
 Now we are ready to start using R and RStudio.
 
 ### Creating an R Script
@@ -347,7 +347,7 @@ Many in-built functions are organised into a package called `base` which is alwa
 Packages group similar/related functions together and are stored on either [The Comprehensive R Arichive Network (CRAN)](https://cran.r-project.org) or [The Bioconductor Project](https://bioconductor.org) which hosts packages exclusively for bioinformatics.
 Currently, there are >22,000 R packages on CRAN and another 3500 on Bioconductor.
 
-Packages are usually named by developers to provide a lighthearted way to remember what they do, with some well known examples being
+Packages are usually named by developers to provide a light-hearted way to remember what they do, with some well known examples being
 
 - `limma`: Linear Models for Microarray Analysis
 - `edgeR`: Empirical analysis of Digital Gene Expression data in R
@@ -477,7 +477,10 @@ To finish our grand tour, there are a few more features which can be quite helpf
 #| echo: false
 #| eval: true
 library(readr)
-psen2VsWT <- read_csv(here::here("practicals", "data", "psen2VsWT.csv"))
+# If the `here` package is not installed, go to the Tools menu and select 'Install packages'
+# Type `here` in the Packages box and click Install. Then re-run this code chunk. 
+library(here)
+psen2VsWT <- read_csv(here("data", "psen2VsWT.csv"))
 ```
 
 
@@ -489,7 +492,7 @@ These are the results from an RNA-Seq analysis as published.
 ::: {.callout-caution}
 
 You should already have the file *psen2VsWT.csv* in your directory `data` and we'll be assuming that location for the next few stages of the practical.
-If you don't have the file in that location and can't find it anywhere else, call a tutor over
+If you don't have the file in that location and can't find it anywhere else, call a tutor over.
 
 :::
 
@@ -613,7 +616,7 @@ This gives a preview up to 10 lines with:
     + Any extra columns which don't fit in your Console width are given as names at the bottom
 - The column data types: `<chr>, <chr>, <dbl> etc`
 
-Most experiences users find this more informative than `View()` as you get just enough information to know what you actually have.
+Most experienced users find this more informative than `View()` as you get just enough information to know what you actually have.
 
 ::: {.callout-note}
 Whilst we introduced this object as a `data.frame` you might have noticed the object type was printed as a `tibble`.
@@ -662,8 +665,8 @@ Lower down the page you’ll see
 
 Some of the rest is technical detail (can sometimes be very helpful)
 
-`head()` prints the first part of an object which can be useful very large objects.
-We can change the number of rows shown to us by choosing a different number instead of 6
+`head()` prints the first part of an object which can be useful for very large objects.
+We can change the number of rows shown to us by choosing a different number instead of 6.
 
 ```{r}
 #| results: markup

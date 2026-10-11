@@ -2,7 +2,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
 
 <meta charset="utf-8">
-<meta name="generator" content="quarto-1.7.32">
+<meta name="generator" content="quarto-1.10.18">
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
@@ -10,10 +10,16 @@
 
 <title>Transcriptomics Practical</title>
 <style>
-code{white-space: pre-wrap;}
+/* Default styles provided by pandoc.
+** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+*/
 span.smallcaps{font-variant: small-caps;}
-div.columns{display: flex; gap: min(4vw, 1.5em);}
-div.column{flex: auto; overflow-x: auto;}
+div.columns{display: flex; gap: 1.5em;}
+div.column{flex: auto;}
+@media screen {
+div.columns{gap: min(4vw, 1.5em);}
+div.column{overflow-x: auto;}
+}
 div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
 ul.task-list{list-style: none;}
 ul.task-list li input[type="checkbox"] {
@@ -60,7 +66,6 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 div.csl-bib-body { }
 div.csl-entry {
   clear: both;
-  margin-bottom: 0em;
 }
 .hanging-indent div.csl-entry {
   margin-left:2em;
@@ -86,13 +91,13 @@ div.csl-indent {
 <script src="introduction_to_r_files/libs/quarto-html/tippy.umd.min.js"></script>
 <script src="introduction_to_r_files/libs/quarto-html/anchor.min.js"></script>
 <link href="introduction_to_r_files/libs/quarto-html/tippy.css" rel="stylesheet">
-<link href="introduction_to_r_files/libs/quarto-html/quarto-syntax-highlighting-37eea08aefeeee20ff55810ff984fec1.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<link href="introduction_to_r_files/libs/quarto-html/quarto-syntax-highlighting-64a204ab8560d761af7679ceaba22944.css" rel="stylesheet" id="quarto-text-highlighting-styles">
 <script src="introduction_to_r_files/libs/bootstrap/bootstrap.min.js"></script>
 <link href="introduction_to_r_files/libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
-<link href="introduction_to_r_files/libs/bootstrap/bootstrap-1e1b6d7d3018d0281420745e134191b0.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<link href="introduction_to_r_files/libs/bootstrap/bootstrap-917079515d91bccb85b543faf8aa8bb6.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
 
   <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
-  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
+  <script defer="" src="https://cdn.jsdelivr.net/npm/mathjax@4/tex-chtml.js" type="text/javascript"></script>
 
 <script type="text/javascript">
 const typesetMath = (el) => {
@@ -105,7 +110,7 @@ const typesetMath = (el) => {
     var macros = [];
     for (var i = 0; i < mathElements.length; i++) {
       var texText = mathElements[i].firstChild;
-      if (mathElements[i].tagName == "SPAN") {
+      if (mathElements[i].tagName == "SPAN" && texText && texText.data) {
         window.katex.render(texText.data, mathElements[i], {
           displayMode: mathElements[i].classList.contains('display'),
           throwOnError: false,
@@ -207,7 +212,7 @@ window.Quarto = {
 <section id="virtual-machines" class="level2">
 <h2 class="anchored" data-anchor-id="virtual-machines">Virtual Machines</h2>
 <p>The practicals that you will be participating in will make use of cloud compute resources that are provided by The University as a <a href="https://en.wikipedia.org/wiki/System_virtual_machine">virtual machine</a> (VM). The VM is basically a program that runs on a server but acts like a separate computer. You can log in to the VM and interact with the programs installed on it. The VMs provided each have 2 CPU cores, 16 GB of system memory, and 80 GB of hard disk space. They are yours to use for the semester, but you are also responsible for looking after them. The University hosts these VMs on AWS RONIN (Amazon Web Services) and pays by the minute for CPU time and storage. As a result, we have added an auto shutdown feature for VMs that stay idle for too long (idle means no jobs running or no user input).</p>
-<p><strong>Please <a href="../AWS_RONIN_connection">go here</a> for instructions on connecting to your VM.</strong></p>
+<p><strong>Please <a href="https://university-of-adelaide-bx-masters.github.io/Fundamentals_of_Bioinformatics/Course_materials/vm_login_instructions.html">go here</a> for instructions on connecting to your VM.</strong></p>
 </section>
 </section>
 <section id="introducing-r-and-rstudio" class="level1">
@@ -239,7 +244,7 @@ window.Quarto = {
 <i class="callout-icon"></i>
 </div>
 <div class="callout-title-container flex-fill">
-Why we’re learning R
+<span class="screen-reader-only">Tip</span>Why we’re learning R
 </div>
 </div>
 <div class="callout-body-container callout-body">
@@ -266,7 +271,7 @@ Why we’re learning R
 <h3 class="anchored" data-anchor-id="how-do-we-use-r">How do we use R</h3>
 <p>R can be installed on any laptop, and the most common way to interact with R is through the IDE called RStudio. When using RStudio, we can compare it to the cabin of a car, while R itself is like the engine. RStudio offers many extra features that are not directly related to R but make our journey much more enjoyable while working with R.</p>
 <p>For these practicals, we have given you a Virtual Machine (VM), and we will use this to ensure minimal issues with the entire practical series. RStudio is how we will primarily interact with our VMs</p>
-<p><strong>Please <a href="../AWS_RONIN_connection">go here</a> for instructions on connecting to your VM.</strong></p>
+<p><strong>Please <a href="https://university-of-adelaide-bx-masters.github.io/Fundamentals_of_Bioinformatics/Course_materials/vm_login_instructions.html">go here</a> for instructions on connecting to your VM.</strong></p>
 </section>
 </section>
 <section id="r-at-its-simplest" class="level2">
@@ -292,10 +297,10 @@ Type 'q()' to quit R.</code></pre>
 <p>(If the cursor is not flashing, click on this pane and it should start flashing.)</p>
 <p>This is the <code>R</code> Console and this symbol is the prompt within an R session. We enter our code here, and can even use this as a simple calculator. Enter the following at the R prompt followed by <kbd>Enter</kbd> after each line, which will evaluate our ‘difficult’ calculations.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="dv">1</span> <span class="sc">+</span> <span class="dv">1</span></span>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="dv">1</span> <span class="sc">+</span> <span class="dv">1</span></span>
 <span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="dv">2</span> <span class="sc">*</span> <span class="dv">2</span></span>
 <span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a><span class="dv">1</span> <span class="sc">/</span> <span class="dv">4</span></span>
-<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a><span class="dv">3</span> <span class="sc">^</span> <span class="dv">2</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a><span class="dv">3</span> <span class="sc">^</span> <span class="dv">2</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <p>Mess around with a few more simple calculations, then move on to the next section.</p>
 </section>
@@ -337,7 +342,7 @@ Important
 <i class="callout-icon"></i>
 </div>
 <div class="callout-title-container flex-fill">
-Take Care Managing Your Data
+<span class="screen-reader-only">Tip</span>Take Care Managing Your Data
 </div>
 </div>
 <div class="callout-body-container callout-body">
@@ -405,15 +410,15 @@ Take Care Managing Your Data
 </ul>
 <p>To see this in action, type the following directly in the R Console</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>x <span class="ot">&lt;-</span> <span class="dv">5</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb7"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>x <span class="ot">&lt;-</span> <span class="dv">5</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <ul>
 <li>We have just defined an object called <code>x</code></li>
 <li>View the contents of the object <code>x</code> by entering it’s name directly in the <code>Console</code>, or by calling <code>print()</code>.</li>
 </ul>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>x</span>
-<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(x)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb8"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>x</span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(x)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <div class="callout callout-style-default callout-caution callout-titled">
 <div class="callout-header d-flex align-content-center">
@@ -466,8 +471,8 @@ The object is in our R Workspace (or Environment). We can save our R Environment
 </div>
 <p>The <code>Environment</code> pane shows us which objects are currently in our R Environment. The <code>Environment</code> is very much like the desk in your study (or bedroom) where we can have things spread and piled up everywhere. In the R Environment, we can create objects of multiple types. Once an object is in our <code>Environment</code> we can perform calculations on it. Using the object <code>x</code> we created as an example:</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="dv">1</span> <span class="sc">+</span> x</span>
-<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>x<span class="sc">^</span><span class="dv">2</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb9"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="dv">1</span> <span class="sc">+</span> x</span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>x<span class="sc">^</span><span class="dv">2</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <div class="callout callout-style-default callout-warning callout-titled">
 <div class="callout-header d-flex align-content-center">
@@ -487,12 +492,12 @@ Warning
 <h3 class="anchored" data-anchor-id="accessing-help-pages">Accessing Help Pages</h3>
 <p><code>R</code> has a series of in-built functions, e.g.&nbsp;<code>sqrt()</code>, <code>log()</code>, <code>max()</code>, <code>min()</code> etc. loaded into your Environment. We place an object or value inside the <code>()</code> after the name of a function - these are the <em>arguments</em> to the function.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb10"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="fu">sqrt</span>(x)</span>
-<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a><span class="fu">log</span>(x)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb10"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="fu">sqrt</span>(x)</span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a><span class="fu">log</span>(x)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <p>Many in-built functions are organised into a package called <code>base</code> which is always loaded and installed with <code>R</code></p>
 <p>Packages group similar/related functions together and are stored on either <a href="https://cran.r-project.org">The Comprehensive R Arichive Network (CRAN)</a> or <a href="https://bioconductor.org">The Bioconductor Project</a> which hosts packages exclusively for bioinformatics. Currently, there are &gt;22,000 R packages on CRAN and another 3500 on Bioconductor.</p>
-<p>Packages are usually named by developers to provide a lighthearted way to remember what they do, with some well known examples being</p>
+<p>Packages are usually named by developers to provide a light-hearted way to remember what they do, with some well known examples being</p>
 <ul>
 <li><code>limma</code>: Linear Models for Microarray Analysis</li>
 <li><code>edgeR</code>: Empirical analysis of Digital Gene Expression data in R</li>
@@ -500,7 +505,7 @@ Warning
 <li><code>pheatmap</code>: Pretty heatmaps</li>
 </ul>
 <p>Every function in R comes with a help page, with some being excellent and others being less so. They’re always written by the package authors and some authors have a knack of explaining things well, whilst for some functions the technical knowledge required can be difficult to explain. Typing a single question mark followed by the name of a function will take you to the help page. To see an example of a help page enter the following in the Console</p>
-<div class="sourceCode" id="cb11"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a>?sqrt</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb11"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a>?sqrt</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <p>Some of this should make sense to you already, whilst some of the content is more technical. Importantly, you’ll notice that the function <code>sqrt()</code> has one <strong>argument</strong> defined as <code>x</code> which is just a common way of saying “this can be anything”.</p>
 <p>Underneath the <strong>Usage</strong> section you’ll see the <strong>Arguments</strong> section which describes what <code>x</code> can be. It’s a bit technical, but we’ll soon understand this.</p>
 </section>
@@ -521,8 +526,8 @@ Warning
 <p>The <code>#</code> symbol can actually appear anywhere in a line, however anything after this symbol will be ignored by the R Console.</p>
 <p>To see how this works enter the following in the Script Window but don’t do anything else. (You can copy &amp; paste if you’d like)</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb12"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="do">## Create an object called x</span></span>
-<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a>x <span class="ot">&lt;-</span> <span class="dv">1</span><span class="sc">:</span><span class="dv">5</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb12"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="do">## Create an object called x</span></span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a>x <span class="ot">&lt;-</span> <span class="dv">1</span><span class="sc">:</span><span class="dv">5</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <p>We’ve only written plain text as this point and R has not executed anything. To send this to the Console:</p>
 <ul>
@@ -532,20 +537,20 @@ Warning
 </ul>
 <p>As well as creating objects, we can use this to write general code. Enter the following in your script, then send it to the R Console.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb13"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="do">## What do we have in the object `x`</span></span>
-<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(x)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb13"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="do">## What do we have in the object `x`</span></span>
+<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(x)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <p>In <code>R</code>, this type of object is known as a vector, and this is quite similar to a single column in Excel. We can perform operations on an entire vector. Again, type this into your script window, then send it to the Console</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb14"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="do">## I'm not sure. Which values are greater than one?</span></span>
-<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a>x <span class="sc">&gt;</span> <span class="dv">1</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb14"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="do">## I'm not sure. Which values are greater than one?</span></span>
+<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a>x <span class="sc">&gt;</span> <span class="dv">1</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <p>As well as a logical test, we can perform mathematical operations on a vector.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb15"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="do">## Let's square every value in `x`</span></span>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb15"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="do">## Let's square every value in `x`</span></span>
 <span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a>x<span class="sc">^</span><span class="dv">2</span></span>
 <span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a><span class="do">## And we can find the square root of every value</span></span>
-<span id="cb15-4"><a href="#cb15-4" aria-hidden="true" tabindex="-1"></a><span class="fu">sqrt</span>(x)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb15-4"><a href="#cb15-4" aria-hidden="true" tabindex="-1"></a><span class="fu">sqrt</span>(x)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <p>We’ll learn more about vectors later, but this idea of having multiple values in an object and performing a simple operation on them is one of the key design features of R that gives it it’s power.</p>
 <div class="callout callout-style-default callout-note callout-titled">
@@ -603,6 +608,17 @@ Note
 </section>
 <section id="importing-data" class="level1">
 <h1>Importing Data</h1>
+<div class="cell">
+<div class="cell-output cell-output-stderr">
+<pre><code>Warning: package 'readr' was built under R version 4.5.2</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Warning: One or more parsing issues, call `problems()` on your data frame for details,
+e.g.:
+  dat &lt;- vroom(...)
+  problems(dat)</code></pre>
+</div>
+</div>
 <p>Now that we’ve oriented ourselves and had a guided tour of RStudio, let’s move straight to real data. The first thing we might like to do is import some data and explore the data in R. We’ll start with some RNA-Seq results taken from analysis of a mutation in the Alzheimer’s-associated gene <em>psen2</em> using a zebrafish model <span class="citation" data-cites="Jiang202-ps">(<a href="#ref-Jiang202-ps" role="doc-biblioref">Jiang et al. 2020</a>)</span>. These are the results from an RNA-Seq analysis as published.</p>
 <div class="callout callout-style-default callout-caution callout-titled">
 <div class="callout-header d-flex align-content-center">
@@ -663,15 +679,15 @@ Important
 <i class="callout-icon"></i>
 </div>
 <div class="callout-title-container flex-fill">
-What Just Happened
+<span class="screen-reader-only">Note</span>What Just Happened
 </div>
 </div>
 <div class="callout-body-container callout-body">
 <p>The code we copied has three lines</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb17"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1"></a><span class="fu">library</span>(readr)</span>
-<span id="cb17-2"><a href="#cb17-2"></a>psen2VsWT <span class="ot">&lt;-</span> <span class="fu">read_csv</span>(<span class="st">"data/psen2VsWT.csv"</span>)</span>
-<span id="cb17-3"><a href="#cb17-3"></a><span class="fu">View</span>(psen2VsWT)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb19"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb19-1"><a href="#cb19-1" aria-label="1"></a><span class="fu">library</span>(readr)</span>
+<span id="cb19-2"><a href="#cb19-2" aria-label="2"></a>psen2VsWT <span class="ot">&lt;-</span> <span class="fu">read_csv</span>(<span class="st">"data/psen2VsWT.csv"</span>)</span>
+<span id="cb19-3"><a href="#cb19-3" aria-label="3"></a><span class="fu">View</span>(psen2VsWT)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <ol type="1">
 <li>The first line loaded the package <code>readr</code>. This is usually done by placing the package name inside <code>library()</code> as you are loading a library of functions</li>
@@ -699,12 +715,12 @@ Tip
 <p>This is truly our first R Script and the process is now reproducible. We don’t need to use the GUI again for this dataset because we have the code it will execute anyway. Let’s tidy it up a little bit to develop our coding skills</p>
 <p>Insert a new line before <code>library(readr)</code> and add</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb18"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a><span class="do">## Load packages first</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb20"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a><span class="do">## Load packages first</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <p>This is a comment with no executable code but which communicates to “future” you what you’re doing. (A comment only needs a single <code>#</code>, but sometimes we use two so we don’t accidentally un-comment the line.)</p>
 <p>Insert a line after library(readr) then enter</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb19"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a><span class="do">## Now load the file "psen2VsWT.csv"</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb21"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a><span class="do">## Now load the file "psen2VsWT.csv"</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 </section>
 <section id="data-frame-objects" class="level2">
@@ -717,24 +733,24 @@ Tip
 </ol>
 <p>We can actually preview the object just by typing it’s name</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb20"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a>psen2VsWT</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb22"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a>psen2VsWT</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
-<pre><code># A tibble: 16,021 × 15
+<pre><code># A tibble: 16,021 × 18
    gene_id    gene_name  logFC logCPM   PValue      FDR chromosome  start    end
-   &lt;chr&gt;      &lt;chr&gt;      &lt;dbl&gt;  &lt;dbl&gt;    &lt;dbl&gt;    &lt;dbl&gt; &lt;chr&gt;       &lt;dbl&gt;  &lt;dbl&gt;
- 1 ENSDARG00… zgc:1229…  1.42    6.15 2.55e-23 4.09e-19 chr21      5.17e6 5.17e6
- 2 ENSDARG00… nr4a1      1.96    2.88 3.47e-20 2.78e-16 chr23      3.21e7 3.22e7
- 3 ENSDARG00… tsc22d3    1.21    6.52 1.76e-16 9.39e-13 chr14      2.80e7 2.80e7
- 4 ENSDARG00… cipca     -0.974   4.67 2.58e-16 1.03e-12 chr17      4.48e7 4.48e7
- 5 ENSDARG00… BX247868… -1.29    3.85 4.07e-16 1.30e-12 chr9       4.20e7 4.20e7
- 6 ENSDARG00… cbr1       1.62    4.57 6.74e-15 1.80e-11 chr1       4.72e7 4.72e7
- 7 ENSDARG00… plk2b      1.14    5.21 3.21e-14 7.34e-11 chr8       1.71e7 1.71e7
- 8 ENSDARG00… upf3a     -1.43    7.50 8.51e-14 1.70e-10 chr9       3.49e7 3.49e7
- 9 ENSDARG00… si:ch211… -1.20    5.39 1.34e-13 2.38e-10 chr8       4.64e7 4.64e7
-10 ENSDARG00… spen      -0.819   8.40 1.53e-13 2.46e-10 chr23      2.44e7 2.45e7
+   &lt;chr&gt;      &lt;chr&gt;      &lt;dbl&gt;  &lt;dbl&gt;    &lt;dbl&gt;    &lt;dbl&gt;      &lt;dbl&gt;  &lt;dbl&gt;  &lt;dbl&gt;
+ 1 ENSDARG00… zgc:1229…  1.42    6.15 2.55e-23 4.09e-19         21 5.17e6 5.17e6
+ 2 ENSDARG00… nr4a1      1.96    2.88 3.47e-20 2.78e-16         23 3.21e7 3.22e7
+ 3 ENSDARG00… tsc22d3    1.21    6.52 1.76e-16 9.39e-13         14 2.80e7 2.80e7
+ 4 ENSDARG00… cipca     -0.974   4.67 2.58e-16 1.03e-12         17 4.48e7 4.48e7
+ 5 ENSDARG00… BX247868… -1.29    3.85 4.07e-16 1.30e-12          9 4.20e7 4.20e7
+ 6 ENSDARG00… cbr1       1.62    4.57 6.74e-15 1.80e-11          1 4.72e7 4.72e7
+ 7 ENSDARG00… plk2b      1.14    5.21 3.21e-14 7.34e-11          8 1.71e7 1.71e7
+ 8 ENSDARG00… upf3a     -1.43    7.50 8.51e-14 1.70e-10          9 3.49e7 3.49e7
+ 9 ENSDARG00… si:ch211… -1.20    5.39 1.34e-13 2.38e-10          8 4.64e7 4.64e7
+10 ENSDARG00… spen      -0.819   8.40 1.53e-13 2.46e-10         23 2.44e7 2.45e7
 # ℹ 16,011 more rows
-# ℹ 6 more variables: gene_biotype &lt;chr&gt;, description &lt;chr&gt;, entrezid &lt;chr&gt;,
-#   gc_content &lt;dbl&gt;, length &lt;dbl&gt;, LR &lt;dbl&gt;</code></pre>
+# ℹ 9 more variables: gene_biotype &lt;chr&gt;, description &lt;chr&gt;, entrezid &lt;chr&gt;,
+#   gc_content &lt;dbl&gt;, length &lt;dbl&gt;, LR &lt;dbl&gt;, coef &lt;chr&gt;, bonfP &lt;dbl&gt;, DE &lt;lgl&gt;</code></pre>
 </div>
 </div>
 <p>This gives a preview up to 10 lines with:</p>
@@ -766,11 +782,11 @@ Note
 <h2 class="anchored" data-anchor-id="understanding-functions">Understanding Functions</h2>
 <p>A common function in R is <code>head()</code> which we can use to inspect the top few lines of a data frame. There’s a corresponding function <code>tail()</code> which will show us the last few lines as well.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb22"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(psen2VsWT)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb24"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(psen2VsWT)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <p>Let’s look at the <strong>Help</strong> page</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb23"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a>?head</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb25"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a>?head</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <p>(If you get multiple options, choose the one from utils)</p>
 <p>The important place to look at is, and in particular we’ll look at the one following <code>## Default S3 method:</code></p>
@@ -789,17 +805,17 @@ head(x, n = 6L, ...)</code></pre>
 <p>Some of the rest is technical detail (can sometimes be very helpful)</p>
 <p><code>head()</code> prints the first part of an object which can be useful very large objects. We can change the number of rows shown to us by choosing a different number instead of 6</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb25"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(psen2VsWT, <span class="dv">4</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb27"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(psen2VsWT, <span class="dv">4</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
-<pre><code># A tibble: 4 × 15
+<pre><code># A tibble: 4 × 18
   gene_id     gene_name  logFC logCPM   PValue      FDR chromosome  start    end
-  &lt;chr&gt;       &lt;chr&gt;      &lt;dbl&gt;  &lt;dbl&gt;    &lt;dbl&gt;    &lt;dbl&gt; &lt;chr&gt;       &lt;dbl&gt;  &lt;dbl&gt;
-1 ENSDARG000… zgc:1229…  1.42    6.15 2.55e-23 4.09e-19 chr21      5.17e6 5.17e6
-2 ENSDARG000… nr4a1      1.96    2.88 3.47e-20 2.78e-16 chr23      3.21e7 3.22e7
-3 ENSDARG000… tsc22d3    1.21    6.52 1.76e-16 9.39e-13 chr14      2.80e7 2.80e7
-4 ENSDARG000… cipca     -0.974   4.67 2.58e-16 1.03e-12 chr17      4.48e7 4.48e7
-# ℹ 6 more variables: gene_biotype &lt;chr&gt;, description &lt;chr&gt;, entrezid &lt;chr&gt;,
-#   gc_content &lt;dbl&gt;, length &lt;dbl&gt;, LR &lt;dbl&gt;</code></pre>
+  &lt;chr&gt;       &lt;chr&gt;      &lt;dbl&gt;  &lt;dbl&gt;    &lt;dbl&gt;    &lt;dbl&gt;      &lt;dbl&gt;  &lt;dbl&gt;  &lt;dbl&gt;
+1 ENSDARG000… zgc:1229…  1.42    6.15 2.55e-23 4.09e-19         21 5.17e6 5.17e6
+2 ENSDARG000… nr4a1      1.96    2.88 3.47e-20 2.78e-16         23 3.21e7 3.22e7
+3 ENSDARG000… tsc22d3    1.21    6.52 1.76e-16 9.39e-13         14 2.80e7 2.80e7
+4 ENSDARG000… cipca     -0.974   4.67 2.58e-16 1.03e-12         17 4.48e7 4.48e7
+# ℹ 9 more variables: gene_biotype &lt;chr&gt;, description &lt;chr&gt;, entrezid &lt;chr&gt;,
+#   gc_content &lt;dbl&gt;, length &lt;dbl&gt;, LR &lt;dbl&gt;, coef &lt;chr&gt;, bonfP &lt;dbl&gt;, DE &lt;lgl&gt;</code></pre>
 </div>
 </div>
 <div class="callout callout-style-default callout-important callout-titled">
@@ -814,11 +830,11 @@ Important
 <div class="callout-body-container callout-body">
 <p>If passing function arguments in order, we don’t need to name them. Try the above example but naming the arguments</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb27"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(<span class="at">x =</span> psen2VsWT, <span class="at">n =</span> <span class="dv">4</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb29"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb29-1"><a href="#cb29-1" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(<span class="at">x =</span> psen2VsWT, <span class="at">n =</span> <span class="dv">4</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <p>If we choose to name arguments, we can actually provide them in any order. The following will give identical results.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb28"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb28-1"><a href="#cb28-1" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(<span class="at">n =</span> <span class="dv">4</span>, <span class="at">x =</span> psen2VsWT)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb30"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb30-1"><a href="#cb30-1" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(<span class="at">n =</span> <span class="dv">4</span>, <span class="at">x =</span> psen2VsWT)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 </div>
 </div>
@@ -847,20 +863,20 @@ Important
 <p>As our final task for the session, we’ll learn how to dig a little deeper into the data we’ve loaded, before doing a full exploration over the next few practical sessions. We’ve already seen how to print the top or bottom of the object using <code>head()</code> and <code>tail()</code>, but we can also print subsets by placing the square brackets after the object name</p>
 <p>If we wanted to choose the first 3 rows, we can place <code>1:3</code> inside the square brackets, before the comma</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb30"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb30-1"><a href="#cb30-1" aria-hidden="true" tabindex="-1"></a><span class="do">## Select the first 3 rows by placing the numbers before the comma</span></span>
-<span id="cb30-2"><a href="#cb30-2" aria-hidden="true" tabindex="-1"></a>psen2VsWT[<span class="dv">1</span><span class="sc">:</span><span class="dv">3</span>, ]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb32"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb32-1"><a href="#cb32-1" aria-hidden="true" tabindex="-1"></a><span class="do">## Select the first 3 rows by placing the numbers before the comma</span></span>
+<span id="cb32-2"><a href="#cb32-2" aria-hidden="true" tabindex="-1"></a>psen2VsWT[<span class="dv">1</span><span class="sc">:</span><span class="dv">3</span>, ]</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <p>We can select columns by placing our selection after the comma.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb31"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb31-1"><a href="#cb31-1" aria-hidden="true" tabindex="-1"></a><span class="do">## Select the first 3 columns by placing our selection after the comma</span></span>
-<span id="cb31-2"><a href="#cb31-2" aria-hidden="true" tabindex="-1"></a>psen2VsWT[, <span class="dv">1</span><span class="sc">:</span><span class="dv">3</span>]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb33"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb33-1"><a href="#cb33-1" aria-hidden="true" tabindex="-1"></a><span class="do">## Select the first 3 columns by placing our selection after the comma</span></span>
+<span id="cb33-2"><a href="#cb33-2" aria-hidden="true" tabindex="-1"></a>psen2VsWT[, <span class="dv">1</span><span class="sc">:</span><span class="dv">3</span>]</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <p>Unlike rows (which have no useful names in a <code>tibble</code>), we can also select columns by name</p>
 <div class="columns">
 <div class="column">
 <div class="cell">
-<div class="sourceCode cell-code" id="cb32"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb32-1"><a href="#cb32-1" aria-hidden="true" tabindex="-1"></a><span class="do">## Select the first column by position</span></span>
-<span id="cb32-2"><a href="#cb32-2" aria-hidden="true" tabindex="-1"></a>psen2VsWT[, <span class="dv">1</span>]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb34"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb34-1"><a href="#cb34-1" aria-hidden="true" tabindex="-1"></a><span class="do">## Select the first column by position</span></span>
+<span id="cb34-2"><a href="#cb34-2" aria-hidden="true" tabindex="-1"></a>psen2VsWT[, <span class="dv">1</span>]</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
 <pre><code># A tibble: 16,021 × 1
    gene_id           
@@ -880,8 +896,8 @@ Important
 </div>
 </div><div class="column">
 <div class="cell">
-<div class="sourceCode cell-code" id="cb34"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb34-1"><a href="#cb34-1" aria-hidden="true" tabindex="-1"></a><span class="do">## Select the first column by name</span></span>
-<span id="cb34-2"><a href="#cb34-2" aria-hidden="true" tabindex="-1"></a>psen2VsWT[, <span class="st">"gene_id"</span>]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb36"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb36-1"><a href="#cb36-1" aria-hidden="true" tabindex="-1"></a><span class="do">## Select the first column by name</span></span>
+<span id="cb36-2"><a href="#cb36-2" aria-hidden="true" tabindex="-1"></a>psen2VsWT[, <span class="st">"gene_id"</span>]</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
 <pre><code># A tibble: 16,021 × 1
    gene_id           
@@ -903,12 +919,12 @@ Important
 </div>
 <p>We can also select individual columns by placing the <code>$</code> symbol after the object name, the entering a column.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb36"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb36-1"><a href="#cb36-1" aria-hidden="true" tabindex="-1"></a><span class="do">## Select an entire column as a vector</span></span>
-<span id="cb36-2"><a href="#cb36-2" aria-hidden="true" tabindex="-1"></a>psen2VsWT<span class="sc">$</span>gene_name</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb38"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb38-1"><a href="#cb38-1" aria-hidden="true" tabindex="-1"></a><span class="do">## Select an entire column as a vector</span></span>
+<span id="cb38-2"><a href="#cb38-2" aria-hidden="true" tabindex="-1"></a>psen2VsWT<span class="sc">$</span>gene_name</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <p>Notice that we’ve just printed &gt;16,000 gene names to our Console. This is where <code>head()</code> would come in very handy.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb37"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb37-1"><a href="#cb37-1" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(psen2VsWT<span class="sc">$</span>gene_name, <span class="dv">10</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb39"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb39-1"><a href="#cb39-1" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(psen2VsWT<span class="sc">$</span>gene_name, <span class="dv">10</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <div class="callout callout-style-default callout-important callout-titled" title="Vectors">
 <div class="callout-header d-flex align-content-center">
@@ -916,7 +932,7 @@ Important
 <i class="callout-icon"></i>
 </div>
 <div class="callout-title-container flex-fill">
-Vectors
+<span class="screen-reader-only">Important</span>Vectors
 </div>
 </div>
 <div class="callout-body-container callout-body">
@@ -926,28 +942,28 @@ Vectors
 </div>
 <p>For vectors, we can also use the square brackets to obtain a subset of values. However, given that they only have one dimension, there’s no need for the comma inside these brackets.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb38"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb38-1"><a href="#cb38-1" aria-hidden="true" tabindex="-1"></a>psen2VsWT<span class="sc">$</span>gene_name[<span class="dv">1</span><span class="sc">:</span><span class="dv">3</span>]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb40"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb40-1"><a href="#cb40-1" aria-hidden="true" tabindex="-1"></a>psen2VsWT<span class="sc">$</span>gene_name[<span class="dv">1</span><span class="sc">:</span><span class="dv">3</span>]</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 </section>
 <section id="vectors" class="level2">
 <h2 class="anchored" data-anchor-id="vectors">Vectors</h2>
 <p>So far, we’ve only selected columns using names or the shorthand <code>1:3</code>. This value <code>1:3</code> actually creates an <code>integer</code> vector with the values <code>1</code>, <code>2</code>, and <code>3</code></p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb39"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb39-1"><a href="#cb39-1" aria-hidden="true" tabindex="-1"></a><span class="dv">1</span><span class="sc">:</span><span class="dv">3</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb41"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb41-1"><a href="#cb41-1" aria-hidden="true" tabindex="-1"></a><span class="dv">1</span><span class="sc">:</span><span class="dv">3</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>[1] 1 2 3</code></pre>
 </div>
 </div>
 <p>We can actually create vectors of non-consecutive integers (or any other data type) using the function <code>c()</code> which combines individual values (which are also vectors) into a larger vector</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb41"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb41-1"><a href="#cb41-1" aria-hidden="true" tabindex="-1"></a><span class="fu">c</span>(<span class="dv">1</span>, <span class="dv">3</span>, <span class="dv">5</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb43"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb43-1"><a href="#cb43-1" aria-hidden="true" tabindex="-1"></a><span class="fu">c</span>(<span class="dv">1</span>, <span class="dv">3</span>, <span class="dv">5</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>[1] 1 3 5</code></pre>
 </div>
 </div>
 <p>We can use this trick to select columns in any order</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb43"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb43-1"><a href="#cb43-1" aria-hidden="true" tabindex="-1"></a>psen2VsWT[, <span class="fu">c</span>(<span class="dv">1</span>, <span class="dv">2</span>, <span class="dv">3</span>, <span class="dv">5</span>)]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb45"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb45-1"><a href="#cb45-1" aria-hidden="true" tabindex="-1"></a>psen2VsWT[, <span class="fu">c</span>(<span class="dv">1</span>, <span class="dv">2</span>, <span class="dv">3</span>, <span class="dv">5</span>)]</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <div class="callout callout-style-default callout-important callout-titled">
 <div class="callout-header d-flex align-content-center">
@@ -965,19 +981,19 @@ Important
 </div>
 <p>There’s a vector called <code>euro</code> that lives in your R Environment so let’s quickly look at that as our final task. It actually contains the exchange rates from all of the different European currencies at the time the Euro was launched.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb44"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb44-1"><a href="#cb44-1" aria-hidden="true" tabindex="-1"></a>euro</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb46"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb46-1"><a href="#cb46-1" aria-hidden="true" tabindex="-1"></a>euro</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <p>We can apply the square brackets approach to extract the values we want</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb45"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb45-1"><a href="#cb45-1" aria-hidden="true" tabindex="-1"></a>euro[<span class="dv">1</span><span class="sc">:</span><span class="dv">3</span>]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb47"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb47-1"><a href="#cb47-1" aria-hidden="true" tabindex="-1"></a>euro[<span class="dv">1</span><span class="sc">:</span><span class="dv">3</span>]</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <p>You may have noticed that these values have names and we can also call values by name.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb46"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb46-1"><a href="#cb46-1" aria-hidden="true" tabindex="-1"></a>euro[<span class="st">"BEF"</span>]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb48"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb48-1"><a href="#cb48-1" aria-hidden="true" tabindex="-1"></a>euro[<span class="st">"BEF"</span>]</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <p>If we wish to call multiple values using the names, we can create a <code>character</code> vector “on-the-fly” to just grab out the values we want. The function <code>c()</code> is designed especially for this type of operation</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb47"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb47-1"><a href="#cb47-1" aria-hidden="true" tabindex="-1"></a>euro[<span class="fu">c</span>(<span class="st">"DEM"</span>, <span class="st">"ATS"</span>, <span class="st">"FIM"</span>)]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb49"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb49-1"><a href="#cb49-1" aria-hidden="true" tabindex="-1"></a>euro[<span class="fu">c</span>(<span class="st">"DEM"</span>, <span class="st">"ATS"</span>, <span class="st">"FIM"</span>)]</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <div class="callout callout-style-default callout-tip callout-titled">
 <div class="callout-header d-flex align-content-center">
@@ -994,8 +1010,8 @@ Tip
 </div>
 <p>Finally, there’s a neat trick with <code>c()</code> where if you give it nothing, it returns the value <code>NULL</code> which is the empty value. Try this &amp; see what happens.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb48"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb48-1"><a href="#cb48-1" aria-hidden="true" tabindex="-1"></a><span class="fu">c</span>()</span>
-<span id="cb48-2"><a href="#cb48-2" aria-hidden="true" tabindex="-1"></a>euro[<span class="fu">c</span>()]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb50"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb50-1"><a href="#cb50-1" aria-hidden="true" tabindex="-1"></a><span class="fu">c</span>()</span>
+<span id="cb50-2"><a href="#cb50-2" aria-hidden="true" tabindex="-1"></a>euro[<span class="fu">c</span>()]</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <p>This has returned an empty vector of the same type (<code>named numeric()</code>), but this leads to a more formal definition of a vector in R.</p>
 <blockquote class="blockquote">
@@ -1024,7 +1040,7 @@ Tip
 
 </section>
 
-<div id="quarto-appendix" class="default"><section class="quarto-appendix-contents" role="doc-bibliography" id="quarto-bibliography"><h2 class="anchored quarto-appendix-heading">References</h2><div id="refs" class="references csl-bib-body hanging-indent" data-entry-spacing="0" role="list">
+<div id="quarto-appendix" class="default"><section class="quarto-appendix-contents" role="doc-bibliography" id="quarto-bibliography"><h2 class="anchored quarto-appendix-heading">References</h2><div id="refs" class="references csl-bib-body hanging-indent" role="list">
 <div id="ref-Jiang202-ps" class="csl-entry" role="listitem">
 Jiang, Haowei, Stevie Pederson, Morgan Newman, Yang Dong, Karissa Barthelson, and Michael Lardelli. 2020. <span>“Transcriptome Analysis Indicates Dominant Effects on Ribosome and Mitochondrial Function of a Premature Termination Codon Mutation in the Zebrafish Gene Psen2.”</span> <em>PLOS ONE</em> 15 (7): 1–25. <a href="https://doi.org/10.1371/journal.pone.0232559">https://doi.org/10.1371/journal.pone.0232559</a>.
 </div>
@@ -1081,13 +1097,14 @@ Jiang, Haowei, Stevie Pederson, Morgan Newman, Yang Dong, Karissa Barthelson, an
       e.clearSelection();
     }
     const getTextToCopy = function(trigger) {
-        const codeEl = trigger.previousElementSibling.cloneNode(true);
-        for (const childEl of codeEl.children) {
-          if (isCodeAnnotation(childEl)) {
-            childEl.remove();
-          }
+      const outerScaffold = trigger.parentElement.cloneNode(true);
+      const codeEl = outerScaffold.querySelector('code');
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
         }
-        return codeEl.innerText;
+      }
+      return codeEl.innerText;
     }
     const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
       text: getTextToCopy

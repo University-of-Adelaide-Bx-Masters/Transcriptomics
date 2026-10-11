@@ -47,7 +47,9 @@ Once we've walked through the fundamentals of data visualisation, we'll move to 
 
 ## Data Import
 
-Before starting any visualisation, let's start a new R script called `data_visualisation.R` and begin our script with the following
+First, make sure you are working in the `R_Practicals` R Project. You can confirm this by looking at the upper right of the RStudio window, just below your 'a' number, where you should see a small, blue `R` icon and `R_Practicals` next to it. If not, click the small, black arrow next to Project and select `R_Praticals` from the drop-down list. 
+
+Before starting any visualisation, let's start a new R script called `data_visualisation.R` and begin our script with the following:
 
 ```{r}
 #| echo: true
@@ -60,8 +62,8 @@ psen2VsWT <- read_csv("data/psen2VsWT.csv")
 #| echo: false
 #| eval: true
 #| message: true
-library(tidyverse)
-psen2VsWT <- read_csv(here::here("practicals", "data", "psen2VsWT.csv"))
+suppressWarnings(library(tidyverse))
+psen2VsWT <- read_csv(here::here("data", "psen2VsWT.csv"))
 ```
 
 As we now know, calling `library(tidyverse)` will load several packages, including `ggplot2`, along with those from the last session.
