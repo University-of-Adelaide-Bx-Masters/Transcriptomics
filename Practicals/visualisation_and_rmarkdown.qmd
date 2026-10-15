@@ -626,7 +626,7 @@ Leave another blank line then add
 `3. Data Visualisation`  
 `4. Quarto`  
 
-`**All material**` can be found at \[the course homepage\]\(https://github.com/University-of-Adelaide-Bx-Masters/Bioinformatics_Sequencing_Technologies/\)
+`**All material**` can be found at [the course homepage](https://github.com/University-of-Adelaide-Bx-Masters/Bioinformatics_Sequencing_Technologies/)
 
 Here we've set the first two words to appear in bold font.
 The section in the square brackets will appear as text with a hyperlink to the site in the round brackets.
@@ -707,9 +707,9 @@ execute:
 
 Lines 8 to 10 are a code `chunk`, which is really just one or more operations that make sense as a block.
 
-1. Chunks always begin with ```{r}
+1. Chunks always begin with ````{r}`
 2. Chunks always end with ```
-3 Executed `R` code goes between these two delineation marks
+3. Executed `R` code goes between these two delineation marks
 
 Chunk names are optional and directly follow the letter `r`, usually using the format 'chunk-name'.
 Chunks can also be other languages (`bash`, `python` etc.), but R is really the main game.
@@ -926,6 +926,6 @@ We'll be using Quarto for all remaining transcriptomics practicals, so you'll be
 Today will have made an excellent primer for you.
 
 # References
-[Quarto](https://quarto.org/)
+
 
 
