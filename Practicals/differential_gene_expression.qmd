@@ -162,6 +162,7 @@ This forms an important part of every bioinformatics analysis.
 
 We'll be using a reference genome which as researchers we'd most likely use repeatedly for multiple experiments.
 It can make sense to place this in a standalone folder, along with any annotation files.
+Using the terminal in RStudio (i.e. **not** the R Console) enter the following commands to create a folder called `references` in your home directory.
 
 ```bash
 cd ~
@@ -176,11 +177,11 @@ Genome masking is not usually of concern for transcriptomics so we don't need to
 <!-- REFERENCES MAY BE BETTER BEING PROVIDED AS SYMLINKS ON THE VMs!!! -->
 <!-- IF SO CHANGE THIS SECTION TO REFLECT THIS APPROACH -->
 
-Download the file using
+Link to the genomic reference fasta file using
 
 ```bash
 cd ~/references
-wget https://ftp.ensemblgenomes.ebi.ac.uk/pub/plants/release-62/fasta/arabidopsis_thaliana/dna/Arabidopsis_thaliana.TAIR10.dna.toplevel.fa.gz
+ln -s /shared/data/prac_transcriptomics_DE_data/00_DB/TAIR10_chrALL.fa TAIR10_chrALL.fa
 ```
 
 We'll also need gene annotations as well and these are most commonly provided in GTF or GFF format.
@@ -189,13 +190,17 @@ These are subtly different file formats and many tools use the abbreviations int
 To obtain the GTF file execute the following.
 
 ```bash
-wget https://ftp.ensemblgenomes.ebi.ac.uk/pub/plants/release-62/gtf/arabidopsis_thaliana/Arabidopsis_thaliana.TAIR10.62.gtf.gz
+ln -s /shared/data/prac_transcriptomics_DE_data/00_DB/TAIR10_GFF3_genes.gtf TAIR10_GFF3_genes.gtf
 ```
 
 Ensembl is a comprehensive data resource containing reference genomes, annotations and multiple layers of information, as managed by the EMBL.
 Regular releases are made as new genes are predicted or discovered and, at the time of writing, Ensembl Plants Release 62 was the latest available release.
 
 Additionally, place the file `ensembl62_tair10_goterms.tsv.gz` in `~/references`.
+
+```bash
+wget https://raw.githubusercontent.com/University-of-Adelaide-Bx-Masters/Transcriptomics/main/Practicals/data/ensembl62_tair10_goterms.tsv.gz
+```
 
 Before we start looking at the actual sequencing data, let's first create an index for this reference genome.
 We will be using a *splice-aware* aligner called `STAR` [@Dobin2013-us] to do the genome mapping in this Prac, with the manual available [here](https://github.com/alexdobin/STAR/blob/5e8a99c8892b9a4455288579fefaf5825960c371/doc/STARmanual.pdf)
@@ -205,14 +210,12 @@ Indexing the reference genome enables each read to be mapped to the reference by
 We can build the `Arabidopsis` reference genome index using following command (run interactively)
 
 ```bash
-gunzip ~/references/Arabidopsis_thaliana.TAIR10.dna.toplevel.fa.gz
-gunzip ~/references/Arabidopsis_thaliana.TAIR10.62.gtf.gz
 STAR \
   --runThreadN 2 \
   --runMode genomeGenerate \
   --genomeDir ~/references/TAIR10/STAR149 \
-  --genomeFastaFiles ~/references/Arabidopsis_thaliana.TAIR10.dna.toplevel.fa \
-  --sjdbGTFfile ~/references/Arabidopsis_thaliana.TAIR10.62.gtf \
+  --genomeFastaFiles ~/references/TAIR10_chrALL.fa \
+  --sjdbGTFfile ~/references/TAIR10_GFF3_genes.gtf \
   --sjdbOverhang 149 \
   --genomeSAindexNbases 12
 ```
@@ -269,7 +272,7 @@ Next we can build symlinks of data files in our corresponding project folders
 
 ```bash
 cd ~/transcriptomics_dge_practical/data/raw_fastq
-ln -s /shared/data/transcriptomics_dge_practical_data/01_raw_data/*.fastq.gz ./
+ln -s /shared/data/prac_transcriptomics_DE_data/01_raw_data/*.fastq.gz ./
 ```
 
 Finally, it's good practice to create an R Project, so using RStudio:
@@ -309,6 +312,8 @@ echo -e "fastqc -t 2 -o ${FQCDIR} ${FQDIR}/*fastq.gz"
 ```
 
 Now save and run the script, noting that we've provided *absolute paths* for all input/output directories.
+
+This will simply print the command about to be executed, so now remove the `echo -e`, along with all quotation marks, and run the script again to actually execute the command.
 
 After `fastQC` has finished running, we can check the QC report by opening the `html` files using web browser.
 For this practical, the dataset is small enough to check QC for each file individually,
@@ -369,6 +374,7 @@ cutadapt \
   -p ${TRIMDIR}/Col_0_mock_rep1_R2.trimmed.fastq.gz \
   --minimum-length 35 \
   --quality-cutoff 30 \
+  --max-n 1 \
   --cores 2 \
   ${RAWDIR}/Col_0_mock_rep1_R1.fastq.gz \
   ${RAWDIR}/Col_0_mock_rep1_R2.fastq.gz > ${LOGDIR}/Col_0_mock_rep1_cutadapt.log
@@ -388,16 +394,6 @@ Before we do the genome mapping, we can run `fastQC` again on the trimmed to che
 
 :::
 
-::: {.callout-tip}
-- If you'd like to inspect the cutadapt log files using `ngsReports` and you still have your R session open, try the following
-
-```{r}
-list.files("output/logs", pattern = "cutadapt.log", full.names = TRUE) |>
-  importNgsLogs("cutadapt") |>
-  glimpse()
-```
-
-:::
 
 ## Genome Mapping
 
@@ -514,6 +510,10 @@ editor_options:
   chunk_output_type: console
 ---
 ```
+
+::: {.callout-tip}
+The above instricutions are for creating a new RMarkdown file, but if you prefer to use quarto as in the earlier pracs, this is completely fine
+:::
 
 Below this add a chunk which will help our RMarkdown document compile nicely.
 Give this chunk the name `set-opts` with settings `include = FALSE`.
