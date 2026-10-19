@@ -439,7 +439,8 @@ To view this file in IGV, we needed to create an index file.
 The final step is to use `featureCounts` [@Liao2014-gy] to count reads which overlap exonic regions, as defined in the GTF.
 For this step we'll use the same GTF that we passed to STAR when indexing the genome.
 
-Create the file `scripts/count_reads.sh` then copy the following code into this file
+Create the file `scripts/count_reads.sh` then copy the following code into this file.
+For this script, we also need to activate the `subread` conda environment, as `subread` contains the tool `featureCounts` and this wasn't installed into the base environment when the VMs were initially created
 
 ```
 #! /bin/bash
@@ -447,6 +448,9 @@ REFDIR="${HOME}/references"
 PROJROOT="${HOME}/transcriptomics_dge_practical"
 BAMDIR="${PROJROOT}/data/bam"
 OUTDIR="${PROJROOT}/output/counts"
+
+eval "$(conda shell.bash hook)"
+conda activate subread
 
 featureCounts \
   -a ${REFDIR}/Arabidopsis_thaliana.TAIR10.62.gtf \
@@ -458,6 +462,8 @@ featureCounts \
   -T 2 \
   -o ${OUTDIR}/all_samples.counts.out \
   ${BAMDIR}/*bam
+  
+conda deactivate
 ```
 
 ::: {.callout-important}
@@ -557,8 +563,8 @@ we can have some ideas about their functions.
 In this Prac, we can use following R code to get a gene annotation table for all annotated Arabidopsis reference genes.
 
 ```{r load-gtf}
-gtf <- file.path("~/references/Arabidopsis_thaliana.TAIR10.62.gtf") %>%
-  import.gff(feature.type = "gene")
+gtf <- file.path("~/references/TAIR10_GFF3_genes.gtf") %>%
+  import.gff()
 gtf
 ```
 
@@ -569,7 +575,7 @@ They don't play nicely with the `tidyverse`, but can be easily coerced to a data
 ```{r count-gene-types}
 mcols(gtf) %>% 
   as.data.frame() %>% 
-  dplyr::count(gene_biotype)
+  dplyr::count(type)
 ```
 
 
@@ -636,13 +642,28 @@ samples_tbl <- tibble(sample = colnames(counts_matrix)) %>%
   )
 ```
 
+Now we can repeat from out GTF to setup our genes.
+
+```{r}
+genes_df <- gtf %>% 
+  as.data.frame() %>% 
+  summarise(
+    chromosome = unique(seqnames), 
+    start = min(start), 
+    end = max(end), 
+    width = sum(width),
+    .by = gene_id
+  ) %>% 
+  set_rownames(.$gene_id)
+```
+
 
 ```{r}
 dge <- DGEList(
   counts = counts_matrix, 
   samples = samples_tbl,
   group = as.integer(samples_tbl$treatment),
-  genes = gtf
+  genes = genes_df[rownames(counts_matrix),]
 )
 dge
 ```
@@ -865,7 +886,7 @@ topTable %>%
   geom_point() +
   geom_smooth(se = FALSE, colour = "blue") +
   geom_text_repel(
-    aes(label = gene_name),
+    aes(label = gene_id),
     data = . %>% dplyr::slice(1:10), show.legend = FALSE
   ) +
   scale_colour_manual(values = c("black", "red"))
@@ -882,7 +903,7 @@ topTable %>%
   ggplot(aes(logFC, -log10p, colour = DE)) +
   geom_point() +
   geom_text_repel(
-    aes(label = gene_name),
+    aes(label = gene_id),
     data = . %>% dplyr::slice(1:10), show.legend = FALSE
   ) +
   scale_colour_manual(values = c("black", "red"))
@@ -892,7 +913,7 @@ topTable %>%
 Now let's check the raw counts for our top-ranked gene
 
 ```{r}
-counts_matrix["AT3G27630",]
+counts_matrix["AT5G48720",]
 ```
 
 Clearly this gene is undetectable in the mock treatment samples, but shows active transcription in the Zeocin treated samples.
@@ -910,10 +931,10 @@ cpm(dge, log = TRUE)[ids,] %>%
   pivot_longer(starts_with("Col"), names_to = "sample", values_to = "logCPM") %>% 
   left_join(dge$samples, by = "sample") %>% 
   left_join(dge$genes, by = "gene_id") %>% 
-  mutate(gene_name = fct_inorder(gene_name)) %>% 
+  mutate(gene_id = fct_inorder(gene_id)) %>% 
   ggplot(aes(treatment, logCPM, fill = treatment)) +
   geom_boxplot() +
-  facet_wrap(~gene_name) +
+  facet_wrap(~gene_id) +
   scale_fill_brewer(palette = "Set1")
 ```
 
@@ -922,7 +943,6 @@ Let's get a list of significant genes, by using an FDR of 0.01 to really pull ou
 
 ```{r}
 sigIDs <- filter(topTable, FDR < 0.01)$gene_id
-sigGeneNames <- filter(topTable, FDR < 0.01)$gene_name
 ```
 
 And we can check the number of significant genes
@@ -935,9 +955,9 @@ We might even like to show these genes using a heatmap so we can see which genes
 Here we'll scale each gene by subtracting the mean expression so genes from samples with higher expression will plot as positive values, whilst those from samples with lower expression will become negative values, whilst retaining the range of differences between groups.
 
 ```{r}
-topCPM <- cpm(dge, log = TRUE)[sigGenes,] %>% 
+topCPM <- cpm(dge, log = TRUE)[sigIDs,] %>% 
   subtract(rowMeans(.)) %>% 
-  set_rownames(sigGeneNames) %>% 
+  set_rownames(sigIDs) %>% 
   t()
 pheatmap(topCPM, fontsize_col = 8, fontsize_row = 10)
 ```
@@ -1032,7 +1052,7 @@ The column we should be checking is the `over_represented_pvalue` column, so let
 ```{r}
 goseq_results <- goseq(pwf, gene2cat = go_by_id) %>% 
   dplyr::select(
-    ontology, term, category,  ends_with("Cat"), PValue = over_represented_pvalue
+    ontology, term, category, ends_with("Cat"), PValue = over_represented_pvalue
   ) %>% 
   mutate(FDR = p.adjust(PValue, "fdr")) %>% 
   as_tibble()
