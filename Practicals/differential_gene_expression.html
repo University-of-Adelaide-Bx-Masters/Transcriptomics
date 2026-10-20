@@ -209,11 +209,11 @@ window.Quarto = {
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>y <span class="ot">&lt;-</span> <span class="fu">rpois</span>(<span class="fl">1e6</span>, <span class="dv">10</span>)</span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="fu">mean</span>(y)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>[1] 10.00117</code></pre>
+<pre><code>[1] 9.995919</code></pre>
 </div>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="fu">var</span>(y)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>[1] 10.01138</code></pre>
+<pre><code>[1] 9.98376</code></pre>
 </div>
 </div>
 <p>This is quite different to the Normal Distribution were the mean and variance are completely independent variables.</p>
@@ -223,11 +223,11 @@ window.Quarto = {
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>y <span class="ot">&lt;-</span> MASS<span class="sc">::</span><span class="fu">rnegbin</span>(<span class="fl">1e6</span>, <span class="dv">10</span>, <span class="at">theta =</span> <span class="dv">10</span>)</span>
 <span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a><span class="fu">mean</span>(y)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>[1] 9.995801</code></pre>
+<pre><code>[1] 9.996899</code></pre>
 </div>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb7"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="fu">var</span>(y)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>[1] 19.96917</code></pre>
+<pre><code>[1] 20.02175</code></pre>
 </div>
 </div>
 <p>When fitting a linear regression model, we can use simple linear algebra to obtain our parameter estimates, with the near-universal approach being to use a formula known as Least Squares. For <em>generalised linear models</em> the linear algebra is less convenient and parameter estimates are commonly obtained using maximum likelihood approaches. In RNA-Seq, the overdispersion parameter as fitted as a function of the mean, leading to the most commonly fitted models using Quasi-Likelihood methods for fitting data. A detailed, but quite readable description of these approaches can be found in <span class="citation" data-cites="Lun2016-vb">Lun et al. (<a href="#ref-Lun2016-vb" role="doc-biblioref">2016</a>)</span>.</p>
@@ -623,7 +623,7 @@ eval "$(conda shell.bash hook)"
 conda activate subread
 
 featureCounts \
-  -a ${REFDIR}/Arabidopsis_thaliana.TAIR10.62.gtf \
+  -a ${REFDIR}/TAIR10_GFF3_genes.gtf \
   -p --countReadPairs \
   -B -C \
   -M --fraction \

@@ -453,7 +453,7 @@ eval "$(conda shell.bash hook)"
 conda activate subread
 
 featureCounts \
-  -a ${REFDIR}/Arabidopsis_thaliana.TAIR10.62.gtf \
+  -a ${REFDIR}/TAIR10_GFF3_genes.gtf \
   -p --countReadPairs \
   -B -C \
   -M --fraction \
