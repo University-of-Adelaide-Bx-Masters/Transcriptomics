@@ -34,12 +34,10 @@ Making sure you are in the correct project folder, create a new directory called
 
 ```bash
 mkdir data
+ln -s /shared/data/scRNA/scrna_practical_data.tar.gz scrna_practical_data.tar.gz 
 ```
 
-<!-- THESE LINKS NEED CHANING ONCE VMs ARE CONFIGURED -->
-Once you've formed this folder and project, head to the `Terminal` and using bash, download today's data from [this link](data/scrna_practical_data.tar.gz) using `wget`.
-
-Once you have obtained this file, please extract it using the following command.
+Once you have obtained this file, please extract it using the following commands.
 
 ```bash
 cd data
@@ -50,6 +48,7 @@ This should produce a folder called `raw_feature_bc_matrix` and inside that fold
 Please check that you have everything required using the following command **in the bash Terminal** (not the R Console).
 
 ```bash
+cd ..
 ls -alh data/raw_feature_bc_matrix
 ```
 
@@ -67,6 +66,8 @@ md5sum data/raw_feature_bc_matrix/*
 ```
 
 ## R Markdown
+
+
 
 Now that we've made sure we have the correct data for today, and that everything is in the correct place, let's begin our R Markdown document.
 Once you've finished your `YAML` header, here are my `setup` and `loadPackages` chunks.
@@ -94,13 +95,20 @@ library(scales)
 library(DropletUtils)
 library(scater)
 library(scran)
-library(scDblFinder)
+# library(scDblFinder)
 library(rtracklayer)
 library(patchwork)
 theme_set(theme_bw())
 ```
 
-If any of the above packages are not installed on your VMs, please install using `BiocManager::install("pkgName")`.
+```{r scrapper, echo = FALSE}
+library(scDblFinder)
+library(scrapper)
+```
+
+
+Note that `sclDblFinder` hasn't been installed on the VMs.
+Unfortunately, the R version is a little out of date so for that section of code, just note the process
 
 ## Data Import
 
@@ -114,13 +122,23 @@ sce <- read10xCounts("data/raw_feature_bc_matrix")
 sce
 ```
 
+This is an object type known as a `SingleCellExperiment` object, which has especially designed by Bioconductor developers to efficiently handle data of this type.
+These objects not only store the counts of each gene in each cell, but are able to hold additional annotation about genes and cells within the object.
+These are known as `rowData` for gene-level annotations and `colData` for cell-level annotations
+
 Take a moment to look at all the information printed to the screen
 
 ::: {.callout-important}
 *In this initial object, how many genes do we have and many cells do we have?*
 :::
 
-<!-- Insert a section here describing rowData & colData as the core concepts in SummarizedExperiment objects -->
+Let's check these gene and cell-specific annotations (interactively)
+
+```{r rowData}
+rowData(sce)
+colData(sce)
+```
+
 
 Now we have our object imported, we should be setup and ready to start the filtering.
 
@@ -129,7 +147,7 @@ Now we have our object imported, we should be setup and ready to start the filte
 
 ## Barcode Ranks
 
-The first step in any scRNA analysis is to remove empty droplets which really means remove barcodes for which no cellular information was obtained.
+The first step in any scRNA analysis is to remove empty droplets which really means the we'll remove barcodes for which no cellular information was obtained.
 The GEMs may have not had a cell, may have had free RNA or the library preparation may have just failed for some other reason.
 The most common approach is to rank each cell by the total counts and find where the clear dropoff in counts is that is likely to represent empty cells.
 
@@ -150,7 +168,7 @@ metadata(bcRanks)
 ```
 
 ```{r}
-bcRanks %>% subset(total > metadata(.)$knee)
+bcRanks %>% subset(total > metadata(bcRanks)$knee)
 ```
 
 We can see this visually, and it seems like we may lose a few informative cells if we use this as out initial filter.
@@ -164,7 +182,7 @@ bcRanks %>%
   geom_hline(
     yintercept = metadata(bcRanks)$knee,
     linetype = 2,
-    colour = "green"
+    colour = "forestgreen"
   ) +
   geom_hline(
     yintercept = metadata(bcRanks)$inflection,
@@ -236,15 +254,32 @@ For this step, and for downstream analysis, we'll need to know which gene is whi
 Given that the data was made public in Nov 2018, it's likely that Ensembl Release 93 will be close to the gene annotations used for obtaining the UMI counts.
 Unfortunately, 10X genomics have not made this information public so we can't be sure, but testing seemed to check this guess out.
 
-Head to https://ftp.ensembl.org/pub/release-93/gtf/homo_sapiens/ and download the file `r list.files("data", pattern = "gtf.gz")` into the directory 'data'.
-(Use `wget` once you have the correct download path)
+To save HDD space, we'll symlink the gtf from the shared repository again.
+In `bash`, enter the following
 
-Once this has downloaded, load the gene-level information.
+```bash
+cd data 
+ln -s /shared/data/scRNA/Homo_sapiens.GRCh38.93.gtf.gz Homo_sapiens.GRCh38.93.gtf.gz
+```
+
+<!-- Head to https://ftp.ensembl.org/pub/release-93/gtf/homo_sapiens/ and download the file `r list.files("data", pattern = "gtf.gz")` into the directory 'data'. -->
+<!-- (Use `wget` once you have the correct download path) -->
+
+<!-- Once this has downloaded, load the gene-level information. -->
 
 ```{r}
 genesGR <- import.gff("data/Homo_sapiens.GRCh38.93.gtf.gz", feature.type = "gene")
 names(genesGR) <- genesGR$gene_id
 genesGR
+```
+
+
+This is a `GenomicRanges` object, again designed by core Bioconductor developers for the handling of large genomic datasets, where a core feature is the genomic co-ordinates.
+Note that the co-ordinates (or ranges) are shown on the LHS of the dashed. with metadata about each of the ranges on the RHS.
+We can inspect the metadata (or mcol) without the ranges as follows (do this interactively, not in your markdown):
+
+```{r}
+mcols(genesGR)
 ```
 
 
@@ -254,6 +289,9 @@ We can place the `GRanges` object associated with each gene in the `rowRanges` s
 rowRanges(sceWC) <- genesGR[rownames(sceWC)]
 rowRanges(sceWC)
 ```
+
+Not that this not only adds the gene annotations, but the ranges are included.
+The full set of annotations can be extracted using `rowRanges(sceWC)` whilst just the gene-annotations we saw earlier using `mcols()` can be extracted using `rowData(sceWC)`
 
 ### Adding QC Statistics
 
@@ -276,10 +314,9 @@ Let's check the `colData(sceWC)` first, and notice that we only have two columns
 colData(sceWC)
 ```
 
-
 Once you've checked that, run `addPerCellQC()` and check the `colData()` once again.
 
-```{r}
+```{r, warning=FALSE, message=FALSE}
 sceWC <- addPerCellQC(sceWC, subsets = list(mito = mito))
 colData(sceWC)
 ```
@@ -358,9 +395,35 @@ Combining these two filtering approaches, we would now retain `r sum(!sceWC$lowC
 An automated approach to doublet detection is also available.
 This simulates doublets by adding sets of two randomly selected cells and uses this set of information to provide a score for whether a cell is likely to be a doublet.
 
+**NB: The `xgboost` dependency was not installed, so the package `scDblFinder` is not available on the VM.**
+**Please take this code as a simple reference, then use the hack below to manually add the correct data to your object**
+
 
 ```{r doublets, cache=TRUE}
 sceWC <- scDblFinder(sceWC) 
+```
+
+
+```{r}
+## This will give you enough information to proceed
+sceWC$scDblFinder.class <- "singlet"
+dbls <- c(
+  "AAAGTCCCACCAGCCA-1", "AAATGGAGTACCGCGT-1", "AAGACAACAGATCACT-1", 
+  "AATGACCGTGTCATCA-1", "ACAACCATCTGCCCTA-1", "ACCCTTGGTATCGTAC-1", 
+  "AGATGAACAGGCACAA-1", "AGGCCACAGGGCCAAT-1", "ATGGGAGCACTCCGGA-1", 
+  "CAAGCTAGTGGCTGCT-1", "CACTAAGGTGATAGTA-1", "CAGGCCAGTTCAATCG-1", 
+  "CATCGTCTCCGTTGAA-1", "CCTAAGAAGACTCTAC-1", "CGATGGCCACTCGATA-1", 
+  "CGTTAGATCATTATCC-1", "CTCCCTCCACCGGAAA-1", "CTGGACGGTTCCCAAA-1", 
+  "CTTCTCTTCCTACAAG-1", "GATCACACACCCTGTT-1", "GGTGTTAGTGGATTTC-1", 
+  "GTAATCGCAGTTTCGA-1", "GTGCTGGCAGGCTACC-1", "GTGGAAGAGCCAAGTG-1", 
+  "TAATTCCCACTCCGGA-1", "TCCTCTTAGCCAAGGT-1", "TGAGCATTCTGTCTCG-1", 
+  "TGGGCTGCATCCGATA-1", "TGTGCGGGTCGTCGGT-1", "TGTTTGTGTGGAAATT-1"
+)
+i <- which(sceWC$Barcode %in% dbls)
+sceWC$scDblFinder.class[i] <- "doublet"
+sceWC$scDblFinder.class <- factor(
+  sceWC$scDblFinder.class, levels = c("singlet", "doublet")
+)
 ```
 
 
@@ -381,7 +444,7 @@ colData(sceWC) %>%
 ```{r}
 sceWC$discard <- colData(sceWC) %>%
   with(
-    lowCounts | hiMito | scDblFinder.class == "coublet"
+    lowCounts | hiMito | scDblFinder.class == "doublet"
   )
 colData(sceWC) %>%
   as.data.frame() %>%
@@ -434,7 +497,7 @@ colData(sceFilt) %>%
   geom_point() 
 ```
 
-Now that we have found our factors for normalisaton, we can add our normalised counts to the `SingleCellExperiment` object.
+Now that we have found our factors for normalisation, we can add our normalised counts to the `SingleCellExperiment` object.
 We do this simply by calling the function `logNormCounts()` which adds this as a new `assay` to the original object.
 
 ```{r}

@@ -3,4 +3,7 @@
 .RData
 .Ruserdata
 *.Rproj
+*raw_feature_bc_matrix*
+Practicals/data/*gtf.gz
+*cache
 
