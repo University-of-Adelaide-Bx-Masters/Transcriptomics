@@ -22,7 +22,7 @@ In this practical, we will use a RNA-Seq dataset from a model plant *Arabidopsis
 This dataset was initially used for identification of long non-coding RNAs by transcriptome assembly of RNA-Seq.
 
 Our aim will be to assemble transcripts using genomic alignments followed by StringTie.
-Following that, we will perform a *de novo* assembly using Trinity, which is a far more computationally demanding approach. 
+Following that, if time permits we will (optionally) perform a *de novo* assembly using Trinity, which is a far more computationally demanding approach. 
 (Please note the expected run time below)
 If we get time, we can compare the assemblies using some QC metrics.
 
@@ -99,7 +99,7 @@ The following table shows the estimated run time in VM for the major steps:
 | ----------- | ----------- | ----------- |
 | QC                            | fastQC      | 3 mins  |
 | Sequence trimming             | cutadapt    | 4 mins  |
-| De novo assembly              | Trinity     | 2.5 hrs |
+| De novo assembly (optional)   | Trinity     | 2.5 hrs |
 | Genome mapping for transcripts| GMAP        | 3 mins  |
 | Genome mapping for short reads| STAR        | 10 mins |
 | Genome-guided assembly        | StringTie   | 1 mins  |
@@ -154,7 +154,8 @@ mkdir output
 mkdir scripts
 ```
 
-Now let's make some sub-directories for key steps during our analysis
+Now let's make some sub-directories for key steps during our analysis.
+These might be starting to look familiar.
 
 
 ``` bash
@@ -189,7 +190,7 @@ mkdir output/logs
 The final folder structure for this project will look like this:
 
 ```
-transcriptomics_assembly_practical/
+./
 ├── data
 │   ├── aligned
 │   ├── raw
@@ -208,37 +209,29 @@ We can see this structure by typing the command `tree` from our current director
 
 ### Raw Data and Reference Data
 
-<!-- CHECK ALL FILE PATHS ONCE THE VM IS CONFIGURED -->
+The initial RNA-Seq raw data is stored in the shared data directory `~/data/prac_assembly_week12`.
 
-The initial RNA-Seq raw data is stored in the shared data directory `~/data/prac_transcriptome_assembly`.
-
-Copy the raw data to your `data/raw` folder
+Symlink the raw data to your `data/raw` folder
 
 ```bash
-cp ~/data/prac_transcriptome_assembly/*.fastq.gz ./data/raw/
+ln -s /shared/data/prac_assembly_week12/*fastq.gz data/raw/
 ```
 
 We already have the reference genome indexed using STAR in our directory `~/references` directory, however, there are additional files included.
 
-The databases, including Arabidopsis reference genome (Arabidopsis_thaliana.TAIR10.dna.toplevel.fa), annotated genes (Arabidopsis_thaliana.TAIR10.62.gtf), and BUSCO lineages file (viridiplantae_odb12.2025-07-01.tar.gz) need to be copied from `~/data/prac_transcriptome_assembly` to `~/references` and the tarball decompressed and extracted (i.e. untarred).
+The databases, including Arabidopsis reference genome (TAIR10_chrALL.fa), annotated genes (TAIR10_GFF3_genes.gtf), and BUSCO lineages file (viridiplantae_odb10.2020-09-10.tar.gz) need to be copied from `~/data/prac_assembly_week12` to `~/references` and the tarball decompressed and extracted (i.e. untarred).
 
 ```bash
-
-## Now copy our databset of conserved orthologs
-cp ~/data/prac_transcriptome_assembly/viridiplantae_odb12.2025-07-01.tar.gz ~/references/
-
-## This is the type of file known as a 'tarball', which contains a complete
-## directory structure in a compressed form. We use the command 'tar' to create 
-## or extract these structures. The flags '-xzvf' let tar know that the tarball
-## is to be extracted (x), is compressed (z), that we want to see the files being
-## extracted (i.e. verbose: v), and that the file is a tarball (f)
-tar -zxvf ~/references/viridiplantae_odb12.2025-07-01.tar.gz --directory ~/references/
+## See what files we have
+ll -h /shared/data/prac_assembly_week12/
+## Now extract our dataset of conserved orthologs directly into the references directory
+tar -zxvf /shared/data/prac_assembly_week12/viridiplantae_odb10.2020-09-10.tar.gz --directory ~/references/
 ```
 
 Finally, we'll move the completed Trinity assembly into the directory `output/assembly`
 
 ```bash
-cp ~/data/prac_transcriptome_assembly/Col_leaf_chr2_trinity.Trinity.fasta output/assembly/
+cp /shared/data/prac_assembly_week12/Col_leaf_chr2_trinity.Trinity.fasta output/assembly/
 ```
 
 Now, all the setup work is done. Let's move to part 2.
@@ -246,8 +239,8 @@ From here, we'll start to record all of our commands as `bash` scripts too.
 
 ## QC
 
-In This part, we will use the skills that we learned from the `NGS_practicals` to do QC and trim adapters and low-quality sequences from our RNA-Seq raw data.
-This is also quite similar to the previous Differential Expression practical
+In This part, we will use the skills that we learned from the earlier to do QC and trim adapters and low-quality sequences from our RNA-Seq raw data.
+This is also quite similar to the previous Differential Expression practical, however, it might be worth considering the different consequences for low quality reads for quantification (as we've done) and for assembling sequences into transcripts.
 
 ### QC for raw reads
 
@@ -443,7 +436,7 @@ To finish the script, we'll call `gffread` which will extract the transcript seq
 ``` bash
 gffread \
   -w ${OUTDIR}/${PREFIX}_stringtie.fa \
-  -g ${REFDIR}/Arabidopsis_thaliana.TAIR10.dna.toplevel.fa \
+  -g ${REFDIR}/TAIR10_chrALL.fa \
   ${OUTDIR}/${PREFIX}_stringtie.gtf
 ```
 
@@ -457,7 +450,7 @@ Let's quickly compare our reference gene annotations with the transcripts identi
 
 ``` bash
 head output/stringtie/Col_leaf_chr2_stringtie.gtf 
-sed -n 241,260p ~/references/Arabidopsis_thaliana.TAIR10.62.gtf | egrep 'CDS'
+sed -n 241,260p ~/references/TAIR10_GFF3_genes.gtf | egrep 'CDS'
 ```
 
 *Can you see anything in the official annotations which resembles that first transcript identified using StringTie?*
@@ -474,14 +467,7 @@ We sometimes use `conda` environments to install software with specific dependen
 
 To enable access to BUSCO, we need to activate the conda environment with the correct dependencies,
 and where we have `busco` installed.
-
-```bash
-source activate busco
-```
-
-You should be able to see that your terminal prompt is now showing `(busco) axxxxxxx@ip-xx-xxx-x-xx:/shared/axxxxxxx$` after the `busco` environment is activated.
-
-We'll need to include this in our script for running busco
+Importantly, we'll need to include this in our script for running busco
 
 ```
 touch scripts/stringtie_busco.sh
@@ -502,7 +488,7 @@ source activate busco
 
 busco \
   -i ${OUTDIR}/stringtie/${PREFIX}_stringtie.fa \
-  -l ${REFDIR}/viridiplantae_odb12 \
+  -l ${REFDIR}/viridiplantae_odb10 \
   --out_path ${OUTDIR}/busco \
   -o ${PREFIX}_stringtie \
   -m transcriptome \
@@ -520,15 +506,15 @@ This line summarises the completeness of assembled transcripts, and explanations
 (The numbers may very slightly in your output)
 
 ```
-    ***** Results: *****
-  
-    C:18.0%[S:14.7%,D:3.3%],F:7.8%,M:74.2%,n:822       
-    148     Complete BUSCOs (C)                        
-    121     Complete and single-copy BUSCOs (S)        
-    27      Complete and duplicated BUSCOs (D)         
-    64      Fragmented BUSCOs (F)                      
-    610     Missing BUSCOs (M)                         
-    822     Total BUSCO groups searched  
+	***** Results: *****
+
+	C:20.2%[S:14.8%,D:5.4%],F:5.2%,M:74.6%,n:425	   
+	86	Complete BUSCOs (C)			   
+	63	Complete and single-copy BUSCOs (S)	   
+	23	Complete and duplicated BUSCOs (D)	   
+	22	Fragmented BUSCOs (F)			   
+	317	Missing BUSCOs (M)			   
+	425	Total BUSCO groups searched	
 ```
 
 ::: {.callout-important}
@@ -543,8 +529,8 @@ Given our small initial number of reads, do you think StringTie did an OK job?
 ::: {.callout-important}
 Please note that the assembly will take ~2.5 hours.
 The VMs are capable of running this but it may take a second attempt for some students, depending on how you're managing your VM capacity.
-Once you set the assembly running, please read the following material.
-We'll analyse the results next week.
+Given the restructure of practicals, we won't have time to run this in the session, but if you're keen, please give it a try.
+We have a prepared assembly we can use for the subsequent analysis, so please jump to the section Assessing the Assembly Quality
 :::
 
 We have previously trimmed the adapter and low-quality sequences from the reads, and we can use these reads to perform  _de novo_ transcriptome assembly using Trinity.
@@ -679,7 +665,7 @@ As we did before, we can use BUSCO to assess the assembly quality.
 source activate busco
 busco \
   -i output/assembly/Col_leaf_chr2_trinity.Trinity.fasta \
-  -l ~/references/viridiplantae_odb12 \
+  -l ~/references/viridiplantae_odb10 \
   --out_path output/busco \
   -o Col_leaf_chr2_trinity \
   -m transcriptome \
@@ -692,7 +678,7 @@ conda deactivate
 - What is the short summary of the BUSCO report for the Trinity assembly?
 - How many complete orthologs did it find?
 - How many duplicated and single copy orthologs did it find?
-- Which assembly is better, the genome guided assembly or the `Trinity` assembly?
+- Which assembly do you think is better, the genome guided assembly or the full `Trinity` assembly?
 
 :::
 
@@ -707,7 +693,7 @@ we'll change into the `references` directory, then go back up to the practical h
 
 ```bash
 cd ~/references
-gmap_build -D ./TAIR10 -d GMAP Arabidopsis_thaliana.TAIR10.dna.toplevel.fa
+gmap_build -D ./TAIR10 -d GMAP TAIR10_chrALL.fa
 cd ~/transcriptomics_assembly_practical
 ```
 
@@ -737,7 +723,7 @@ The files we'll choose are:
 
 ```bash
 mkdir temp
-cp ~/references/Arabidopsis_thaliana.TAIR10* temp/
+cp ~/references/TAIR10_* temp/
 cp data/aligned/Col_leaf_chr2.Aligned.sortedByCoord.out.* temp/
 cp output/stringtie/Col_leaf_chr2_stringtie.gtf temp/
 cp output/assembly/Col_leaf_chr2_trinity.gff3 temp/
@@ -751,12 +737,13 @@ It will be 100-120Mb so will take a minute to download, but it shouldn't be too 
 
 Now go to the IGV website and:
 
-1. Upload both Arabidopsis_thaliana.TAIR10.dna.toplevel.fa and Arabidopsis_thaliana.TAIR10.dna.toplevel.fa.fai together using `Genome -> Local File`
+1. Upload both TAIR10_chrALL.fa and TAIR10_chrALL.fa.fai together using `Genome -> Local File`
 2. Upload the reference GTF (TAIR10_GFF3_genes.gtf)
 3. Repeat individually for our StringTie and Trinity annotations
 
-Browse to somewhere on chr2 and have a look.
+Change the track heights to something a bit more suitable for your browser and screen resolution (e.g. 250), then browse to somewhere on chr2 and have a look.
 Try `Chr2:9,778,710-9,783,692` as a starting point.
+(It may take a little while to show on the screen.)
 Which annotations do you think were the best?
 
 # References

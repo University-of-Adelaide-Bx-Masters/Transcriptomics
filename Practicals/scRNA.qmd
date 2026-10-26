@@ -86,7 +86,7 @@ knitr::opts_chunk$set(
     results = "hide",
     fig.show = "hide"
 )
-if (interactive()) setwd(here::here("practicals"))
+# if (interactive()) setwd(here::here("practicals"))
 ```
 
 ```{r loadPackages}
