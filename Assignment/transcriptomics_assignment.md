@@ -62,7 +62,7 @@ __Step 6. Identify one assembled transcript including alternative splicing event
 1. Can we get all genes assembled from one transcriptome sequenced from a sample collected from one particular tissue at one particular developmental stage? [*1 mark*]
 2. Give the reason(s) supporting your answer in quesion 1 [*3 marks*]
 
-### Resources (also in assignment 4)
+### Resources
 
 + The genome (fasta) for the model plant _Arabidopsis thaliana_ can be found [here: http://ftp.ebi.ac.uk/ensemblgenomes/pub/release-51/plants/fasta/arabidopsis_thaliana/dna/](http://ftp.ebi.ac.uk/ensemblgenomes/pub/release-51/plants/fasta/arabidopsis_thaliana/dna/) and the annotation (gff3) files can be found [here: http://ftp.ebi.ac.uk/ensemblgenomes/pub/release-51/plants/gff3/arabidopsis_thaliana/](http://ftp.ebi.ac.uk/ensemblgenomes/pub/release-51/plants/gff3/arabidopsis_thaliana/). There are multiple files in these directories, so take care to choose the full genome sequence and full genome gff files.
 + The genome file should be "Arabidopsis_thaliana.TAIR10.dna.toplevel.fa.gz" and not contain an "rm" or "sm" in the filename. These refer to the genome being "repeat-masked" i.e. all the repetitive elements have been ignored, or "soft-masked" were the repeats and low-complexity regions are in lower-case letters (acgt not ACGT)
