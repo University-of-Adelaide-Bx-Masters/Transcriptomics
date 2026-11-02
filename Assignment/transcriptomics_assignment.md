@@ -1,4 +1,4 @@
-# Transcriptome analysis assignment [*35 marks*]
+# Practical Assignment 3: Transcriptomics  [*35 marks*]
 
 Your answers to all questions should be submitted to myUni as a `.zip` file containing **four** bash scripts, and a `5_final_assembly` folder including files required in **step 5**, a screenshot file showing alternative splicing events in **Step6**, and a text file inlcuding your answers to theoretical questions. [*1 mark*]
 
